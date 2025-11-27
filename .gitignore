@@ -7,10 +7,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependency folders
 node_modules
-pnpm-lock.yaml
+
+# Build output
 dist
 dist-ssr
+
+# Lock file (optional – keep if production)
+pnpm-lock.yaml
+
+# Local environment files
 *.local
 
 # Editor directories and files

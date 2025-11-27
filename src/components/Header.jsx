@@ -1,6 +1,6 @@
 import React from "react";
 import "./Header.css";
-
+import { FaSearch } from "react-icons/fa";   
 
 const Header = () => {
   return (
@@ -10,8 +10,6 @@ const Header = () => {
       </div>
 
       <div className="header-right">
-        
-        {/* Search Box */}
         <div className="search-box">
           <FaSearch className="search-icon" />
           <input
@@ -21,7 +19,6 @@ const Header = () => {
           />
         </div>
 
-        {/* Theme Toggle */}
         <button className="theme-btn">
           <span className="moon-icon">🌙</span>
         </button>

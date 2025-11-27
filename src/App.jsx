@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import Header from "./components/Header";
+import Header from "./components/Header.jsx";
 
 
 const productCategories = [
@@ -20,10 +20,9 @@ const productCategories = [
 const App = () => {
   return (
     <>
-      <Header />
-      <div className="main-wrapper">
+    <Header />
 
-        {/* Header Section */}
+      <div className="main-wrapper">
         <section className="hero">
           <h1 className="title">Jamai Da Hotel</h1>
           <p className="subtitle">Fresh Flavors from Our Kitchen to Your Table</p>
@@ -42,7 +41,6 @@ const App = () => {
           </div>
         </section>
 
-        {/* Product Categories Section */}
         <section className="category-section">
           {productCategories.map((item, index) => (
             <button className="category-btn" key={index}>
