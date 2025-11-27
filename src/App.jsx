@@ -25,21 +25,21 @@ const App = () => {
 
       <div className="main-wrapper">
         <section className="hero">
-          <h1 className="title">Jamai Da Hotel</h1>
-          <p className="subtitle">Fresh Flavors from Our Kitchen to Your Table</p>
+          <h1 className="title">SS Supplement</h1>
+          <p className="subtitle">genuine product, cheap price.</p>
 
-          <div className="alert-box closed">
+          {/* <div className="alert-box closed">
             <p className="alert-title">⏱ Currently Closed</p>
             <p className="alert-desc">
               We're closed for the day. Our kitchen is preparing fresh dishes for tomorrow!
             </p>
-          </div>
+          </div> */}
 
-          <div className="next-open">
+          {/* <div className="next-open">
             <p>We’ll be back at</p>
             <h2 className="open-time">7:00 AM</h2>
             <small>Regular Hours: 7:00 AM - 11:30 PM</small>
-          </div>
+          </div> */}
         </section>
 
         <section className="category-section">
