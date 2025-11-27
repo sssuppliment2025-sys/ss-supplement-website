@@ -8,22 +8,28 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Dependency folders
-node_modules
+node_modules/
 
 # Build output
-dist
-dist-ssr
+dist/
+dist-ssr/
 
-# Lock file (optional – keep if production)
+# IGNORE THESE FILES (your request)
 pnpm-lock.yaml
+package.json
 
 # Local environment files
 *.local
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
