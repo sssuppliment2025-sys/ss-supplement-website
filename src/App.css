@@ -1,3 +1,11 @@
+/* ======================= Common Styles ======================= */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+}
+
 .main-wrapper {
   width: 100%;
   text-align: center;
@@ -8,6 +16,7 @@
   padding: 40px 20px;
   color: white;
   background: url("/background.jpg") center/cover no-repeat;
+  border-radius: 12px;
 }
 
 .title {
@@ -68,8 +77,63 @@
   font-size: 1rem;
   font-weight: 500;
   transition: 0.2s;
+  color: #111;
 }
 
 .category-btn:hover {
   background: #ffc233;
+}
+
+/* ======================= Responsive Handling ======================= */
+
+/* Default: hide mobile view */
+.mobile-view {
+  display: none;
+}
+
+/* Show desktop view on larger screens */
+.desktop-view {
+  display: block;
+}
+
+/* ======================= Mobile/Phone Styles ======================= */
+@media (max-width: 768px) {
+  /* Hide desktop view on small screens */
+  .desktop-view {
+    display: none;
+  }
+
+  /* Show mobile view */
+  .mobile-view {
+    display: block;
+  }
+
+  .hero {
+    padding: 30px 15px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .alert-box {
+    width: 90%;
+  }
+
+  .next-open {
+    width: 90%;
+  }
+
+  .open-time {
+    font-size: 1.4rem;
+  }
+
+  .category-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
 }

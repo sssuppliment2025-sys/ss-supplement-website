@@ -1,47 +1,44 @@
+/* ===============================
+   🔥 DESKTOP / LAPTOP HEADER STYLE
+================================== */
 .header-container {
   width: 100%;
   height: 70px;
-  background: #111;               
+  background: #111;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 0 20px;
   box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
   z-index: 999;
 }
 
-
+/* LOGO */
 .logo {
-  color: #f5c024;                 
+  color: #f5c024;
   font-size: 26px;
   font-weight: 700;
-  letter-spacing: 1px;
 }
 
-
-
+/* RIGHT */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
 }
 
-
+/* SEARCH BOX */
 .search-box {
   display: flex;
   align-items: center;
   background: #1a1a1a;
-  padding: 8px 14px;
+  padding: 7px 12px;
   border-radius: 30px;
   border: 2px solid #333;
-  width: 250px;
+  width: 240px;
   transition: 0.3s;
-}
-
-.search-box:hover {
-  border-color: #f5c024;
 }
 
 .search-input {
@@ -55,29 +52,86 @@
 
 .search-icon {
   color: #aaa;
-  font-size: 16px;
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
-
+/* THEME BUTTON */
 .theme-btn {
-  width: 48px;
+  width: 45px;
   height: 28px;
   border-radius: 30px;
   border: none;
-  background: #ffd83d;            
+  background: #ffd83d;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-  transition: 0.3s;
 }
 
-.theme-btn:hover {
-  background: #ffcc00;
+/* Show/Hide Theme Buttons */
+.theme-btn-desktop {
+  display: block; /* Desktop visible */
 }
 
-.moon-icon {
-  font-size: 18px;
+.theme-btn-mobile {
+  display: none; /* Mobile hidden */
+}
+
+/* ==================================================
+   📱 TABLET (max 900px)
+================================================== */
+@media (max-width: 900px) {
+  .search-box {
+    width: 200px;
+  }
+}
+
+/* ==================================================
+   📱 MOBILE FIX (max 600px)
+================================================== */
+@media (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+    gap: 10px;
+    background: #111;
+  }
+
+  .header-left,
+  .header-right {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
+
+  /* Mobile Full width search bar */
+  .search-box {
+    width: 100%;
+    max-width: 320px;
+    padding: 6px 10px;
+    background: #222;
+    border-color: #444;
+  }
+
+  .search-input {
+    font-size: 13px;
+  }
+
+  .theme-btn {
+    width: 40px;
+    height: 26px;
+  }
+
+  /* Swap Theme Buttons */
+  .theme-btn-desktop {
+    display: none;
+  }
+
+  .theme-btn-mobile {
+    display: block;
+  }
 }
