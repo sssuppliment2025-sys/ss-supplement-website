@@ -1,6 +1,6 @@
 ## Install & Run  
 Comand : (pnpm install)  --For first install
-For run comand : (pnpm run dev)  -- For website run on localhost
+                      For run comand : (pnpm run dev)  -- For website run on localhost
 
 # React + Vite
 
