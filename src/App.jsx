@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
-import Header from "./components/Header.jsx";
-import Footer from "./components/Footer.jsx";
+import Header from "./Components/Header.jsx";
+import Footer from "./Components/Footer.jsx";
 
 const productCategories = [
   "Protein Wafer Bar",

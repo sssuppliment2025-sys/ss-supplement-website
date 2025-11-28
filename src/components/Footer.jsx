@@ -12,9 +12,8 @@ const Footer = () => {
   return (
     <footer className="mb-footer">
       <div className="mb-footer-inner">
-        {/* TOP: LINK COLUMNS */}
         <div className="mb-footer-columns">
-          {/* Products */}
+          
           <div className="mb-footer-col">
             <h4 className="mb-footer-heading">Products</h4>
             <ul className="mb-footer-list">
