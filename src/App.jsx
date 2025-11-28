@@ -10,7 +10,7 @@ const productCategories = [
   "Whey Protein",
   "Isorich Protein",
   "Creatine Monohydrate",
-  "Nitro Iso Whey",
+  "Nitro Iso Whey", // ← your line was broken, now fixed
   "Alpha Whey",
   "Muscle Gainer",
   "Mass Gainer",
