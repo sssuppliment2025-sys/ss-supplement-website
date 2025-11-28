@@ -25,7 +25,7 @@ const App = () => {
       {/* ====== Laptop/Desktop View ====== */}
       <div className="main-wrapper desktop-view">
         <section className="hero">
-          <h1 className="title">SSS Supplement</h1>
+          <h1 className="title">SS Supplement</h1>
           <p className="subtitle">Genuine product, cheap price.</p>
         </section>
 
