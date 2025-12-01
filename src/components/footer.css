@@ -169,10 +169,25 @@
   opacity: 0.8;
 }
 
-/* responsive */
+/* =========================
+   RESPONSIVE STYLES
+   (desktop / laptop view stays as base)
+   ========================= */
+
+/* tablets & small laptops */
 @media (max-width: 900px) {
+  .mb-footer-inner {
+    padding-inline: 1rem;
+  }
+
   .mb-footer-columns {
-    gap: 2rem;
+    gap: 2.2rem;
+    flex-wrap: wrap;
+  }
+
+  .mb-footer-col {
+    flex: 1 1 45%;
+    min-width: 220px;
   }
 
   .mb-footer-newsletter {
@@ -180,17 +195,63 @@
   }
 }
 
-@media (max-width: 600px) {
+/* phones: iOS & Android (portrait/landscape) */
+@media (max-width: 768px) {
   .mb-footer-inner {
-    padding-inline: 1rem;
+    padding: 2.5rem 1.1rem 2rem;
+  }
+
+  .mb-footer-columns {
+    flex-direction: row;
+    gap: 1.8rem;
+    max-width: 100%;
+  }
+
+  .mb-footer-col {
+    flex: 1 1 100%;
+    max-width: 33%;
+  }
+
+  .mb-footer-heading {
+    font-size: 1rem;
+  }
+
+  .mb-footer-list li {
+    font-size: 0.88rem;
   }
 
   .mb-footer-subscribe {
     flex-direction: column;
+    width: 40%;
   }
 
   .mb-footer-subscribe button {
     width: 100%;
     padding-block: 0.6rem;
+  }
+
+  .mb-footer-bottom {
+    text-align: left;
+  }
+}
+
+/* very small phones */
+@media (max-width: 480px) {
+  .mb-footer-inner {
+    padding: 2.2rem 0.9rem 1.8rem;
+  }
+
+  .mb-footer-bottom p {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .mb-footer-social {
+    gap: 0.0rem;
+  }
+
+  .mb-footer-social a {
+    width: 30px;
+    height: 30px;
   }
 }
