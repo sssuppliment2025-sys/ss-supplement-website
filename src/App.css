@@ -15,7 +15,7 @@ body {
 .hero {
   padding: 140px 20px;
   color: white;
-  background: url("/T1.jpg") center/cover no-repeat;
+  /* background: url("/T1.jpg") center/cover no-repeat; */
   border-radius: 12px;
 }
 
@@ -97,7 +97,7 @@ body {
 }
 
 /* ======================= Mobile/Phone Styles ======================= */
-@media (max-width: 768px) {
+@media (max-width: 450px) {
   /* Hide desktop view on small screens */
   .desktop-view {
     display: none;
@@ -107,7 +107,9 @@ body {
   .mobile-view {
     display: block;
   }
-
+  .body{
+    width: 100%;
+  }
   .hero {
     padding: 30px 15px;
   }
