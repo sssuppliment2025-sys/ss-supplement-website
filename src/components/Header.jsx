@@ -13,11 +13,11 @@ const Header = () => {
       {/* Center: Nav links */}
       <div className="header-center">
         <nav className="nav-links">
-          <a href="#about">About</a>
-          <a href="#products">Products</a>
-          <a href="#product-details">Product Details</a>
-          <a href="#contact">Contact Us</a>
-          <a href="#connect">Connect Us</a>
+          <a href="/UnderConstruction">About</a>
+          <a href="/UnderConstruction">Products</a>
+          <a href="/UnderConstruction">Product Details</a>
+          <a href="/UnderConstruction">Contact Us</a>
+          <a href="/UnderConstruction">Connect Us</a>
         </nav>
       </div>
 

@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom"; 
 import App from "./App.jsx";
-// import Body from "./components/Body.jsx";
+import UnderConstruction from "./components/userconstraction/UnderConstruction.jsx";
 
 
 
@@ -11,7 +11,8 @@ function MainApp() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        {/* <Route path="/Body" element={<Body />} /> */}
+        <Route path="/UnderConstruction" element={<UnderConstruction />} />
+        
       </Routes>
     </BrowserRouter>
   );

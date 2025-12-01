@@ -81,6 +81,9 @@ body {
   transition: 0.2s;
   color: #111;
 }
+.category-btn a {
+  color: black;
+}
 
 .category-btn:hover {
   background: #ffc233;

@@ -24,10 +24,10 @@ const Body = () => {
           <p className="subtitle">Genuine product, cheap price.</p>
         </section>
 
-        <section className="category-section">
+        <section className="category-section" >
           {productCategories.map((item, index) => (
             <button className="category-btn" key={index}>
-              {item}
+              <a href="/UnderConstruction">{item}</a>
             </button>
           ))}
         </section>
