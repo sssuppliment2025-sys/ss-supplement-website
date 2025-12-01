@@ -39,9 +39,11 @@ const Header = () => {
         </div>
 
         <div className="theme-btn-mobile">
+          {/* Mobile theme button, if you want:
           <button className="theme-btn">
             <span className="moon-icon">🌙</span>
-          </button>
+          </button> 
+          */}
         </div>
       </div>
     </header>

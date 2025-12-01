@@ -1,10 +1,13 @@
 /* ===============================
    🔥 DESKTOP / LAPTOP HEADER STYLE
 ================================== */
+
+/* prevent padding from causing overflow */
 .header-container {
   width: 100%;
+  box-sizing: border-box;
   height: 70px;
-  background: #111;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -17,12 +20,18 @@
 
 /* LOGO */
 .logo {
-  color: #f5c024;
+  color: black;
   font-size: 26px;
   font-weight: 700;
 }
 
 /* 🔗 NAVIGATION LINKS */
+.header-center {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
 .nav-links {
   display: flex;
   gap: 25px;
@@ -33,12 +42,12 @@
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
-  color: #f5c024; /* Gold color */
+  color: black;
   transition: 0.3s;
 }
 
 .nav-links a:hover {
-  color: white;
+  color: rgb(108, 108, 0);
   transform: translateY(-2px);
 }
 
@@ -59,6 +68,7 @@
   border: 2px solid #333;
   width: 240px;
   transition: 0.3s;
+  box-sizing: border-box; /* avoids its own overflow */
 }
 
 .search-input {
@@ -128,8 +138,13 @@
     justify-content: center;
   }
 
+  .header-center {
+    width: 100%;
+  }
+
   .logo {
     font-size: 22px;
+    color: #fff;
   }
 
   /* 📱 MOBILE NAVIGATION */
@@ -142,6 +157,7 @@
 
   .nav-links a {
     font-size: 14px;
+    color: #fff;
   }
 
   /* MOBILE SEARCH BAR */
