@@ -12,8 +12,9 @@ const Footer = () => {
   return (
     <footer className="mb-footer">
       <div className="mb-footer-inner">
+        {/* TOP: LINK COLUMNS */}
         <div className="mb-footer-columns">
-          
+          {/* Products */}
           <div className="mb-footer-col">
             <h4 className="mb-footer-heading">Products</h4>
             <ul className="mb-footer-list">
@@ -79,12 +80,11 @@ const Footer = () => {
             <div className="mb-footer-contact">
               <div>
                 <span className="mb-footer-contact-icon">📞</span>
-                <span>+91 9547899170</span>
+                <span>+91 85 277 32 632</span>
               </div>
               <div>
                 <span className="mb-footer-contact-icon">✉️</span>
-                <span><a href="mailto:sssupplement@gmail.com">sssuppliment@gmail.com</a>
-</span>
+                <span>info@example.com</span>
               </div>
             </div>
 

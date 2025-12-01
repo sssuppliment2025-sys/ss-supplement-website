@@ -7,7 +7,7 @@ body {
 }
 
 .main-wrapper {
-  width: 98%;
+  width: 100%;
   text-align: center;
   padding: 20px;
 }
@@ -15,7 +15,7 @@ body {
 .hero {
   padding: 140px 20px;
   color: white;
-  background: url("/T1.jpg") center/cover no-repeat;
+  /* background: url("/T1.jpg") center/cover no-repeat; */
   border-radius: 12px;
 }
 

@@ -39,9 +39,9 @@ const Header = () => {
         </div>
 
         <div className="theme-btn-mobile">
-          <button className="theme-btn">
+          {/* <button className="theme-btn">
             <span className="moon-icon">🌙</span>
-          </button>
+          </button> */}
         </div>
       </div>
     </header>

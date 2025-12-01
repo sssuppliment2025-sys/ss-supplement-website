@@ -2,9 +2,9 @@
    🔥 DESKTOP / LAPTOP HEADER STYLE
 ================================== */
 .header-container {
-  width: 97%;
+  width: 100%;
   height: 70px;
-  background: #111;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -17,7 +17,7 @@
 
 /* LOGO */
 .logo {
-  color: #f5c024;
+  color: black;
   font-size: 26px;
   font-weight: 700;
 }
@@ -33,12 +33,12 @@
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
-  color: #f5c024; /* Gold color */
+  color: black /* Gold color */
   transition: 0.3s;
 }
 
 .nav-links a:hover {
-  color: white;
+  color: rgb(108, 108, 0);
   transform: translateY(-2px);
 }
 

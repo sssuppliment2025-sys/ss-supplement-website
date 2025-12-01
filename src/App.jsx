@@ -23,7 +23,7 @@ const App = () => {
       <Header />
 
       {/* ====== Laptop/Desktop View ====== */}
-      <div className="main-wrapper desktop-view">
+      {/* <div className="main-wrapper desktop-view">
         <section className="hero">
           <h1 className="title">SS Supplement</h1>
           <p className="subtitle">Genuine product, cheap price.</p>
@@ -36,10 +36,10 @@ const App = () => {
             </button>
           ))}
         </section>
-      </div>
+      </div> */}
 
       {/* ====== Mobile/Phone View ====== */}
-      <div className="main-wrapper mobile-view">
+      {/* <div className="main-wrapper mobile-view">
         <section className="hero">
           <h1 className="title">SS Supplement</h1>
           <p className="subtitle">Genuine product, cheap price.</p>
@@ -52,7 +52,7 @@ const App = () => {
             </button>
           ))}
         </section>
-      </div>
+      </div> */}
 
       <Footer />
     </>
