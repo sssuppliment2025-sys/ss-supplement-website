@@ -5,31 +5,39 @@ import { FaSearch } from "react-icons/fa";
 const Header = () => {
   return (
     <header className="header-container">
-      {/* Left Section */}
+      {/* Left: Logo */}
       <div className="header-left">
         <h2 className="logo">SS Supplement</h2>
       </div>
 
-      {/* Right Section */}
+      {/* Center: Nav links */}
+      <div className="header-center">
+        <nav className="nav-links">
+          <a href="#about">About</a>
+          <a href="#products">Products</a>
+          <a href="#product-details">Product Details</a>
+          <a href="#contact">Contact Us</a>
+          <a href="#connect">Connect Us</a>
+        </nav>
+      </div>
+
+      {/* Right: Search + Theme */}
       <div className="header-right">
-        {/* Search Box */}
         <div className="search-box">
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search dishes..."
+            placeholder="Search products..."
             className="search-input"
           />
         </div>
 
-        {/* Theme button for Desktop / Laptop */}
         <div className="theme-btn-desktop">
           <button className="theme-btn">
             <span className="moon-icon">🌙</span>
           </button>
         </div>
 
-        {/* Theme button for Mobile */}
         <div className="theme-btn-mobile">
           <button className="theme-btn">
             <span className="moon-icon">🌙</span>

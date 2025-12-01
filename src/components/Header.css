@@ -2,7 +2,7 @@
    🔥 DESKTOP / LAPTOP HEADER STYLE
 ================================== */
 .header-container {
-  width: 98%;
+  width: 97%;
   height: 70px;
   background: #111;
   display: flex;
@@ -22,7 +22,27 @@
   font-weight: 700;
 }
 
-/* RIGHT */
+/* 🔗 NAVIGATION LINKS */
+.nav-links {
+  display: flex;
+  gap: 25px;
+  margin-left: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #f5c024; /* Gold color */
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* RIGHT SIDE */
 .header-right {
   display: flex;
   align-items: center;
@@ -69,11 +89,11 @@
 
 /* Show/Hide Theme Buttons */
 .theme-btn-desktop {
-  display: block; /* Desktop visible */
+  display: block;
 }
 
 .theme-btn-mobile {
-  display: none; /* Mobile hidden */
+  display: none;
 }
 
 /* ==================================================
@@ -86,7 +106,7 @@
 }
 
 /* ==================================================
-   📱 MOBILE FIX (max 600px)
+   📱 MOBILE (max 600px)
 ================================================== */
 @media (max-width: 600px) {
   .header-container {
@@ -108,7 +128,19 @@
     font-size: 22px;
   }
 
-  /* Mobile Full width search bar */
+  /* 📱 MOBILE NAVIGATION */
+  .nav-links {
+    gap: 15px;
+    margin-left: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+  }
+
+  /* MOBILE SEARCH BAR */
   .search-box {
     width: 100%;
     max-width: 320px;
@@ -121,12 +153,12 @@
     font-size: 13px;
   }
 
+  /* MOBILE THEME BUTTON */
   .theme-btn {
     width: 40px;
     height: 26px;
   }
 
-  /* Swap Theme Buttons */
   .theme-btn-desktop {
     display: none;
   }
