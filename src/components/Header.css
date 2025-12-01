@@ -7,7 +7,8 @@
   width: 100%;
   box-sizing: border-box;
   height: 70px;
-  background: white;
+  /* soft sunrise gradient */
+  background: linear-gradient(90deg, #fff7eb 0%, #fff1d6 35%, #ffe7c6 65%, #ffd89b 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,19 +37,26 @@
   display: flex;
   gap: 25px;
   margin-left: 25px;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 8px;
+  /* gradient background for nav links area (desktop) */
+  background: linear-gradient(90deg, #f4c430 0%, #ff8a00 50%, #f04e30 100%);
 }
 
 .nav-links a {
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
-  color: black;
-  transition: 0.3s;
+  color: #111;
+  transition: 0.18s ease;
 }
 
 .nav-links a:hover {
-  color: rgb(108, 108, 0);
-  transform: translateY(-2px);
+  color: #111;
+  background: rgba(255,255,255,0.9);
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 
 /* RIGHT SIDE */
@@ -62,12 +70,13 @@
 .search-box {
   display: flex;
   align-items: center;
-  background: #1a1a1a;
+  /* translucent white so it reads over the gradient */
+  background: rgba(255,255,255,0.85);
   padding: 7px 12px;
   border-radius: 30px;
-  border: 2px solid #333;
-  width: 240px;
-  transition: 0.3s;
+  border: 1px solid rgba(0,0,0,0.06);
+  width: 260px;
+  transition: 0.18s ease;
   box-sizing: border-box; /* avoids its own overflow */
 }
 
@@ -75,7 +84,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: white;
+  color: #111;
   width: 100%;
   font-size: 14px;
 }
@@ -155,9 +164,45 @@
     justify-content: center;
   }
 
+  /* Mobile: explicit 3-row bars rendered by Header.jsx */
+  .nav-links-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: center;
+  }
+
+  .mobile-nav-row {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+  }
+
+  .mobile-nav-row a {
+    color: #fff;
+    padding: 6px 8px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  /* remove desktop gradient on mobile */
+  .nav-links {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+  }
+
   .nav-links a {
     font-size: 14px;
     color: #fff;
+    display: block;
+    text-align: center;
+    padding: 6px 8px;
   }
 
   /* MOBILE SEARCH BAR */
