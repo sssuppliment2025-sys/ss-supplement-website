@@ -20,7 +20,7 @@ const Body = () => {
       {/* ====== Laptop / Desktop View ====== */}
       <div className="main-wrapper desktop-view">
         <section className="hero">
-          <h1 className="title">SS Supplement</h1>
+          <h1 className="title">SjkdjfS Supplement</h1>
           <p className="subtitle">Genuine product, cheap price.</p>
         </section>
 
@@ -36,7 +36,7 @@ const Body = () => {
       {/* ====== Mobile / Phone View ====== */}
       <div className="main-wrapper mobile-view">
         <section className="hero">
-          <h1 className="title">SS Supplement</h1>
+          <h1 className="title">SfdsdfsS Supplement</h1>
           <p className="subtitle">Genuine product, cheap price.</p>
         </section>
 
