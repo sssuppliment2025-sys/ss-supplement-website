@@ -1,6 +1,7 @@
 /* ======================= Common Styles ======================= */
 body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
   background: #111;
   color: #fff;
@@ -10,6 +11,7 @@ body {
   width: 100%;
   text-align: center;
   padding: 20px;
+  box-sizing: border-box; /* ensures padding doesn’t break layout */
 }
 
 .hero {
@@ -130,6 +132,13 @@ body {
 
   .open-time {
     font-size: 1.4rem;
+  }
+
+  .category-section {
+    /* Make buttons wrap nicely on mobile */
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
   }
 
   .category-btn {
