@@ -35,14 +35,51 @@ const Header = ({ darkMode, toggleDarkMode }) => {
         </div>
 
         <div className="theme-btn-desktop">
-          <button className="theme-btn" onClick={toggleDarkMode}>
-            {darkMode ? <FaSun className="theme-icon" /> : <FaMoon className="theme-icon" />}
+          <button className="theme-toggle" onClick={toggleDarkMode}>
+            <div className={`toggle-track ${darkMode ? 'dark' : 'light'}`}>
+              <div className="toggle-slider">
+                {darkMode ? <FaMoon className="toggle-icon" /> : <FaSun className="toggle-icon" />}
+              </div>
+              <div className="toggle-background">
+                {darkMode ? (
+                  <>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                  </>
+                ) : (
+                  <>
+                    <span className="cloud cloud-1"></span>
+                    <span className="cloud cloud-2"></span>
+                  </>
+                )}
+              </div>
+            </div>
           </button>
         </div>
 
         <div className="theme-btn-mobile">
-          <button className="theme-btn" onClick={toggleDarkMode}>
-            {darkMode ? <FaSun className="theme-icon" /> : <FaMoon className="theme-icon" />}
+          <button className="theme-toggle" onClick={toggleDarkMode}>
+            <div className={`toggle-track ${darkMode ? 'dark' : 'light'}`}>
+              <div className="toggle-slider">
+                {darkMode ? <FaMoon className="toggle-icon" /> : <FaSun className="toggle-icon" />}
+              </div>
+              <div className="toggle-background">
+                {darkMode ? (
+                  <>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                  </>
+                ) : (
+                  <>
+                    <span className="cloud cloud-1"></span>
+                    <span className="cloud cloud-2"></span>
+                  </>
+                )}
+              </div>
+            </div>
           </button>
         </div>
       </div>
