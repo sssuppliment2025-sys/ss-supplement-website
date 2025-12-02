@@ -1,17 +1,113 @@
 /* ======================= Common Styles ======================= */
-body {
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
   font-family: Arial, sans-serif;
-  background: #111;
+  background: #EEEEEE;
+  color: #232323;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ======================= Dark Mode ======================= */
+body.dark-mode {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .header-container {
+  background: #2d2d2d !important;
+  box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .logo {
   color: #fff;
+}
+
+body.dark-mode .nav-links {
+  background: linear-gradient(90deg, #444 0%, #555 50%, #444 100%) !important;
+}
+
+body.dark-mode .nav-links a {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .nav-links a:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+body.dark-mode .search-box {
+  background: #333;
+  border-color: #555;
+}
+
+body.dark-mode .search-input {
+  color: #e0e0e0;
+}
+
+body.dark-mode .search-icon {
+  color: #999;
+}
+
+body.dark-mode .theme-btn {
+  background: #1a1a1a;
+  border-color: #32FF6A;
+  color: #32FF6A;
+  box-shadow: 0 4px 12px rgba(50, 255, 106, 0.4), inset 0 1px 2px rgba(50, 255, 106, 0.1);
+}
+
+body.dark-mode .theme-btn:hover {
+  background: #32FF6A;
+  color: #232323;
+  border-color: #32FF6A;
+  box-shadow: 0 6px 20px rgba(50, 255, 106, 0.6), 0 0 30px rgba(50, 255, 106, 0.4);
+}
+
+body.dark-mode .category-btn {
+  background: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+body.dark-mode .category-btn a {
+  color: #e0e0e0;
+}
+
+body.dark-mode .category-btn:hover {
+  background: #444;
+  border-color: #666;
+}
+
+body.dark-mode .carousel-wrapper {
+  background: #2d2d2d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .next-open {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+body.dark-mode .open-time {
+  color: #ffa500;
 }
 
 .main-wrapper {
   width: 100%;
+  max-width: 100vw;
   text-align: center;
   padding: 20px;
-  box-sizing: border-box; /* ensures padding doesn’t break layout */
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .hero {
@@ -73,20 +169,29 @@ body {
 .category-btn {
   padding: 10px 20px;
   border-radius: 25px;
-  background: #eee;
-  border: none;
+  background: #FFFFFF;
+  border: 2px solid #32FF6A;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  transition: 0.2s;
-  color: #111;
+  transition: all 0.3s ease;
+  color: #232323;
+  box-shadow: 0 2px 8px rgba(50, 255, 106, 0.2);
 }
 .category-btn a {
-  color: black;
+  color: #232323;
 }
 
 .category-btn:hover {
-  background: #ffc233;
+  background: #32FF6A;
+  border-color: #32FF6A;
+  color: #232323;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(50, 255, 106, 0.4);
+}
+
+.category-btn:hover a {
+  color: #232323;
 }
 
 /* ======================= Responsive Handling ======================= */
