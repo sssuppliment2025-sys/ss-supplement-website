@@ -1,13 +1,13 @@
 import React from "react";
 import "./Header.css";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaMoon, FaSun, FaWhatsapp } from "react-icons/fa";
 
-const Header = () => {
+const Header = ({ darkMode, toggleDarkMode }) => {
   return (
     <header className="header-container">
-      {/* Left: Logo */}
+      {/* Left: Logo Image */}
       <div className="header-left">
-        <h2 className="logo">SS Supplement</h2>
+        <img src="/logo.jpg" alt="SS Supplement Logo" className="logo-image" />
       </div>
 
       {/* Center: Nav links */}
@@ -17,7 +17,9 @@ const Header = () => {
           <a href="/UnderConstruction">Products</a>
           <a href="/UnderConstruction">Product Details</a>
           <a href="/UnderConstruction">Contact Us</a>
-          <a href="/UnderConstruction">Connect Us</a>
+          <a href="/UnderConstruction" className="whatsapp-link">
+            <FaWhatsapp className="whatsapp-icon" />
+          </a>
         </nav>
       </div>
 
@@ -33,17 +35,52 @@ const Header = () => {
         </div>
 
         <div className="theme-btn-desktop">
-          <button className="theme-btn">
-            <span className="moon-icon">🌙</span>
+          <button className="theme-toggle" onClick={toggleDarkMode}>
+            <div className={`toggle-track ${darkMode ? 'dark' : 'light'}`}>
+              <div className="toggle-slider">
+                {darkMode ? <FaMoon className="toggle-icon" /> : <FaSun className="toggle-icon" />}
+              </div>
+              <div className="toggle-background">
+                {darkMode ? (
+                  <>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                  </>
+                ) : (
+                  <>
+                    <span className="cloud cloud-1"></span>
+                    <span className="cloud cloud-2"></span>
+                  </>
+                )}
+              </div>
+            </div>
           </button>
         </div>
 
         <div className="theme-btn-mobile">
-          {/* Mobile theme button, if you want:
-          <button className="theme-btn">
-            <span className="moon-icon">🌙</span>
-          </button> 
-          */}
+          <button className="theme-toggle" onClick={toggleDarkMode}>
+            <div className={`toggle-track ${darkMode ? 'dark' : 'light'}`}>
+              <div className="toggle-slider">
+                {darkMode ? <FaMoon className="toggle-icon" /> : <FaSun className="toggle-icon" />}
+              </div>
+              <div className="toggle-background">
+                {darkMode ? (
+                  <>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                    <span className="star"></span>
+                  </>
+                ) : (
+                  <>
+                    <span className="cloud cloud-1"></span>
+                    <span className="cloud cloud-2"></span>
+                  </>
+                )}
+              </div>
+            </div>
+          </button>
         </div>
       </div>
     </header>
