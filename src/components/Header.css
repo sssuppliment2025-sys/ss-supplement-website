@@ -7,18 +7,18 @@
   width: 100%;
   box-sizing: border-box;
   min-height: 50px;
-  /* neon green background */
-  background: #32FF6A;
+  /* clean light background */
+  background: #F8F9FB;
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 25px;
-  box-shadow: 0px 4px 20px rgba(50, 255, 106, 0.4);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.12);
   position: sticky;
   top: 0;
   z-index: 999;
-  border-bottom: 2px solid #232323;
+  border-bottom: 1px solid #E5E7EB;
   overflow-x: hidden;
 }
 
@@ -52,9 +52,9 @@
   align-items: center;
   padding: 8px 16px;
   border-radius: 50px;
-  /* neon green for light theme */
-  background: #32FF6A;
-  box-shadow: 0 4px 12px rgba(50, 255, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  /* clean background matching navbar */
+  background: #F8F9FB;
+  box-shadow: none;
   position: relative;
   overflow: hidden;
 }
@@ -79,7 +79,7 @@
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  color: #232323;
+  color: #111827;
   padding: 8px 16px;
   border-radius: 25px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -89,10 +89,10 @@
 }
 
 .nav-links a:hover {
-  color: #32FF6A;
-  background: #232323;
+  color: #007AFF;
+  background: rgba(0, 122, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(35, 35, 35, 0.5), 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 /* WHATSAPP LINK */
@@ -105,11 +105,13 @@
 
 .whatsapp-icon {
   font-size: 20px;
-  transition: transform 0.3s ease;
+  color: #4B5563;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .whatsapp-link:hover .whatsapp-icon {
   transform: scale(1.2) rotate(15deg);
+  color: #007AFF;
 }
 
 /* RIGHT SIDE */
@@ -127,36 +129,36 @@
   backdrop-filter: blur(8px);
   padding: 9px 16px;
   border-radius: 30px;
-  border: 2px solid #232323;
+  border: 1px solid #E5E7EB;
   width: 350px;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  box-shadow: 0 2px 8px rgba(35, 35, 35, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .search-box:focus-within {
-  border-color: #232323;
-  box-shadow: 0 4px 16px rgba(35, 35, 35, 0.3);
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
   background: #FFFFFF;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .search-input {
   background: transparent;
   border: none;
   outline: none;
-  color: #232323;
+  color: #111827;
   width: 100%;
   font-size: 14px;
   font-weight: 500;
 }
 
 .search-input::placeholder {
-  color: rgba(35, 35, 35, 0.6);
+  color: #4B5563;
 }
 
 .search-icon {
-  color: #232323;
+  color: #4B5563;
   margin-right: 8px;
   font-size: 16px;
 }
@@ -354,6 +356,10 @@
 ================================================== */
 @media (max-width: 600px) {
 
+  body {
+    padding-top: 200px;
+  }
+  
   .body{
     max-width: 100%;
     overflow-x: hidden;
@@ -364,7 +370,14 @@
     min-height: auto;
     padding: 10px;
     gap: 10px;
-    background: #32FF6A;
+    background: #F8F9FB;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid #E5E7EB;
   }
 
   .header-left,
@@ -427,30 +440,36 @@
     text-align: center;
   }
 
-  /* mobile nav with neon green */
+  /* mobile nav with clean light background */
   .nav-links {
-    background: #32FF6A;
-    padding: 8px;
+    background: #F8F9FB;
+    padding: 6px;
     border-radius: 15px;
-    width: 95%;
+    width: 85%;
+    max-width: 500px;
   }
 
   .nav-links a {
-    font-size: 13px;
-    color: #232323;
+    font-size: 12px;
+    color: #111827;
     display: block;
     text-align: center;
-    padding: 6px 10px;
+    padding: 5px 8px;
     white-space: nowrap;
+  }
+
+  .nav-links a:hover {
+    color: #007AFF;
+    background: rgba(0, 122, 255, 0.1);
   }
 
   /* MOBILE SEARCH BAR */
   .search-box {
-    width: 90%;
-    max-width: 320px;
+    width: 85%;
+    max-width: 280px;
     padding: 6px 10px;
     background: #FFFFFF;
-    border-color: #232323;
+    border-color: #E5E7EB;
   }
 
   .search-input {
