@@ -26,15 +26,15 @@
 
 /* columns */
 .mb-footer-columns {
-  display: flex;
+  display: inline-block;
   flex-wrap: wrap;
   gap: 3rem;
   justify-content: space-between;
 }
 
 .mb-footer-col {
-  min-width: 200px;
-  flex: 1;
+  min-width: 180px;
+  flex: 2;
 }
 
 .mb-footer-heading {
@@ -181,12 +181,15 @@
 }
 
 @media (max-width: 600px) {
+  .mb-footer-col li {
+  font-size: 0.5rem;
+}
   .mb-footer-inner {
     padding-inline: 1rem;
   }
 
   .mb-footer-subscribe {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .mb-footer-subscribe button {

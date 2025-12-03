@@ -80,11 +80,11 @@ const Footer = () => {
             <div className="mb-footer-contact">
               <div>
                 <span className="mb-footer-contact-icon">📞</span>
-                <span>+91 85 277 32 632</span>
+                <span>+91 9547899170</span>
               </div>
               <div>
                 <span className="mb-footer-contact-icon">✉️</span>
-                <span>info@example.com</span>
+                <span>sssuppliment@gmail.com</span>
               </div>
             </div>
 
@@ -106,7 +106,7 @@ const Footer = () => {
               </a>
             </div>
 
-            <div className="mb-footer-payments">
+            {/* <div className="mb-footer-payments">
               <p>✅ 100% Safe &amp; Secure payments:</p>
               <div className="mb-footer-payment-badges">
                 <span>UPI</span>
@@ -115,7 +115,7 @@ const Footer = () => {
                 <span>RuPay</span>
                 <span>NetBanking</span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

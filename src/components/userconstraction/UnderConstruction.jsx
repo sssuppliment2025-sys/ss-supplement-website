@@ -7,7 +7,7 @@ const UnderConstruction = () => {
       <div className="construction-content-wrapper">
         <img
           src="/ConstractionPic.webp"
-          alt="Construction Worker"
+          alt="Under Construction"
           className="construction-worker-logo"
         />
         <a href="/" className="cta-button construction-back-button">
