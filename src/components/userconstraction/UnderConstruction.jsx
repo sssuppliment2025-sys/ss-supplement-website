@@ -1,4 +1,5 @@
 import React from "react";
+import Layout from "../Layout";
 import "./UnderConstruction.css";
 
 const UnderConstruction = () => {
@@ -7,7 +8,7 @@ const UnderConstruction = () => {
       <div className="construction-content-wrapper">
         <img
           src="/ConstractionPic.webp"
-          alt="Under Construction"
+          alt="Construction Worker"
           className="construction-worker-logo"
         />
         <a href="/" className="cta-button construction-back-button">
