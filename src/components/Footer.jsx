@@ -26,9 +26,9 @@ const Footer = () => {
               <li>Creatine</li>
               <li>High Protein Muesli</li>
               <li>MB Multivitamin</li>
-              <li>Fish Oil</li>
+              {/* <li>Fish Oil</li>
               <li>Pre Workout</li>
-              <li>Protein Bars</li>
+              <li>Protein Bars</li> */}
             </ul>
           </div>
 
@@ -36,15 +36,15 @@ const Footer = () => {
           <div className="mb-footer-col">
             <h4 className="mb-footer-heading">Categories</h4>
             <ul className="mb-footer-list">
-              <li>Proteins</li>
-              <li>Gainers</li>
-              <li>Pre/Post Workout</li>
-              <li>Ayurveda</li>
-              <li>Fit Foods</li>
-              <li>Vitamin Supplements</li>
-              <li>Fat Loss</li>
-              <li>Fitness Accessories</li>
-              <li>Apparel Overall</li>
+              <li>Mass gainer</li>
+              <li>Vitamin SUPPLEMENTS</li>
+              <li>PRE workout</li>
+              <li>Fat loss</li>
+              <li>Health Foods</li>
+              <li>Fitness accessories</li>
+              <li>Fitness equipments</li>
+              <li>protein</li>
+              <li>Creatine</li>
             </ul>
           </div>
 
@@ -53,7 +53,7 @@ const Footer = () => {
             <h4 className="mb-footer-heading">Useful Links</h4>
             <ul className="mb-footer-list">
               <li>About Us</li>
-              <li>FAQs</li>
+              {/* <li>FAQs</li> */}
               <li>Blog</li>
               <li>Trade Partners</li>
               <li>T &amp; C</li>
@@ -61,7 +61,7 @@ const Footer = () => {
               <li>Privacy Policy</li>
               <li>Return &amp; Refund</li>
               <li>Contact Us</li>
-              <li>Business Enquiry</li>
+              {/* <li>Business Enquiry</li> */}
             </ul>
           </div>
 
