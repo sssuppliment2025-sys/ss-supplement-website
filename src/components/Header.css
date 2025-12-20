@@ -1,4 +1,13 @@
 ﻿/* HEADER STYLES */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: visible; /* IMPORTANT */
+}
+
+
 .header-container {
   width: 100%;
   box-sizing: border-box;
