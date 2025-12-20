@@ -3,11 +3,16 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   overflow-x: hidden;
+  height: auto;
 }
 
 body {
@@ -204,7 +209,7 @@ body.dark-mode .open-time {
 
 /* Default: hide mobile view */
 .mobile-view {
-  display: none;
+  display: none !important;
 }
 
 /* Show desktop view on larger screens */
@@ -213,15 +218,15 @@ body.dark-mode .open-time {
 }
 
 /* ======================= Mobile/Phone Styles ======================= */
-@media (max-width: 450px) {
+@media (max-width: 600px) {
   /* Hide desktop view on small screens */
   .desktop-view {
-    display: none;
+    display: none !important;
   }
 
   /* Show mobile view */
   .mobile-view {
-    display: block;
+    display: block !important;
   }
   .body{
     width: 100%;
