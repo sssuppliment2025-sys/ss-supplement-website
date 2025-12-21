@@ -5,20 +5,20 @@ import { FaSearch, FaMoon, FaSun, FaWhatsapp, FaBars, FaTimes } from "react-icon
 import { getAllProducts } from "../products";
 
 const Header = ({ darkMode, toggleDarkMode }) => {
-    const headerRef = useRef(null);
-    // Add sticky shadow on scroll
-    useEffect(() => {
-      const handleScroll = () => {
-        if (!headerRef.current) return;
-        if (window.scrollY > 10) {
-          headerRef.current.classList.add('sticky');
-        } else {
-          headerRef.current.classList.remove('sticky');
-        }
-      };
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+  const headerRef = useRef(null);
+  // Add sticky shadow on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!headerRef.current) return;
+      if (window.scrollY > 10) {
+        headerRef.current.classList.add('sticky');
+      } else {
+        headerRef.current.classList.remove('sticky');
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -43,10 +43,10 @@ const Header = ({ darkMode, toggleDarkMode }) => {
         setMenuOpen(false);
       }
     };
-    
+
     // Check immediately
     checkMobile();
-    
+
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, [menuOpen]);
@@ -70,10 +70,10 @@ const Header = ({ darkMode, toggleDarkMode }) => {
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     if (query.trim().length >= 2) {
       const allProducts = getAllProducts();
-      const filtered = allProducts.filter(product => 
+      const filtered = allProducts.filter(product =>
         product.name.toLowerCase().includes(query.toLowerCase()) ||
         product.flavors?.toLowerCase().includes(query.toLowerCase()) ||
         product.weight?.toLowerCase().includes(query.toLowerCase()) ||
@@ -152,22 +152,22 @@ const Header = ({ darkMode, toggleDarkMode }) => {
           <div className="search-box" ref={searchRef}>
             <form onSubmit={handleSearchSubmit}>
               <FaSearch className="search-icon" onClick={handleSearchSubmit} />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
+              <input
+                type="text"
+                placeholder="Search products..."
                 className="search-input"
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onFocus={() => searchQuery.trim().length >= 2 && setShowResults(true)}
               />
             </form>
-            
+
             {/* Search Results Dropdown */}
             {showResults && searchResults.length > 0 && (
               <div className="search-results-dropdown">
                 {searchResults.map((product) => (
-                  <div 
-                    key={product.id} 
+                  <div
+                    key={product.id}
                     className="search-result-item"
                     onClick={() => handleProductClick(product)}
                   >
@@ -181,7 +181,7 @@ const Header = ({ darkMode, toggleDarkMode }) => {
                 ))}
               </div>
             )}
-            
+
             {showResults && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
               <div className="search-results-dropdown">
                 <div className="search-no-results">
@@ -244,7 +244,7 @@ const Header = ({ darkMode, toggleDarkMode }) => {
                 <span className="close-x">✕</span>
               </button>
             </div>
-            
+
             <div className="mobile-menu-links">
               <Link to="/" onClick={closeMenu}>🏠 Home</Link>
               <Link to="/UnderConstruction" onClick={closeMenu}>ℹ️ About</Link>

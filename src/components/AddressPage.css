@@ -1,0 +1,125 @@
+.address-page {
+  padding: 30px;
+  background: #f5faff;
+  min-height: 100vh;
+}
+
+.dark-mode .address-page {
+  background: #121212;
+  color: #e0e0e0;
+}
+
+.address-box {
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+}
+
+.dark-mode .address-box {
+  background: #1e1e1e;
+}
+
+.address-header {
+  background: #2874f0;
+  color: #fff;
+  padding: 12px;
+  font-weight: bold;
+}
+
+.location-btn {
+  margin: 15px 0;
+  background: #2874f0;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background: #2a2a2a;
+  color: #fff;
+  border-color: #444;
+}
+
+.form-grid textarea {
+  height: 80px;
+}
+
+.full {
+  grid-column: span 2;
+}
+
+.address-type {
+  display: flex;
+  gap: 20px;
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+}
+
+.save-btn {
+  background: #ff6a00;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: none;
+  color: #2874f0;
+  border: none;
+  cursor: pointer;
+}
+
+.error {
+  color: #ff4d4f;
+  font-size: 12px;
+}
+
+.saved-list {
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+.saved-card {
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.dark-mode .saved-card {
+  background: #1e1e1e;
+}
+
+.saved-actions button {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.badge {
+  background: green;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
