@@ -6,6 +6,7 @@ import UnderConstruction from "./components/userconstraction/UnderConstruction.j
 import { CategoryPage, ProductImageManager } from "./products";
 import OptimumNutration from "./products/ProductsDetailsPages/OptimumNutration.jsx";
 import Layout from "./components/Layout";
+import AddressPage from "./components/AddressPage.jsx"
 
 
 
@@ -18,6 +19,7 @@ function MainApp() {
         <Route path="/products/:slug" element={<CategoryPage />} />
         <Route path="/admin/images" element={<ProductImageManager />} />
         <Route path="/Product" element={ <Layout> <OptimumNutration /> </Layout>} />
+        <Route path="/AddressPage" element={ <AddressPage /> } />
       </Routes>
     </BrowserRouter>
   );

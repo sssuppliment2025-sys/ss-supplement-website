@@ -113,89 +113,92 @@ export default function AddressPage() {
   };
 
   return (
-    <div className="address-page">
-      <div className="address-box">
-        <div className="address-header">DELIVERY ADDRESS</div>
+    <>
+      <div className="address-page">
+        
+        <div className="address-box">
+          <div className="address-header">DELIVERY ADDRESS</div>
 
-        <button className="location-btn" onClick={useMyLocation}>
-          📍 Use my current location
-        </button>
+          <button className="location-btn" onClick={useMyLocation}>
+            📍 Use my current location
+          </button>
 
-        <div className="form-grid">
-          <div>
-            <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
-            {errors.name && <span className="error">{errors.name}</span>}
-          </div>
-
-          <div>
-            <input name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} />
-            {errors.phone && <span className="error">{errors.phone}</span>}
-          </div>
-
-          <div>
-            <input name="pincode" placeholder="Pincode" value={form.pincode} onChange={handleChange} />
-            {errors.pincode && <span className="error">{errors.pincode}</span>}
-          </div>
-
-          <input name="locality" placeholder="Locality" value={form.locality} onChange={handleChange} />
-
-          <div className="full">
-            <textarea name="address" placeholder="Address (Area & Street)" value={form.address} onChange={handleChange} />
-            {errors.address && <span className="error">{errors.address}</span>}
-          </div>
-
-          <div>
-            <input name="city" placeholder="City/District/Town" value={form.city} onChange={handleChange} />
-            {errors.city && <span className="error">{errors.city}</span>}
-          </div>
-
-          <select name="state" value={form.state} onChange={handleChange}>
-            <option>West Bengal</option>
-            <option>Bihar</option>
-            <option>Odisha</option>
-          </select>
-
-          <input name="landmark" placeholder="Landmark (Optional)" value={form.landmark} onChange={handleChange} />
-          <input name="altPhone" placeholder="Alternate Phone (Optional)" value={form.altPhone} onChange={handleChange} />
-
-          <div className="full address-type">
-            <label><input type="radio" name="type" value="Home" checked={form.type === "Home"} onChange={handleChange} /> Home</label>
-            <label><input type="radio" name="type" value="Work" checked={form.type === "Work"} onChange={handleChange} /> Work</label>
-          </div>
-
-          <div className="full">
-            <label className="default-check">
-              <input type="checkbox" name="isDefault" checked={form.isDefault} onChange={handleChange} />
-              Set as default address
-            </label>
-          </div>
-
-          <div className="full actions">
-            <button className="save-btn" onClick={handleSubmit}>
-              {editMode ? "UPDATE ADDRESS" : "SAVE AND DELIVER HERE"}
-            </button>
-            <button className="cancel-btn" onClick={() => setForm(emptyForm)}>CANCEL</button>
-          </div>
-        </div>
-      </div>
-
-      {addresses.length > 0 && (
-        <div className="saved-list">
-          <h3>Saved Addresses</h3>
-          {addresses.map((a) => (
-            <div key={a.id} className="saved-card">
-              <p><b>{a.name}</b> ({a.type}) {a.isDefault && <span className="badge">DEFAULT</span>}</p>
-              <p>{a.address}</p>
-              <p>{a.city} - {a.pincode}</p>
-              <p>{a.phone}</p>
-              <div className="saved-actions">
-                <button onClick={() => editAddress(a)}>Edit</button>
-                <button onClick={() => deleteAddress(a.id)}>Delete</button>
-              </div>
+          <div className="form-grid">
+            <div>
+              <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
+              {errors.name && <span className="error">{errors.name}</span>}
             </div>
-          ))}
+
+            <div>
+              <input name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} />
+              {errors.phone && <span className="error">{errors.phone}</span>}
+            </div>
+
+            <div>
+              <input name="pincode" placeholder="Pincode" value={form.pincode} onChange={handleChange} />
+              {errors.pincode && <span className="error">{errors.pincode}</span>}
+            </div>
+
+            <input name="locality" placeholder="Locality" value={form.locality} onChange={handleChange} />
+
+            <div className="full">
+              <textarea name="address" placeholder="Address (Area & Street)" value={form.address} onChange={handleChange} />
+              {errors.address && <span className="error">{errors.address}</span>}
+            </div>
+
+            <div>
+              <input name="city" placeholder="City/District/Town" value={form.city} onChange={handleChange} />
+              {errors.city && <span className="error">{errors.city}</span>}
+            </div>
+
+            <select name="state" value={form.state} onChange={handleChange}>
+              <option>West Bengal</option>
+              <option>Bihar</option>
+              <option>Odisha</option>
+            </select>
+
+            <input name="landmark" placeholder="Landmark (Optional)" value={form.landmark} onChange={handleChange} />
+            <input name="altPhone" placeholder="Alternate Phone (Optional)" value={form.altPhone} onChange={handleChange} />
+
+            <div className="full address-type">
+              <label><input type="radio" name="type" value="Home" checked={form.type === "Home"} onChange={handleChange} /> Home</label>
+              <label><input type="radio" name="type" value="Work" checked={form.type === "Work"} onChange={handleChange} /> Work</label>
+            </div>
+
+            <div className="full">
+              <label className="default-check">
+                <input type="checkbox" name="isDefault" checked={form.isDefault} onChange={handleChange} />
+                Set as default address
+              </label>
+            </div>
+
+            <div className="full actions">
+              <button className="save-btn" onClick={handleSubmit}>
+                {editMode ? "UPDATE ADDRESS" : "SAVE AND DELIVER HERE"}
+              </button>
+              <button className="cancel-btn" onClick={() => setForm(emptyForm)}>CANCEL</button>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+
+        {addresses.length > 0 && (
+          <div className="saved-list">
+            <h3>Saved Addresses</h3>
+            {addresses.map((a) => (
+              <div key={a.id} className="saved-card">
+                <p><b>{a.name}</b> ({a.type}) {a.isDefault && <span className="badge">DEFAULT</span>}</p>
+                <p>{a.address}</p>
+                <p>{a.city} - {a.pincode}</p>
+                <p>{a.phone}</p>
+                <div className="saved-actions">
+                  <button onClick={() => editAddress(a)}>Edit</button>
+                  <button onClick={() => deleteAddress(a.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
