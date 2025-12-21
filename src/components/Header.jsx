@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
-import { FaSearch, FaMoon, FaSun, FaWhatsapp, FaBars, FaTimes } from "react-icons/fa";
+import { FaSearch, FaMoon, FaSun, FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 import { getAllProducts } from "../products";
 
 const Header = ({ darkMode, toggleDarkMode }) => {
@@ -143,6 +143,9 @@ const Header = ({ darkMode, toggleDarkMode }) => {
               <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="whatsapp-link">
                 <FaWhatsapp className="whatsapp-icon" />
               </a>
+              <Link to="/cart" onClick={closeMenu} className="cart-link">
+                <FaShoppingCart className="cart-icon" /> <span className="cart-count">(2)</span>
+              </Link>
             </nav>
           </div>
         )}
@@ -252,6 +255,11 @@ const Header = ({ darkMode, toggleDarkMode }) => {
               <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
                 <FaWhatsapp className="whatsapp-icon" /> WhatsApp
               </a>
+              <Link to="/cart" onClick={closeMenu} className="cart-link">
+                <FaShoppingCart className="cart-icon" />
+                Cart <span className="cart-count">(2)</span>
+              </Link>
+
             </div>
 
             <div className="mobile-menu-theme">

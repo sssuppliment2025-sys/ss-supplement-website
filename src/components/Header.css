@@ -445,3 +445,18 @@ body.dark-mode .hamburger-btn {
   background: #32FF6A;
   color: #232323;
 }
+.cart-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #232323;
+}
+
+.cart-link:hover {
+  color: #32FF6A;
+}
+
+.cart-icon {
+  font-size: 1.2rem;
+}
