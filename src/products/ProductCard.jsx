@@ -15,8 +15,7 @@ const ProductCard = ({ product, onAddToCart }) => {
     flavors,
     price,
     image,
-    category,
-    route
+    category
   } = product;
 
   const [displayImage, setDisplayImage] = useState(defaultProductImage);
@@ -30,24 +29,26 @@ const ProductCard = ({ product, onAddToCart }) => {
         return;
       }
     }
-    setDisplayImage(image && image.trim() !== "" ? image : defaultProductImage);
+
+    setDisplayImage(
+      image && image.trim() !== "" ? image : defaultProductImage
+    );
   }, [id, image]);
 
-  // ✅ FIXED: pass product via state
+  // ✅ ALWAYS go to /Product and pass product via state
   const handleProductClick = () => {
-    if (route) {
-      navigate(route, {
-        state: { product }
-      });
-    }
+    navigate("/Product", {
+      state: { product }
+    });
   };
 
   return (
     <div className="product-card">
+      {/* IMAGE */}
       <div
         className="product-image-container"
         onClick={handleProductClick}
-        style={{ cursor: route ? "pointer" : "default" }}
+        style={{ cursor: "pointer" }}
       >
         <img
           src={displayImage}
@@ -57,16 +58,18 @@ const ProductCard = ({ product, onAddToCart }) => {
             e.target.src = defaultProductImage;
           }}
         />
+
         {category && (
           <span className="product-category-tag">{category}</span>
         )}
       </div>
 
+      {/* INFO */}
       <div className="product-info">
         <h3
           className="product-name"
           onClick={handleProductClick}
-          style={{ cursor: route ? "pointer" : "default" }}
+          style={{ cursor: "pointer" }}
         >
           {name}
         </h3>
@@ -74,7 +77,9 @@ const ProductCard = ({ product, onAddToCart }) => {
         <p className="product-weight">{weight}</p>
 
         <p className="product-flavors" title={flavors}>
-          {flavors.length > 40 ? flavors.substring(0, 40) + "..." : flavors}
+          {flavors.length > 40
+            ? flavors.substring(0, 40) + "..."
+            : flavors}
         </p>
 
         <div className="product-price-section">
@@ -84,7 +89,7 @@ const ProductCard = ({ product, onAddToCart }) => {
 
           <button
             className="add-to-cart-btn"
-            onClick={() => onAddToCart && onAddToCart(product)}
+            onClick={() => onAddToCart?.(product)}
           >
             Add to Cart
           </button>

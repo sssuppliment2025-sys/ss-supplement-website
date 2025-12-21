@@ -4,7 +4,7 @@ import ImageCarousel from "./ImageCarousel";
 import { ProductCard, getRandomProducts, getCategoryNames } from "../products";
 import "./Body.css";
 
-// Get category names for navigation buttons
+
 const categoryNavItems = getCategoryNames();
 
 const Body = () => {
@@ -14,7 +14,7 @@ const Body = () => {
     alert(`Added ${product.name} to cart!`);
   };
 
-  // Helper function to get category icons
+  
   const getCategoryIcon = (key) => {
     const icons = {
       wheyProtein: '🥛',
