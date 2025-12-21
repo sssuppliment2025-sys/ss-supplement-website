@@ -3,8 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { FaSearch, FaMoon, FaSun, FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 import { getAllProducts } from "../products";
+import { useCart } from "../context/CartContext.jsx";
+
+
+
 
 const Header = ({ darkMode, toggleDarkMode }) => {
+  const { totalItems } = useCart();
   const headerRef = useRef(null);
   // Add sticky shadow on scroll
   useEffect(() => {
@@ -144,7 +149,8 @@ const Header = ({ darkMode, toggleDarkMode }) => {
                 <FaWhatsapp className="whatsapp-icon" />
               </a>
               <Link to="/cart" onClick={closeMenu} className="cart-link">
-                <FaShoppingCart className="cart-icon" /> <span className="cart-count">(2)</span>
+                <FaShoppingCart className="cart-icon" />
+                Cart <span className="cart-count">{totalItems > 0 && <span className="cart-badge">{totalItems}</span>}</span>
               </Link>
             </nav>
           </div>
@@ -257,7 +263,7 @@ const Header = ({ darkMode, toggleDarkMode }) => {
               </a>
               <Link to="/cart" onClick={closeMenu} className="cart-link">
                 <FaShoppingCart className="cart-icon" />
-                Cart <span className="cart-count">(2)</span>
+                Cart <span className="cart-count">{totalItems > 0 && <span className="cart-badge">{totalItems}</span>}</span>
               </Link>
 
             </div>

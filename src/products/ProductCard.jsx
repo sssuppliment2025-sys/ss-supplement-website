@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProductCard.css";
+import { useCart } from "../context/CartContext.jsx";
 
 const defaultProductImage =
   "https://via.placeholder.com/200x200?text=Add+Image";
 
-const ProductCard = ({ product, onAddToCart }) => {
+const ProductCard = ({ product }) => {
+  const { addToCart } = useCart(); // ✅ ONLY HERE
   const navigate = useNavigate();
 
   const {
@@ -35,16 +37,12 @@ const ProductCard = ({ product, onAddToCart }) => {
     );
   }, [id, image]);
 
-  // ✅ ALWAYS go to /Product and pass product via state
   const handleProductClick = () => {
-    navigate("/Product", {
-      state: { product }
-    });
+    navigate("/Product", { state: { product } });
   };
 
   return (
     <div className="product-card">
-      {/* IMAGE */}
       <div
         className="product-image-container"
         onClick={handleProductClick}
@@ -54,9 +52,7 @@ const ProductCard = ({ product, onAddToCart }) => {
           src={displayImage}
           alt={name}
           className="product-image"
-          onError={(e) => {
-            e.target.src = defaultProductImage;
-          }}
+          onError={(e) => (e.target.src = defaultProductImage)}
         />
 
         {category && (
@@ -64,7 +60,6 @@ const ProductCard = ({ product, onAddToCart }) => {
         )}
       </div>
 
-      {/* INFO */}
       <div className="product-info">
         <h3
           className="product-name"
@@ -89,7 +84,7 @@ const ProductCard = ({ product, onAddToCart }) => {
 
           <button
             className="add-to-cart-btn"
-            onClick={() => onAddToCart?.(product)}
+            onClick={() => addToCart(product)}
           >
             Add to Cart
           </button>
