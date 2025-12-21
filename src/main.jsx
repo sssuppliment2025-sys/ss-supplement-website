@@ -17,7 +17,7 @@ function MainApp() {
         <Route path="/UnderConstruction" element={<UnderConstruction />} />
         <Route path="/products/:slug" element={<CategoryPage />} />
         <Route path="/admin/images" element={<ProductImageManager />} />
-        <Route path="/OptimumNutration" element={<OptimumNutration />} />
+        <Route path="/Product" element={<OptimumNutration />} />
         
       </Routes>
     </BrowserRouter>

@@ -6,9 +6,19 @@ const defaultProductImage =
   "https://via.placeholder.com/200x200?text=Add+Image";
 
 const ProductCard = ({ product, onAddToCart }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  const { id, name, weight, flavors, price, image, category } = product;
+  const {
+    id,
+    name,
+    weight,
+    flavors,
+    price,
+    image,
+    category,
+    route
+  } = product;
+
   const [displayImage, setDisplayImage] = useState(defaultProductImage);
 
   useEffect(() => {
@@ -23,9 +33,22 @@ const ProductCard = ({ product, onAddToCart }) => {
     setDisplayImage(image && image.trim() !== "" ? image : defaultProductImage);
   }, [id, image]);
 
+  // ✅ FIXED: pass product via state
+  const handleProductClick = () => {
+    if (route) {
+      navigate(route, {
+        state: { product }
+      });
+    }
+  };
+
   return (
     <div className="product-card">
-      <div className="product-image-container">
+      <div
+        className="product-image-container"
+        onClick={handleProductClick}
+        style={{ cursor: route ? "pointer" : "default" }}
+      >
         <img
           src={displayImage}
           alt={name}
@@ -40,7 +63,14 @@ const ProductCard = ({ product, onAddToCart }) => {
       </div>
 
       <div className="product-info">
-        <h3 className="product-name">{name}</h3>
+        <h3
+          className="product-name"
+          onClick={handleProductClick}
+          style={{ cursor: route ? "pointer" : "default" }}
+        >
+          {name}
+        </h3>
+
         <p className="product-weight">{weight}</p>
 
         <p className="product-flavors" title={flavors}>
@@ -54,10 +84,7 @@ const ProductCard = ({ product, onAddToCart }) => {
 
           <button
             className="add-to-cart-btn"
-            onClick={() => {
-              onAddToCart && onAddToCart(product); 
-              navigate("/OptimumNutration");      
-            }}
+            onClick={() => onAddToCart && onAddToCart(product)}
           >
             Add to Cart
           </button>
