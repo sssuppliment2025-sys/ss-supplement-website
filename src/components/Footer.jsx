@@ -14,6 +14,22 @@ const Footer = () => {
       <div className="mb-footer-inner">
         {/* TOP: LINK COLUMNS */}
         <div className="mb-footer-columns">
+          {/* Categories */}
+          <div className="mb-footer-col">
+            <h4 className="mb-footer-heading">Categories</h4>
+            <ul className="mb-footer-list">
+              <li>Mass gainer</li>
+              <li>Vitamin SUPPLEMENTS</li>
+              <li>PRE workout</li>
+              <li>Fat loss</li>
+              <li>Health Foods</li>
+              <li>Fitness accessories</li>
+              <li>Fitness equipments</li>
+              <li>protein</li>
+              <li>Creatine</li>
+            </ul>
+          </div>
+
           {/* Products */}
           <div className="mb-footer-col">
             <h4 className="mb-footer-heading">Products</h4>
@@ -32,21 +48,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Categories */}
-          <div className="mb-footer-col">
-            <h4 className="mb-footer-heading">Categories</h4>
-            <ul className="mb-footer-list">
-              <li>Mass gainer</li>
-              <li>Vitamin SUPPLEMENTS</li>
-              <li>PRE workout</li>
-              <li>Fat loss</li>
-              <li>Health Foods</li>
-              <li>Fitness accessories</li>
-              <li>Fitness equipments</li>
-              <li>protein</li>
-              <li>Creatine</li>
-            </ul>
-          </div>
+          
 
           {/* Useful Links */}
           <div className="mb-footer-col">
@@ -84,7 +86,7 @@ const Footer = () => {
               </div>
               <div>
                 <span className="mb-footer-contact-icon">✉️</span>
-                <span>sssuppliment@gmail.com</span>
+                <span classname="email">sssuppliment@gmail.com</span>
               </div>
             </div>
 

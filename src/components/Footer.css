@@ -192,8 +192,10 @@
 /* 🍎 iPhone */
 @media (max-width: 600px) {
   .mb-footer-columns {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    grid: template columns 0.1em;
+    gap: 1.2rem;
+    column-gap: 0rem;
+    
   }
 
   .mb-footer-inner {
@@ -201,19 +203,20 @@
   }
 
   .mb-footer-col {
-    text-align: center;
+    text-align: left;
+    max-width: 0.5rem;
   }
 
   .mb-footer-social {
-    justify-content: center;
+    justify-content:space-evenly;
   }
 
   .mb-footer-contact div {
-    justify-content: center;
+    justify-content: left;
   }
-
+ 
   .mb-footer-list li {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
   }
 
   .mb-footer-subscribe {
@@ -223,5 +226,6 @@
   .mb-footer-subscribe button {
     width: 100%;
     padding-block: 0.6rem;
+
   }
 }
