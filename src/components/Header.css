@@ -30,7 +30,11 @@ body {
 }
 
 .logo-image {
-  height: 50px;
+  display: flex;
+  align-items: center;
+  height: 120px;
+  gap: 8px;
+  padding-top: 15px;
   width: auto;
 }
 
