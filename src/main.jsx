@@ -31,7 +31,6 @@ function MainApp() {
           />
           <Route path="/AddressPage" element={<AddressPage />} />
 
-          {/* ✅ CART PAGE */}
           <Route path="/cart" element={<Cart />} />
         </Routes>
       </CartProvider>

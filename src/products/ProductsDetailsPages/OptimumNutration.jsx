@@ -1,14 +1,16 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 import "../ProductsDetailsPagesCss/AllProductsDetailsPages.css";
 import { getAllProducts } from "../productsData.js";
 
 const OptimumNutration = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+
   const product = state?.product;
 
-  // ❌ Safety check
   if (!product) {
     return <h2 className="not-found">Product not found</h2>;
   }
@@ -16,7 +18,6 @@ const OptimumNutration = () => {
   const manufacturingPrice = product.price - 600;
   const profit = product.price - manufacturingPrice;
 
-  // ✅ Suggested products from same category
   const suggestedProducts = getAllProducts()
     .filter(
       (item) =>
@@ -55,8 +56,24 @@ const OptimumNutration = () => {
           </div>
 
           <div className="btn-group">
-            <button className="buy-btn">Buy Now</button>
-            <button className="cart-btn">Add to Cart</button>
+            {/* BUY NOW */}
+            <button
+              className="buy-btn"
+              onClick={() => {
+                addToCart(product);
+                navigate("/cart");
+              }}
+            >
+              Buy Now
+            </button>
+
+            {/* ADD TO CART */}
+            <button
+              className="cart-btn"
+              onClick={() => addToCart(product)}
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
@@ -76,7 +93,6 @@ const OptimumNutration = () => {
               <p>{item.weight}</p>
               <p className="suggested-price">₹{item.price}</p>
 
-              {/* ✅ ALWAYS open /Product */}
               <button
                 onClick={() =>
                   navigate("/Product", {

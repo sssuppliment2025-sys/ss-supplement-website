@@ -12,9 +12,11 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // ADD TO CART
   const addToCart = (product) => {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
+
       if (existing) {
         return prev.map((item) =>
           item.id === product.id
@@ -22,16 +24,23 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
+
       return [...prev, { ...product, qty: 1 }];
     });
   };
 
+  // REMOVE
   const removeFromCart = (id) => {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
+  // UPDATE QTY (FIXED)
   const updateQty = (id, qty) => {
-    if (qty <= 0) return;
+    if (qty <= 0) {
+      removeFromCart(id);
+      return;
+    }
+
     setCartItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, qty } : item
@@ -41,9 +50,13 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => setCartItems([]);
 
-  const totalItems = cartItems.reduce((a, b) => a + b.qty, 0);
+  const totalItems = cartItems.reduce(
+    (sum, item) => sum + item.qty,
+    0
+  );
+
   const totalPrice = cartItems.reduce(
-    (a, b) => a + b.price * b.qty,
+    (sum, item) => sum + item.price * item.qty,
     0
   );
 
