@@ -36,7 +36,6 @@
   padding: 28px;
   background: var(--bg-page);
   border-radius: 20px;
-  color: #020617;
 }
 
 /* ================================
@@ -54,7 +53,6 @@
   border-radius: 18px;
   box-shadow: var(--shadow);
   transition: all 0.3s ease;
-  color: #020617;
 }
 
 .cart-item:hover {
