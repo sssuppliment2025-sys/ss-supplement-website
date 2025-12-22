@@ -8,8 +8,10 @@ export const productCategories = {
     slug: "whey-protein",
     description: "Premium quality whey protein supplements for muscle building and recovery",
     products: [
-      { id: 1, name: "Optimum Nutrition", weight: "2LB/907GM", flavors: "Double Rich Chocolate / Vanilla Ice Cream", price: 2499, image: "", route: "/Product" },
-      { id: 2, name: "Optimum Nutrition", weight: "5LB/2.27KG", flavors: "Double Rich Chocolate / Vanilla Ice Cream", price: 5299, image: "", route: "/Product" },
+      { id: 1, name: "Optimum Nutrition", weight: "2LB/907GM", flavors: "Double Rich Chocolate", price: 2499, image: "", route: "/Product" },
+      { id: 1, name: "Optimum Nutrition", weight: "2LB/907GM", flavors: "Vanilla Ice Cream", price: 2499, image: "", route: "/Product" },
+      { id: 2, name: "Optimum Nutrition", weight: "5LB/2.27KG", flavors: "Double Rich Chocolate", price: 5299, image: "", route: "/Product" },
+      { id: 2, name: "Optimum Nutrition", weight: "5LB/2.27KG", flavors: "Vanilla Ice Cream", price: 5299, image: "", route: "/Product" },
       { id: 3, name: "Dymatize Elite", weight: "5LB/2.27KG", flavors: "Rich Chocolate", price: 4899, image: "", route: "/Product" },
       { id: 4, name: "Labrada Whey", weight: "500G", flavors: "Chocolate / Vanilla / Mocha", price: 1299, image: "", route: "/Product" },
       { id: 5, name: "Labrada Whey", weight: "1KG", flavors: "Chocolate / Vanilla / Mocha", price: 2399, image: "", route: "/Product" },
@@ -20,25 +22,25 @@ export const productCategories = {
       { id: 10, name: "GNC Whey Pro Performance", weight: "2LB/907GM", flavors: "Chocolate Fudge / Vanilla / Chocolate", price: 2799, image: "", route: "/Product" },
       { id: 11, name: "GNC Whey Pro Performance", weight: "4LB/1.8KG", flavors: "Chocolate Fudge / Vanilla / Chocolate", price: 4999, image: "", route: "/Product" },
       { id: 12, name: "GNC Puro Isolate", weight: "1KG/2KG", flavors: "Chocolate Fudge / Vanilla / Chocolate", price: 3599, image: "", route: "/Product" },
-      { id: 13, name: "GNC Select", weight: "1KG", flavors: "Chocolate", price: 2199, image: "", route: "/Product"   },
-      { id: 15, name: "BPI Whey HD", weight: "1KG", flavors: "Chocolate Delight", price: 2499, image: "", route: "/Product"   },
-      { id: 16, name: "BPI Whey HD", weight: "2KG", flavors: "Chocolate Delight", price: 4299, image: "", route: "/Product"   },
-      { id: 17, name: "One Science Whey Protein", weight: "1LB", flavors: "Chocolate Charge", price: 1299, image: "", route: "/Product"   },
-      { id: 18, name: "One Science Whey Protein", weight: "2LB/907GM", flavors: "Chocolate Charge", price: 2399, image: "", route: "/Product"   },
-      { id: 19, name: "One Science Whey Protein", weight: "4LB/1.8KG", flavors: "Chocolate Charge", price: 4299, image: "", route: "/Product"   },
-      { id: 20, name: "Isopure Whey Protein", weight: "1KG", flavors: "Chocolate", price: 2699, image: "", route: "/Product"   },
-      { id: 21, name: "Isopure Whey Protein", weight: "2KG", flavors: "Chocolate", price: 4899, image: "",route: "/Product"   },
-      { id: 22, name: "MB Biozyme Whey Performance", weight: "1KG/2KG", flavors: "Rich Chocolate / Chocolate Hazelnut / Choco Crispie / Kesar Thandai / Magical Mango", price: 3299, image: "", route: "/Product"   },
-      { id: 23, name: "MB Biozyme Whey Isozero", weight: "1KG/2KG", flavors: "Chocolate Fudge / Cookies & Cream", price: 3799, image: "", route: "/Product"   },
-      { id: 24, name: "MB Biozyme Whey PR", weight: "1KG/2KG", flavors: "Low Carbs Ice Cream Chocolate / Low Carbs Cookies & Cream", price: 3499, image: "", route: "/Product"   },
-      { id: 25, name: "Avvatar Whey Protein", weight: "1KG/2KG", flavors: "Belgian Chocolate / Malai Kulfi / Chocolate Hazelnut", price: 2899, image: "", route: "/Product"   },
-      { id: 26, name: "Avvatar 100% Performance Whey", weight: "1KG/2KG", flavors: "Belgian Chocolate / Malai Kulfi / Chocolate Hazelnut", price: 2699, image: "", route: "/Product"   },
-      { id: 27, name: "Avvatar Isorich", weight: "1KG/2KG", flavors: "Belgian Chocolate / Malai Kulfi / Chocolate Hazelnut", price: 3199, image: "", route: "/Product"   },
-      { id: 28, name: "Fuelone Whey", weight: "1KG/2KG", flavors: "Chocolate", price: 1999, image: "", route: "/Product"   },
-      { id: 29, name: "Attom Whey", weight: "1KG/2KG", flavors: "Double Rich Chocolate / French Vanilla", price: 2299, image: "", route: "/Product"   },
-      { id: 30, name: "Morphenlab Turbo Whey", weight: "1KG", flavors: "Butter Scotch", price: 1899, image: "", route: "/Product"   },
-      { id: 31, name: "Morphenlab Whey Protein", weight: "2KG", flavors: "Chocolate", price: 3299, image: "", route: "/Product"   },
-      { id: 32, name: "Absolute Whey Legender", weight: "1KG/2KG", flavors: "Chocolate / Cashew Saffron Pistachio", price: 2599, image: "", route: "/Product"   },
+      { id: 13, name: "GNC Select", weight: "1KG", flavors: "Chocolate", price: 2199, image: "", route: "/Product" },
+      { id: 15, name: "BPI Whey HD", weight: "1KG", flavors: "Chocolate Delight", price: 2499, image: "", route: "/Product" },
+      { id: 16, name: "BPI Whey HD", weight: "2KG", flavors: "Chocolate Delight", price: 4299, image: "", route: "/Product" },
+      { id: 17, name: "One Science Whey Protein", weight: "1LB", flavors: "Chocolate Charge", price: 1299, image: "", route: "/Product" },
+      { id: 18, name: "One Science Whey Protein", weight: "2LB/907GM", flavors: "Chocolate Charge", price: 2399, image: "", route: "/Product" },
+      { id: 19, name: "One Science Whey Protein", weight: "4LB/1.8KG", flavors: "Chocolate Charge", price: 4299, image: "", route: "/Product" },
+      { id: 20, name: "Isopure Whey Protein", weight: "1KG", flavors: "Chocolate", price: 2699, image: "", route: "/Product" },
+      { id: 21, name: "Isopure Whey Protein", weight: "2KG", flavors: "Chocolate", price: 4899, image: "", route: "/Product" },
+      { id: 22, name: "MB Biozyme Whey Performance", weight: "1KG/2KG", flavors: "Rich Chocolate / Chocolate Hazelnut / Choco Crispie / Kesar Thandai / Magical Mango", price: 3299, image: "", route: "/Product" },
+      { id: 23, name: "MB Biozyme Whey Isozero", weight: "1KG/2KG", flavors: "Chocolate Fudge / Cookies & Cream", price: 3799, image: "", route: "/Product" },
+      { id: 24, name: "MB Biozyme Whey PR", weight: "1KG/2KG", flavors: "Low Carbs Ice Cream Chocolate / Low Carbs Cookies & Cream", price: 3499, image: "", route: "/Product" },
+      { id: 25, name: "Avvatar Whey Protein", weight: "1KG/2KG", flavors: "Belgian Chocolate / Malai Kulfi / Chocolate Hazelnut", price: 2899, image: "", route: "/Product" },
+      { id: 26, name: "Avvatar 100% Performance Whey", weight: "1KG/2KG", flavors: "Belgian Chocolate / Malai Kulfi / Chocolate Hazelnut", price: 2699, image: "", route: "/Product" },
+      { id: 27, name: "Avvatar Isorich", weight: "1KG/2KG", flavors: "Belgian Chocolate / Malai Kulfi / Chocolate Hazelnut", price: 3199, image: "", route: "/Product" },
+      { id: 28, name: "Fuelone Whey", weight: "1KG/2KG", flavors: "Chocolate", price: 1999, image: "", route: "/Product" },
+      { id: 29, name: "Attom Whey", weight: "1KG/2KG", flavors: "Double Rich Chocolate / French Vanilla", price: 2299, image: "", route: "/Product" },
+      { id: 30, name: "Morphenlab Turbo Whey", weight: "1KG", flavors: "Butter Scotch", price: 1899, image: "", route: "/Product" },
+      { id: 31, name: "Morphenlab Whey Protein", weight: "2KG", flavors: "Chocolate", price: 3299, image: "", route: "/Product" },
+      { id: 32, name: "Absolute Whey Legender", weight: "1KG/2KG", flavors: "Chocolate / Cashew Saffron Pistachio", price: 2599, image: "", route: "/Product" },
     ]
   },
   creatine: {
@@ -238,11 +240,11 @@ export const getAllProducts = () => {
 // Search products by query
 export const searchProducts = (query) => {
   if (!query || query.trim().length < 2) return [];
-  
+
   const allProducts = getAllProducts();
   const searchTerm = query.toLowerCase().trim();
-  
-  return allProducts.filter(product => 
+
+  return allProducts.filter(product =>
     product.name.toLowerCase().includes(searchTerm) ||
     product.flavors?.toLowerCase().includes(searchTerm) ||
     product.weight?.toLowerCase().includes(searchTerm) ||
