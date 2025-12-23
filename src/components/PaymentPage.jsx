@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "../pages/Cart.css";
-import "./AddressPage.css";
+import "./PaymentPage.css";
+
+/* ================= CONFIG ================= */
+const UPI_ID = "8116873240@superyes"; // 🔴 replace with real UPI
 
 const PaymentPage = () => {
   const navigate = useNavigate();
@@ -10,13 +13,24 @@ const PaymentPage = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [transactionId, setTransactionId] = useState("");
+  const [copied, setCopied] = useState(false);
 
-  // last saved address
-  const savedAddresses =
-    JSON.parse(localStorage.getItem("ss_addresses")) || [];
-  const address = savedAddresses[savedAddresses.length - 1];
+  /* ================= GET SAVED ADDRESS ================= */
+  const address =
+    JSON.parse(localStorage.getItem("ss_addresses")) || null;
 
-  /* ================= WHATSAPP MESSAGE ================= */
+  /* ================= COPY UPI ================= */
+  const copyUpiId = async () => {
+    try {
+      await navigator.clipboard.writeText(UPI_ID);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      alert("Unable to copy UPI ID");
+    }
+  };
+
+  /* ================= BUILD WHATSAPP MESSAGE ================= */
   const buildWhatsAppMessage = () => {
     const products = cartItems
       .map(
@@ -48,28 +62,30 @@ ${
 }
 
 🏠 *Delivery Address*
-${address?.name}
-${address?.phone}
-${address?.address}
-${address?.locality}, ${address?.city}
-${address?.state} - ${address?.pincode}
+${address?.name || "N/A"}
+${address?.phone || "N/A"}
+${address?.address || "N/A"}
+${address?.locality || ""}${address?.city ? ", " + address.city : ""}
+${address?.state || ""} - ${address?.pincode || ""}
 
 Please confirm this order.
     `;
   };
 
-  /* ================= SEND TO WHATSAPP ================= */
+  /* ================= PLACE ORDER ================= */
   const placeOrderOnWhatsApp = () => {
-    if (paymentMethod === "online" && !transactionId.trim()) {
-      alert("Please enter Transaction ID");
+    if (!address || !address.name) {
+      alert("Address missing. Please add address again.");
+      navigate("/AddressPage");
       return;
     }
 
-    const numbers = [
-      "918900299008",
-      "919123456789",
-    ];
+    if (paymentMethod === "online" && transactionId.trim().length < 6) {
+      alert("Please enter a valid Transaction ID");
+      return;
+    }
 
+    const numbers = ["918900299008", "919123456789"];
     const randomNumber =
       numbers[Math.floor(Math.random() * numbers.length)];
 
@@ -83,6 +99,7 @@ Please confirm this order.
     clearCart();
   };
 
+  /* ================= UI ================= */
   return (
     <>
       {/* HEADER */}
@@ -96,13 +113,13 @@ Please confirm this order.
         </div>
       </header>
 
-      {/* SAME CART LAYOUT */}
-      <div className="cart-layout">
+      {/* LAYOUT */}
+      <div className="cart-layout payment-layout">
         {/* LEFT */}
         <div className="cart-left">
           <h2 className="cart-title">Payment</h2>
 
-          <p style={{ color: "var(--text-muted)", marginBottom: "14px" }}>
+          <p className="payment-subtitle">
             Choose a payment method to complete your order.
           </p>
 
@@ -129,11 +146,27 @@ Please confirm this order.
 
           {/* ONLINE PAYMENT */}
           {paymentMethod === "online" && (
-            <div style={{ marginTop: "20px" }}>
-              <p style={{ fontSize: "14px", marginBottom: "8px" }}>
-                Complete payment using QR / UPI and enter the Transaction ID.
+            <div className="online-payment-box">
+              <p className="online-info">
+                Scan the QR or pay via UPI.  
+                After payment, enter the <b>Transaction ID</b>.
               </p>
 
+              {/* QR */}
+              <div className="qr-wrapper">
+                <img src="/upi-qr.jpeg" alt="UPI QR Code" />
+              </div>
+
+              {/* UPI + COPY */}
+              <div className="upi-id">
+                <b>UPI ID:</b>
+                <span className="upi-text">{UPI_ID}</span>
+                <button className="copy-btn" onClick={copyUpiId}>
+                  {copied ? "✔ Copied" : "Copy"}
+                </button>
+              </div>
+
+              {/* TRANSACTION ID */}
               <input
                 type="text"
                 placeholder="Enter Transaction ID"
@@ -147,7 +180,6 @@ Please confirm this order.
           {paymentMethod && (
             <button
               className="place-order-btn"
-              style={{ marginTop: "30px" }}
               onClick={placeOrderOnWhatsApp}
             >
               Place Order via WhatsApp

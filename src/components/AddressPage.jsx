@@ -21,7 +21,7 @@ const BASE_FORM = {
   addressType: "home",
 };
 
-const Address = () => {
+const AddressPage = () => {
   const navigate = useNavigate();
   const { cartItems, totalPrice } = useCart();
 
@@ -305,4 +305,4 @@ const Address = () => {
   );
 };
 
-export default Address;
+export default AddressPage;
