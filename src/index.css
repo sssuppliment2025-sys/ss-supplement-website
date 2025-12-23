@@ -3,8 +3,8 @@
 }
 
 html {
-  /* scroll-behavior: smooth; */
-  width: 100%;
+  scroll-behavior: smooth;
+  /* width: 100%; */
 }
 
 body {
