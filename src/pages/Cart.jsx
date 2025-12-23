@@ -38,6 +38,10 @@ const Cart = () => {
           />
           <h2>Your cart is empty</h2>
         </div>
+        {/* FOOTER */}
+      <footer className="cart-footer">
+        ⭐ 1000+ Happy Customers ❤️
+      </footer>
       </>
     );
   }

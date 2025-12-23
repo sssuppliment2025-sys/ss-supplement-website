@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import "../pages/Cart.css"; // reuse cart theme
+import "../pages/Cart.css";
 import "./AddressPage.css";
 
 const SERVICEABLE_PINCODES = ["721652", "721101", "700001"];
-const STORAGE_KEY = "ss_addresses";
+const STORAGE_KEY = "ss_addresses";      // final saved address
+const DRAFT_KEY = "ss_address_draft";    // temp draft
 
 const Address = () => {
   const navigate = useNavigate();
+  const { cartItems, totalPrice } = useCart();
 
-  /* CART DATA FOR RIGHT SECTION */
-  const { cartItems, totalPrice, clearCart } = useCart();
+  const initialized = useRef(false);
 
-  /* ADDRESS FORM STATE */
+  /* ================= ADDRESS FORM STATE ================= */
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -29,36 +30,68 @@ const Address = () => {
 
   const [status, setStatus] = useState("");
 
-  /* ================= FORM HANDLING ================= */
+  /* ================= RESTORE ADDRESS ON LOAD ================= */
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const draft = localStorage.getItem(DRAFT_KEY);
+
+    if (saved) {
+      setForm(JSON.parse(saved));          // highest priority
+    } else if (draft) {
+      setForm(JSON.parse(draft));
+    }
+
+    initialized.current = true;
+  }, []);
+
+  /* ================= AUTO-SAVE DRAFT ================= */
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const draft = localStorage.getItem(DRAFT_KEY);
+
+    const baseForm = {
+      name: "",
+      phone: "",
+      pincode: "",
+      locality: "",
+      address: "",
+      city: "",
+      state: "West Bengal",
+      landmark: "",
+      altPhone: "",
+      addressType: "home",
+    };
+
+    if (saved) {
+      setForm({ ...baseForm, ...JSON.parse(saved) });
+    } else if (draft) {
+      setForm({ ...baseForm, ...JSON.parse(draft) });
+    }
+
+    initialized.current = true;
+  }, []);
+
+
+  /* ================= HANDLERS ================= */
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setStatus("");
   };
 
   const checkDeliverable = (pin) => {
-    if (SERVICEABLE_PINCODES.includes(pin)) {
-      setStatus("deliverable");
-    } else {
-      setStatus("not-deliverable");
-    }
+    setStatus(
+      SERVICEABLE_PINCODES.includes(pin)
+        ? "deliverable"
+        : "not-deliverable"
+    );
   };
 
-  /* ================= SAVE ADDRESS ================= */
+  /* ================= SAVE ADDRESS (OVERWRITE OLD) ================= */
   const saveAddressToLocal = () => {
-    const existing =
-      JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    const alreadyExists = existing.some(
-      (addr) =>
-        addr.phone === form.phone &&
-        addr.pincode === form.pincode &&
-        addr.address === form.address
-    );
-
-    if (!alreadyExists) {
-      existing.push(form);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-    }
+    // ✅ overwrite previous address completely
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+    // keep draft same as final
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
   };
 
   /* ================= USE CURRENT LOCATION ================= */
@@ -69,41 +102,103 @@ const Address = () => {
     }
 
     navigator.geolocation.getCurrentPosition(
-      () => {
-        const autoPin = "721652";
+      async (position) => {
+        const { latitude, longitude } = position.coords;
 
-        setForm({
-          ...form,
-          pincode: autoPin,
-          locality: "Moyna",
-          address: "Moyna Subdistrict",
-          city: "Purba Medinipur",
-          state: "West Bengal",
-        });
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            {
+              headers: {
+                "Accept": "application/json",
+                "User-Agent": "ss-supplement-app/1.0",
+              },
+            }
+          );
 
-        checkDeliverable(autoPin);
+          const data = await res.json();
+          const a = data.address || {};
+
+          const pincode = a.postcode || "";
+          const city =
+            a.city || a.town || a.village || a.county || "";
+
+          const locality =
+            a.suburb ||
+            a.neighbourhood ||
+            a.village ||
+            city ||
+            "";
+
+          const addressLine = [
+            a.house_number,
+            a.road,
+            locality,
+            city,
+          ]
+            .filter(Boolean)
+            .join(", ");
+
+          setForm((prev) => ({
+            ...prev,
+            pincode,
+            city,
+            locality,
+            address: addressLine || data.display_name || "",
+          }));
+
+          checkDeliverable(pincode);
+        } catch (err) {
+          alert("Unable to fetch address. Please fill manually.");
+        }
       },
-      () => alert("Unable to fetch location")
+      () => alert("Location permission denied"),
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
     );
   };
 
+  /* ================= SUBMIT ================= */
+  const handleSubmit = () => {
+    if (
+      !form.name ||
+      !form.phone ||
+      !form.pincode ||
+      !form.address ||
+      !form.city
+    ) {
+      alert("⚠️ Please fill all required address details.");
+      return;
+    }
+
+    if (status === "not-deliverable") {
+      alert("❌ Currently not deliverable to this address.");
+      return;
+    }
+
+    saveAddressToLocal();
+    navigate("/payment");
+  };
+
+  /* ================= UI ================= */
   return (
     <>
-      {/* HEADER (SAME AS CART) */}
+      {/* HEADER */}
       <header className="cart-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
           ←
         </button>
-
         <div className="brand">
           <img src="/logo.jpg" alt="SS Supplement" />
           <span>SS Supplement</span>
         </div>
       </header>
 
-      {/* SAME CART LAYOUT */}
       <div className="cart-layout">
-        {/* LEFT → ADDRESS FORM */}
+        {/* LEFT */}
         <div className="cart-left">
           <h2 className="cart-title">Delivery Address</h2>
 
@@ -122,7 +217,6 @@ const Address = () => {
             📍 Use my current location
           </button>
 
-          {/* FORM GRID */}
           <div
             style={{
               display: "grid",
@@ -130,20 +224,8 @@ const Address = () => {
               gap: "14px",
             }}
           >
-            <input
-              name="name"
-              placeholder="Name"
-              value={form.name}
-              onChange={handleChange}
-            />
-
-            <input
-              name="phone"
-              placeholder="10-digit mobile number"
-              value={form.phone}
-              onChange={handleChange}
-            />
-
+            <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
+            <input name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} />
             <input
               name="pincode"
               placeholder="Pincode"
@@ -153,13 +235,7 @@ const Address = () => {
                 checkDeliverable(e.target.value);
               }}
             />
-
-            <input
-              name="locality"
-              placeholder="Locality"
-              value={form.locality}
-              onChange={handleChange}
-            />
+            <input name="locality" placeholder="Locality" value={form.locality} onChange={handleChange} />
 
             <textarea
               name="address"
@@ -171,61 +247,42 @@ const Address = () => {
             />
 
             <p className="char-count">
-              {form.address.length}/100
+              {(form.address || "").length}/100
             </p>
 
-            <input
-              name="city"
-              placeholder="City/District/Town"
-              value={form.city}
-              onChange={handleChange}
-            />
 
-            {/* STATE DROPDOWN */}
+            <input name="city" placeholder="City/District/Town" value={form.city} onChange={handleChange} />
+
             <select disabled>
               <option>West Bengal</option>
             </select>
 
-            <input
-              name="landmark"
-              placeholder="Landmark (Optional)"
-              value={form.landmark}
-              onChange={handleChange}
-            />
-
-            <input
-              name="altPhone"
-              placeholder="Alternate Phone (Optional)"
-              value={form.altPhone}
-              onChange={handleChange}
-            />
+            <input name="landmark" placeholder="Landmark (Optional)" value={form.landmark} onChange={handleChange} />
+            <input name="altPhone" placeholder="Alternate Phone (Optional)" value={form.altPhone} onChange={handleChange} />
           </div>
 
           {/* ADDRESS TYPE */}
-          <div style={{ marginTop: "20px" }}>
+          <div className="address-type">
             <p><b>Address Type</b></p>
+            <div className="address-type-options">
+              <label>
+                <input
+                  type="radio"
+                  checked={form.addressType === "home"}
+                  onChange={() => setForm({ ...form, addressType: "home" })}
+                />
+                Home (All day delivery)
+              </label>
 
-            <label style={{ marginRight: "20px" }}>
-              <input
-                type="radio"
-                checked={form.addressType === "home"}
-                onChange={() =>
-                  setForm({ ...form, addressType: "home" })
-                }
-              />
-              Home
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                checked={form.addressType === "work"}
-                onChange={() =>
-                  setForm({ ...form, addressType: "work" })
-                }
-              />
-              Work
-            </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={form.addressType === "work"}
+                  onChange={() => setForm({ ...form, addressType: "work" })}
+                />
+                Work (10 AM – 5 PM)
+              </label>
+            </div>
           </div>
 
           {/* STATUS */}
@@ -243,27 +300,17 @@ const Address = () => {
 
           {/* ACTIONS */}
           <div style={{ marginTop: "24px", display: "flex", gap: "16px" }}>
-            <button
-              className="place-order-btn"
-              disabled={status !== "deliverable"}
-              onClick={() => {
-                saveAddressToLocal();
-                navigate("/payment");
-              }}
-            >
+            <button className="place-order-btn" onClick={handleSubmit}>
               SAVE AND CONTINUE
             </button>
 
-            <button
-              className="clear-cart-link"
-              onClick={() => navigate(-1)}
-            >
+            <button className="clear-cart-link" onClick={() => navigate(-1)}>
               CANCEL
             </button>
           </div>
         </div>
 
-        {/* RIGHT → CART SUMMARY */}
+        {/* RIGHT */}
         <div className="cart-right">
           <h3>PRICE DETAILS</h3>
 
@@ -283,18 +330,9 @@ const Address = () => {
             <span>Total Amount</span>
             <span>₹{totalPrice + 7}</span>
           </div>
-
-          {/* <button
-            className="clear-cart-link"
-            onClick={clearCart}
-            style={{ marginTop: "20px" }}
-          >
-            Clear Cart
-          </button> */}
         </div>
       </div>
 
-      {/* FOOTER */}
       <footer className="cart-footer">
         ⭐ 1000+ Happy Customers ❤️
       </footer>
