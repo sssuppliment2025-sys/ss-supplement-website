@@ -232,16 +232,16 @@ creatine: {
     slug: "fish-oil",
     description: "Omega-3 fish oil supplements for heart and brain health",
     products: [
-      { id: 168, name: "MB Omega3 FishOil 1000mg", weight: "60N", flavors: "Unflavoured", price: 599, image: "", route: "/Product" },
-      { id: 169, name: "MB Omega3 FishOil 1000mg", weight: "90N", flavors: "Unflavoured", price: 799, image: "", route: "/Product" },
-      { id: 170, name: "MB Omega3 FishOil Gold", weight: "60N", flavors: "Unflavoured", price: 899, image: "", route: "/Product" },
-      { id: 171, name: "GNC Omega3 Fish Oil", weight: "60N", flavors: "Unflavoured", price: 749, image: "", route: "/Product" },
-      { id: 172, name: "GNC Omega3 Fish Oil", weight: "90N", flavors: "Unflavoured", price: 1049, image: "", route: "/Product" },
-      { id: 173, name: "GNC Triple Strength Fish Oil", weight: "60N", flavors: "Unflavoured", price: 1199, image: "", route: "/Product" },
-      { id: 174, name: "On FishOil", weight: "60N", flavors: "Unflavoured", price: 649, image: "", route: "/Product" },
-      { id: 175, name: "Alaska Omega3 Fish Oil", weight: "100N", flavors: "Unflavoured", price: 799, image: "", route: "/Product" },
-      { id: 176, name: "MuscleTech Omega3 Fish Oil", weight: "100N", flavors: "Unflavoured", price: 899, image: "", route: "/Product" },
-      { id: 177, name: "Neuherbs Deep Sea Fish Oil 2500mg", weight: "60N", flavors: "Unflavoured", price: 699, image: "", route: "/Product" },
+      { id: 168, name: "MB Omega3 FishOil 1000mg", weight: "60N", flavors: "Unflavoured", price: 599, image: "/image/Fishoil/MB/MB_fishoil_60N.jpg", route: "/Product" },
+      { id: 169, name: "MB Omega3 FishOil 1000mg", weight: "90N", flavors: "Unflavoured", price: 799, image: "/image/Fishoil/MB/MB_fishoil_90N.jpg", route: "/Product" },
+      { id: 170, name: "MB Omega3 FishOil Gold", weight: "60N", flavors: "Unflavoured", price: 899, image: "/image/Fishoil/MB/MB_fishoil_gold_60N.jpg", route: "/Product" },
+      { id: 171, name: "GNC Omega3 Fish Oil", weight: "60N", flavors: "Unflavoured", price: 749, image: "/image/Fishoil/GNC/gnc_omega3_fishoil_60N.webp", route: "/Product" },
+      { id: 172, name: "GNC Omega3 Fish Oil", weight: "90N", flavors: "Unflavoured", price: 1049, image: "/image/Fishoil/GNC/gnc_omega3_fishoil_90N.webp", route: "/Product" },
+      { id: 173, name: "GNC Triple Strength Fish Oil", weight: "60N", flavors: "Unflavoured", price: 1199, image: "/image/Fishoil/GNC/gnc_triplestrength_fishoil_60N.webp", route: "/Product" },
+      { id: 174, name: "On FishOil", weight: "60N", flavors: "Unflavoured", price: 649, image: "/image/Fishoil/ON/on_fishoil_60N.webp", route: "/Product" },
+      { id: 175, name: "Alaska Omega3 Fish Oil", weight: "100N", flavors: "Unflavoured", price: 799, image: "/image/Fishoil/ALASKA/alaska_omega3_fishoil_100n.jpg", route: "/Product" },
+      { id: 176, name: "MuscleTech Omega3 Fish Oil", weight: "100N", flavors: "Unflavoured", price: 899, image: "/image/Fishoil/MuscleTech/muscletech_omega3_fishoil_100n.jpg", route: "/Product" },
+      { id: 177, name: "Neuherbs Deep Sea Fish Oil 2500mg", weight: "60N", flavors: "Unflavoured", price: 699, image: "/image/Fishoil/NEUHERBS/neuherbs_fishoil_2500mg_60n.jpg", route: "/Product" },
     ]
   },
   preWorkout: {
@@ -249,24 +249,30 @@ creatine: {
     slug: "pre-workout",
     description: "Energy-boosting pre-workout supplements for intense training",
     products: [
-      { id: 178, name: "MB Pre Workout 200 XTreme", weight: "100G", flavors: "Fruit Punch", price: 899, image: "", route: "/Product" },
-      { id: 179, name: "MB Pre Workout 200 XTreme", weight: "200G", flavors: "Fruit Punch", price: 1599, image: "", route: "/Product" },
-      { id: 180, name: "MB Pre Workout 200 XTreme", weight: "100G", flavors: "Tangy Orange", price: 899, image: "", route: "/Product" },
-      { id: 181, name: "MB Pre Workout 200 XTreme", weight: "200G", flavors: "Tangy Orange", price: 1599, image: "", route: "/Product" },
-      { id: 182, name: "MB Pre Workout IMPAktix", weight: "340G", flavors: "Fruit Fury", price: 1499, image: "", route: "/Product" },
-      { id: 183, name: "MB Pre Workout IMPAktix", weight: "510G", flavors: "Fruit Fury", price: 2099, image: "", route: "/Product" },
-      { id: 184, name: "MB Pre Workout IMPAktix", weight: "340G", flavors: "Cola Frost", price: 1499, image: "", route: "/Product" },
-      { id: 185, name: "MB Pre Workout IMPAktix", weight: "510G", flavors: "Cola Frost", price: 2099, image: "", route: "/Product" },
+      { id: 178, name: "MB Pre Workout 200 XTreme", weight: "100G", flavors: "Fruit Punch", price: 899, image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_100g.jpg", route: "/Product" },
+      { id: 179, name: "MB Pre Workout 200 XTreme", weight: "200G", flavors: "Fruit Punch", price: 1599, image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_200g.jpg", route: "/Product" },
+      { id: 180, name: "MB Pre Workout 200 XTreme", weight: "100G", flavors: "Tangy Orange", price: 899, image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_100g.jpg", route: "/Product" },
+      { id: 181, name: "MB Pre Workout 200 XTreme", weight: "200G", flavors: "Tangy Orange", price: 1599, image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_200g.webp", route: "/Product" },
+      { id: 182, name: "MB Pre Workout IMPAktix", weight: "340G", flavors: "Fruit Fury", price: 1499, image: "/image/Pre_Workout/MB/warthx_fruit_340g.jpg", route: "/Product" },
+      { id: 183, name: "MB Pre Workout IMPAktix", weight: "510G", flavors: "Fruit Fury", price: 2099, image: "/image/Pre_Workout/MB/warthx_fruit_510g.jpg", route: "/Product" },
+      { id: 184, name: "MB Pre Workout IMPAktix", weight: "340G", flavors: "Cola Frost", price: 1499, image: "/image/Pre_Workout/MB/warthx_cola_340g.jpg", route: "/Product" },
+      { id: 185, name: "MB Pre Workout IMPAktix", weight: "510G", flavors: "Cola Frost", price: 2099, image: "/image/Pre_Workout/MB/warthx_cola_510g.jpg", route: "/Product" },
+      
       { id: 186, name: "The Big Daddy Inferno", weight: "300GM", flavors: "Fruit Punch", price: 1299, image: "", route: "/Product" },
-      { id: 187, name: "GNC Pro Performance Pre Workout", weight: "360GM", flavors: "Fruit Punch", price: 1699, image: "", route: "/Product" },
-      { id: 188, name: "BigMuscle Karnage Pre Workout", weight: "300GM", flavors: "Watermelon Lime", price: 1199, image: "", route: "/Product" },
-      { id: 189, name: "BigMuscle Karnage Pre Workout", weight: "300GM", flavors: "Arctic Blast", price: 1199, image: "", route: "/Product" },
-      { id: 190, name: "BigMuscle Karnage Pre Workout", weight: "300GM", flavors: "Sex On The Beach", price: 1199, image: "", route: "/Product" },
-      { id: 191, name: "Wellversed Dynamite", weight: "420GM", flavors: "Fruit Blast", price: 1399, image: "", route: "/Product" },
-      { id: 192, name: "Wellversed Dynamite", weight: "420GM", flavors: "Berry Burst", price: 1399, image: "", route: "/Product" },
-      { id: 193, name: "Wellversed Dynamite", weight: "420GM", flavors: "Watermelon Ice", price: 1399, image: "", route: "/Product" },
-      { id: 194, name: "Fast & Up Citirun", weight: "200GM", flavors: "Unflavoured", price: 799, image: "", route: "/Product" },
-      { id: 195, name: "GNC L-Arginine", weight: "90N", flavors: "Unflavoured", price: 1099, image: "", route: "/Product" },
+     
+      { id: 187, name: "GNC Pro Performance Pre Workout", weight: "360GM", flavors: "Fruit Punch", price: 1699, image: "/image/Pre_Workout/Gnc/fruit_punch_340gm.webp", route: "/Product" },
+     
+      { id: 188, name: "BigMuscle Karnage Pre Workout", weight: "300GM", flavors: "Watermelon Lime", price: 1199, image: "/image/Pre_Workout/BigMuscle/Watermelon_lime_300gm.jpg", route: "/Product" },
+      { id: 189, name: "BigMuscle Karnage Pre Workout", weight: "300GM", flavors: "Arctic Blast", price: 1199, image: "/image/Pre_Workout/BigMuscle/Artic_blast_300gm.jpg", route: "/Product" },
+      { id: 190, name: "BigMuscle Karnage Pre Workout", weight: "300GM", flavors: "Sex On The Beach", price: 1199, image: "/image/Pre_Workout/BigMuscle/sex_on_beach_300gm.jpg", route: "/Product" },
+     
+      { id: 191, name: "Wellversed Dynamite", weight: "420GM", flavors: "Fruit Blast", price: 1399, image: "/image/Pre_Workout/Wellversed/Fruit_420gm.jpg", route: "/Product" },
+      { id: 192, name: "Wellversed Dynamite", weight: "420GM", flavors: "Berry Burst", price: 1399, image: "/image/Pre_Workout/Wellversed/Berry_420gm.jpg", route: "/Product" },
+      { id: 193, name: "Wellversed Dynamite", weight: "420GM", flavors: "Watermelon Ice", price: 1399, image: "/image/Pre_Workout/Wellversed/Watermelon_420gm.jpg", route: "/Product" },
+      
+      { id: 194, name: "Fast & Up Citirun", weight: "200GM", flavors: "Unflavoured", price: 799, image: "/image/Pre_Workout/FAST_&_UP_CITRULIN/unflavoured_200gm.jpg", route: "/Product" },
+      
+      { id: 195, name: "GNC L-Arginine", weight: "90N", flavors: "Unflavoured", price: 1099, image: "/image/Pre_Workout/Gnc/Arginine_90N.jpg", route: "/Product" },
     ]
   },
   weightLoss: {
@@ -274,15 +280,19 @@ creatine: {
     slug: "weight-loss",
     description: "Fat burners and weight loss supplements for achieving your fitness goals",
     products: [
-      { id: 196, name: "MB L-Carnitine 1100mg", weight: "450ML", flavors: "Key Lime", price: 799, image: "", route: "/Product" },
-      { id: 197, name: "MB L-Carnitine 1100mg", weight: "450ML", flavors: "Tangy Orange", price: 799, image: "", route: "/Product" },
-      { id: 198, name: "MB L-Carnitine 1000mg", weight: "450ML", flavors: "Key Lime", price: 749, image: "", route: "/Product" },
-      { id: 199, name: "MB L-Carnitine 1000mg", weight: "450ML", flavors: "Tangy Orange", price: 749, image: "", route: "/Product" },
-      { id: 200, name: "GNC L-Carnitine 3000mg", weight: "450ML", flavors: "Orange", price: 1199, image: "", route: "/Product" },
+      { id: 196, name: "MB L-Carnitine 1100mg", weight: "450ML", flavors: "Key Lime", price: 799, image: "/image/Weight_loss/MB/L_carnitine_keylime_1100_450ml.jpg", route: "/Product" },
+      { id: 197, name: "MB L-Carnitine 1100mg", weight: "450ML", flavors: "Tangy Orange", price: 799, image: "/image/Weight_loss/MB/L_carnitine_tangyorange_1100_450ml.jpg", route: "/Product" },
+      { id: 198, name: "MB L-Carnitine 3300mg", weight: "450ML", flavors: "Key Lime", price: 749, image: "/image/Weight_loss/MB/L_carnitine_keylime_3300_450ml.jpg", route: "/Product" },
+      { id: 199, name: "MB L-Carnitine 3300mg", weight: "450ML", flavors: "Tangy Orange", price: 749, image: "/image/Weight_loss/MB/L_carnitine_tangyorange_3300_450ml.jpg", route: "/Product" },
+     
+      { id: 200, name: "GNC L-Carnitine 3000mg", weight: "450ML", flavors: "Orange", price: 1199, image: "/image/Weight_loss/Gnc/L_carnitine_3000mg_450ml.webp", route: "/Product" },
+     
       { id: 201, name: "Fast And Up L-Carnitine 3000mg", weight: "30N", flavors: "Lemon", price: 899, image: "", route: "/Product" },
       { id: 202, name: "Fast And Up L-Carnitine 3000mg", weight: "30N", flavors: "Orange", price: 899, image: "", route: "/Product" },
-      { id: 203, name: "MB Fat Burner Pro", weight: "60N", flavors: "Unflavoured", price: 699, image: "", route: "/Product" },
-      { id: 204, name: "Apple Cider Vinegar", weight: "500ml", flavors: "Natural", price: 399, image: "", route: "/Product" },
+     
+      { id: 203, name: "MB Fat Burner Pro", weight: "60N", flavors: "Unflavoured", price: 699, image: "/image/Weight_loss/MB/Burnur_pro_60N.jpg", route: "/Product" },
+     
+      { id: 204, name: "Apple Cider Vinegar", weight: "500ml", flavors: "Natural", price: 399, image: "/image/Weight_loss/Apple_cider/Apple_cider_vinegar_500ml.jpg", route: "/Product" },
     ]
   },
   recovery: {
@@ -290,8 +300,8 @@ creatine: {
     slug: "recovery",
     description: "Post-workout recovery supplements for muscle repair",
     products: [
-      { id: 205, name: "MB L-Glutamine", weight: "250GM", flavors: "Unflavoured", price: 899, image: "", route: "/Product" },
-      { id: 206, name: "GNC L-Glutamine", weight: "250GM", flavors: "Unflavoured", price: 999, image: "", route: "/Product" },
+      { id: 205, name: "MB L-Glutamine", weight: "250GM", flavors: "Unflavoured", price: 899, image: "/image/Recovery/mb_l_glutamine_250gm.jpg", route: "/Product" },
+      { id: 206, name: "GNC L-Glutamine", weight: "250GM", flavors: "Unflavoured", price: 999, image: "/image/Recovery/gnc_l_glutamine_250gm.jpg", route: "/Product" },
     ]
   },
   intraWorkout: {
@@ -299,10 +309,10 @@ creatine: {
     slug: "intra-workout",
     description: "BCAA and intra-workout supplements for endurance",
     products: [
-      { id: 207, name: "MB BCAA Pro", weight: "450G", flavors: "Green Apple", price: 1299, image: "", route: "/Product" },
-      { id: 208, name: "MB BCAA Pro", weight: "450G", flavors: "Watermelon", price: 1299, image: "", route: "/Product" },
-      { id: 209, name: "MB BCAA Pro", weight: "245GM", flavors: "Green Apple", price: 799, image: "", route: "/Product" },
-      { id: 210, name: "MB BCAA Pro", weight: "245GM", flavors: "Watermelon", price: 799, image: "", route: "/Product" },
+      { id: 207, name: "MB BCAA Pro", weight: "450G", flavors: "Green Apple", price: 1299, image: "/image/Intra_Workout/Mb_bcaa_pro_greenApple_450g.jpg", route: "/Product" },
+      { id: 208, name: "MB BCAA Pro", weight: "450G", flavors: "Watermelon", price: 1299, image: "/image/Intra_Workout/Mb_bcaa_pro_Watermelon_450g.webp", route: "/Product" },
+      { id: 209, name: "MB BCAA Pro", weight: "250GM", flavors: "Green Apple", price: 799, image: "", route: "/Product" },
+      { id: 210, name: "MB BCAA Pro", weight: "250GM", flavors: "Watermelon", price: 799, image: "/image/Intra_Workout/Mb_bcaa_pro_Watermelon_250g.jpg", route: "/Product" },
     ]
   },
   minerals: {
@@ -310,10 +320,10 @@ creatine: {
     slug: "minerals-health",
     description: "Essential minerals and health supplements",
     products: [
-      { id: 211, name: "GNC Calcium Plus", weight: "60N", flavors: "Unflavoured", price: 499, image: "", route: "/Product" },
-      { id: 212, name: "GNC Zinc Magnesium", weight: "60N", flavors: "Unflavoured", price: 599, image: "", route: "/Product" },
-      { id: 213, name: "GNC Collagen", weight: "200G", flavors: "Lemon", price: 1499, image: "", route: "/Product" },
-      { id: 214, name: "GNC Collagen", weight: "200G", flavors: "Orange", price: 1499, image: "", route: "/Product" },
+      { id: 211, name: "GNC Calcium Plus", weight: "60N", flavors: "Unflavoured", price: 499, image: "/image/Minerals_Health/gnc_calcium_plus_60n.jpg", route: "/Product" },
+      { id: 212, name: "GNC Zinc Magnesium", weight: "60N", flavors: "Unflavoured", price: 599, image: "/image/Minerals_Health/gnc_zinc_60n.jpg", route: "/Product" },
+      { id: 213, name: "GNC Collagen", weight: "200G", flavors: "Lemon", price: 1499, image: "/image/Minerals_Health/gnc_collagen_lemon_200g.jpg", route: "/Product" },
+      { id: 214, name: "GNC Collagen", weight: "200G", flavors: "Orange", price: 1499, image: "/image/Minerals_Health/gnc_collagen_orange_200g.jpg", route: "/Product" },
     ]
   },
   peanutButter: {
@@ -321,13 +331,13 @@ creatine: {
     slug: "peanut-butter-oats",
     description: "Healthy peanut butter and oats for nutrition",
     products: [
-      { id: 215, name: "MyFitness Peanut Butter Smooth", weight: "1.25KG", flavors: "Chocolate", price: 599, image: "", route: "/Product" },
-      { id: 216, name: "MyFitness Peanut Butter Crunchy", weight: "1KG", flavors: "Dark Chocolate", price: 549, image: "", route: "/Product" },
-      { id: 217, name: "MyFitness Peanut Butter Smooth", weight: "510G", flavors: "Dark Chocolate", price: 349, image: "", route: "/Product" },
-      { id: 218, name: "MyFitness Peanut Butter Crunchy", weight: "510G", flavors: "Dark Chocolate", price: 349, image: "", route: "/Product" },
-      { id: 219, name: "MyFitness Peanut Butter Smooth", weight: "227G", flavors: "Chocolate", price: 199, image: "", route: "/Product" },
-      { id: 220, name: "MyFitness Peanut Butter Crunchy", weight: "227G", flavors: "Chocolate", price: 199, image: "", route: "/Product" },
-      { id: 221, name: "MyFitness Peanut Butter Crispy", weight: "227G", flavors: "Chocolate", price: 219, image: "", route: "/Product" },
+      { id: 215, name: "MyFitness Peanut Butter Smooth", weight: "1.25KG", flavors: "Chocolate", price: 599, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_choc_1.25kg.jpg", route: "/Product" },
+      { id: 216, name: "MyFitness Peanut Butter Smooth", weight: "1.25KG", flavors: "Dark Chocolate", price: 549, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_1.25kg.jpg", route: "/Product" },
+      { id: 217, name: "MyFitness Peanut Butter Smooth", weight: "510G", flavors: "Dark Chocolate", price: 349, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g.jpg", route: "/Product" },
+      { id: 218, name: "MyFitness Peanut Butter Crunchy", weight: "510G", flavors: "Dark Chocolate", price: 349, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g.jpg", route: "/Product" },
+      { id: 219, name: "MyFitness Peanut Butter Smooth", weight: "227G", flavors: "Chocolate", price: 199, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_choc_227g.jpg", route: "/Product" },
+      { id: 220, name: "MyFitness Peanut Butter Crunchy", weight: "227G", flavors: "Chocolate", price: 199, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_choc_227g.jpg", route: "/Product" },
+      { id: 221, name: "MyFitness Peanut Butter Crispy", weight: "227G", flavors: "Chocolate", price: 219, image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g.jpg", route: "/Product" },
       { id: 222, name: "Pintola Peanut Butter", weight: "1KG", flavors: "Classic", price: 449, image: "", route: "/Product" },
       { id: 223, name: "Pintola Peanut Butter", weight: "1KG", flavors: "Chocolate", price: 449, image: "", route: "/Product" },
       { id: 224, name: "Pintola Peanut Butter", weight: "510G", flavors: "Classic", price: 279, image: "", route: "/Product" },
@@ -339,10 +349,10 @@ creatine: {
     slug: "ayurvedic",
     description: "Natural ayurvedic supplements for holistic health",
     products: [
-      { id: 226, name: "Kapiva Shilajit", weight: "20G", flavors: "Natural", price: 799, image: "", route: "/Product" },
-      { id: 227, name: "Kapiva Shilajit Gold", weight: "20G", flavors: "Natural", price: 999, image: "", route: "/Product" },
-      { id: 228, name: "Kapiva Ashwagandha Gold", weight: "90N", flavors: "Natural", price: 699, image: "", route: "/Product" },
-      { id: 229, name: "Kapiva Shilajit Gold Capsul", weight: "60N", flavors: "Natural", price: 899, image: "", route: "/Product" },
+      { id: 226, name: "Kapiva Shilajit", weight: "20G", flavors: "Natural", price: 799, image: "/image/Ayurvedic/kapiva_20g.jpg", route: "/Product" },
+      { id: 227, name: "Kapiva Shilajit Gold", weight: "20G", flavors: "Natural", price: 999, image: "/image/Ayurvedic/kapiva_gold_20g.jpg", route: "/Product" },
+      { id: 228, name: "Kapiva Ashwagandha Gold", weight: "90N", flavors: "Natural", price: 699, image: "/image/Ayurvedic/kapiva_aswagandha_60n.jpg", route: "/Product" },
+      { id: 229, name: "Kapiva Shilajit Gold Capsul", weight: "60N", flavors: "Natural", price: 899, image: "/image/Ayurvedic/kapiva_gold_60n.jpg", route: "/Product" },
     ]
   },
   proteinBars: {
@@ -350,9 +360,9 @@ creatine: {
     slug: "protein-bars",
     description: "Healthy protein bars, cookies and chips",
     products: [
-      { id: 230, name: "Max Protein Bar", weight: "10GM/Each", flavors: "Choco Berry", price: 50, image: "", route: "/Product" },
-      { id: 231, name: "Max Protein Bar", weight: "10GM/Each", flavors: "Choco Almond", price: 50, image: "", route: "/Product" },
-      { id: 232, name: "Max Protein Bar", weight: "10GM/Each", flavors: "Date Almond", price: 50, image: "", route: "/Product" },
+      { id: 230, name: "Max Protein Bar", weight: "10GM/Each", flavors: "Choco Berry", price: 50, image: "/image/Protien_bar_and_Snacks/max/choco_berry_10g.jpg", route: "/Product" },
+      { id: 231, name: "Max Protein Bar", weight: "10GM/Each", flavors: "Choco Almond", price: 50, image: "/image/Protien_bar_and_Snacks/max/choco_almond_10g.jpg", route: "/Product" },
+      { id: 232, name: "Max Protein Bar", weight: "10GM/Each", flavors: "Date Almond", price: 50, image: "/image/Protien_bar_and_Snacks/max/choco_date_almond_10g.jpg", route: "/Product" },
       { id: 233, name: "Max Protein Bar", weight: "20GM/Each", flavors: "Choco Berry", price: 80, image: "", route: "/Product" },
       { id: 234, name: "Max Protein Bar", weight: "20GM/Each", flavors: "Choco Almond", price: 80, image: "", route: "/Product" },
       { id: 235, name: "Max Protein Bar", weight: "20GM/Each", flavors: "Date Almond", price: 80, image: "", route: "/Product" },
@@ -370,8 +380,8 @@ creatine: {
     slug: "accessories",
     description: "Gym accessories and fitness gear",
     products: [
-      { id: 117, name: "Gym Bag", weight: "Standard", flavors: "Average Quality", price: 499, image: "", route: "/Product" },
-      { id: 118, name: "Gym Bag Premium", weight: "Standard", flavors: "Good Quality", price: 799, image: "", route: "/Product" },
+      { id: 117, name: "Gym Bag", weight: "Standard", flavors: "Average Quality", price: 499, image: "/image/Accessories/mb_gymbag.jpg", route: "/Product" },
+      { id: 118, name: "Gym Bag Premium", weight: "Standard", flavors: "Good Quality", price: 799, image: "/image/Accessories/mb_gymbag.jpg", route: "/Product" },
       { id: 119, name: "Shaker Bottle", weight: "700ML", flavors: "Various Colors", price: 299, image: "", route: "/Product" },
       { id: 120, name: "Shaker Bottle Premium", weight: "700ML", flavors: "Various Colors", price: 499, image: "", route: "/Product" },
       { id: 121, name: "Gym Gloves", weight: "M/L/XL", flavors: "Black", price: 399, image: "", route: "/Product" },
