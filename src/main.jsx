@@ -8,13 +8,14 @@ import { CategoryPage, ProductImageManager } from "./products";
 import OptimumNutration from "./products/ProductsDetailsPages/OptimumNutration.jsx";
 import Layout from "./components/Layout";
 import AddressPage from "./components/AddressPage.jsx";
-
+import ScrollToTop from "./components/ScrollToTop.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import Cart from "./pages/Cart.jsx";
 
 function MainApp() {
   return (
     <BrowserRouter>
+      <ScrollToTop/>
       <CartProvider>
         <Routes>
           <Route path="/" element={<App />} />
