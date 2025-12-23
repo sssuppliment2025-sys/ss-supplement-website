@@ -7,7 +7,7 @@ const defaultProductImage =
   "https://via.placeholder.com/200x200?text=Add+Image";
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useCart(); // ✅ ONLY HERE
+  const { addToCart } = useCart(); 
   const navigate = useNavigate();
 
   const {
@@ -38,7 +38,7 @@ const ProductCard = ({ product }) => {
   }, [id, image]);
 
   const handleProductClick = () => {
-    navigate("/Product", { state: { product } });
+    navigate(`/product/${product.id}`, { state: { product } });
   };
 
   return (

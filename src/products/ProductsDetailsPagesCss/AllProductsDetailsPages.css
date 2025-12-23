@@ -243,3 +243,78 @@ body.dark-mode {
     font-size: 24px;
   }
 }
+.option-group button {
+  padding: 8px 16px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-group button.active {
+  background-color: #ff9800;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.option-group {
+  margin: 10px 0;
+}
+
+.option-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.option-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.option-scroll::-webkit-scrollbar-thumb {
+  background: #ff9800;
+  border-radius: 3px;
+}
+
+.option-group {
+  margin: 15px 0;
+}
+
+.option-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 5px 0;
+  scroll-behavior: smooth;
+}
+
+.option-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.option-scroll::-webkit-scrollbar-thumb {
+  background: #ff9800;
+  border-radius: 3px;
+}
+
+.option-scroll button {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.option-scroll button.active {
+  background-color: #ff9800;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+
