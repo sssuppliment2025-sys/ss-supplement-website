@@ -14,7 +14,7 @@ body {
   width: 100%;
   overflow-x: hidden;
   background-color: #ffffff;
-  color: #232323;
+  color: #1b1b1b;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
