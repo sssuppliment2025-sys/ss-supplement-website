@@ -1,204 +1,305 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import "../pages/Cart.css"; // reuse cart theme
 import "./AddressPage.css";
 
-const STORAGE_KEY = "saved_addresses";
+const SERVICEABLE_PINCODES = ["721652", "721101", "700001"];
+const STORAGE_KEY = "ss_addresses";
 
-const emptyForm = {
-  id: null,
-  name: "",
-  phone: "",
-  pincode: "",
-  locality: "",
-  address: "",
-  city: "",
-  state: "West Bengal",
-  landmark: "",
-  altPhone: "",
-  type: "Home",
-  isDefault: false,
-};
+const Address = () => {
+  const navigate = useNavigate();
 
-export default function AddressPage() {
-  const [form, setForm] = useState(emptyForm);
-  const [addresses, setAddresses] = useState([]);
-  const [editMode, setEditMode] = useState(false);
-  const [errors, setErrors] = useState({});
+  /* CART DATA FOR RIGHT SECTION */
+  const { cartItems, totalPrice, clearCart } = useCart();
 
-  /* ================= LOAD ================= */
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    setAddresses(saved);
-  }, []);
+  /* ADDRESS FORM STATE */
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    pincode: "",
+    locality: "",
+    address: "",
+    city: "",
+    state: "West Bengal",
+    landmark: "",
+    altPhone: "",
+    addressType: "home",
+  });
 
-  /* ================= HELPERS ================= */
-  const saveStorage = (data) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    setAddresses(data);
-  };
+  const [status, setStatus] = useState("");
 
+  /* ================= FORM HANDLING ================= */
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setStatus("");
   };
 
-  /* ================= VALIDATION ================= */
-  const validate = () => {
-    const e = {};
-    if (!form.name) e.name = "Name required";
-    if (!/^[6-9]\d{9}$/.test(form.phone)) e.phone = "Invalid phone";
-    if (!/^\d{6}$/.test(form.pincode)) e.pincode = "Invalid pincode";
-    if (!form.address) e.address = "Address required";
-    if (!form.city) e.city = "City required";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  /* ================= SUBMIT ================= */
-  const handleSubmit = () => {
-    if (!validate()) return;
-
-    let updated = [...addresses];
-
-    if (form.isDefault) {
-      updated = updated.map((a) => ({ ...a, isDefault: false }));
-    }
-
-    if (editMode) {
-      updated = updated.map((a) => (a.id === form.id ? form : a));
+  const checkDeliverable = (pin) => {
+    if (SERVICEABLE_PINCODES.includes(pin)) {
+      setStatus("deliverable");
     } else {
-      updated.push({ ...form, id: Date.now() });
+      setStatus("not-deliverable");
+    }
+  };
+
+  /* ================= SAVE ADDRESS ================= */
+  const saveAddressToLocal = () => {
+    const existing =
+      JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    const alreadyExists = existing.some(
+      (addr) =>
+        addr.phone === form.phone &&
+        addr.pincode === form.pincode &&
+        addr.address === form.address
+    );
+
+    if (!alreadyExists) {
+      existing.push(form);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+    }
+  };
+
+  /* ================= USE CURRENT LOCATION ================= */
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
     }
 
-    saveStorage(updated);
-    setForm(emptyForm);
-    setEditMode(false);
-    setErrors({});
-  };
+    navigator.geolocation.getCurrentPosition(
+      () => {
+        const autoPin = "721652";
 
-  /* ================= ACTIONS ================= */
-  const editAddress = (addr) => {
-    setForm(addr);
-    setEditMode(true);
-  };
+        setForm({
+          ...form,
+          pincode: autoPin,
+          locality: "Moyna",
+          address: "Moyna Subdistrict",
+          city: "Purba Medinipur",
+          state: "West Bengal",
+        });
 
-  const deleteAddress = (id) => {
-    if (!window.confirm("Delete address?")) return;
-    saveStorage(addresses.filter((a) => a.id !== id));
-  };
-
-  /* ================= GEOLOCATION ================= */
-  const useMyLocation = () => {
-    if (!navigator.geolocation) return alert("Geolocation not supported");
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const { latitude, longitude } = pos.coords;
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_KEY}`
-      );
-      const data = await res.json();
-
-      if (!data.results?.length) return;
-
-      const c = data.results[0].address_components;
-      const get = (t) => c.find((x) => x.types.includes(t))?.long_name || "";
-
-      setForm((p) => ({
-        ...p,
-        address: data.results[0].formatted_address,
-        pincode: get("postal_code"),
-        city: get("administrative_area_level_2"),
-        locality: get("sublocality") || get("locality"),
-      }));
-    });
+        checkDeliverable(autoPin);
+      },
+      () => alert("Unable to fetch location")
+    );
   };
 
   return (
     <>
-      <div className="address-page">
-        
-        <div className="address-box">
-          <div className="address-header">DELIVERY ADDRESS</div>
+      {/* HEADER (SAME AS CART) */}
+      <header className="cart-header">
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          ←
+        </button>
 
-          <button className="location-btn" onClick={useMyLocation}>
+        <div className="brand">
+          <img src="/logo.jpg" alt="SS Supplement" />
+          <span>SS Supplement</span>
+        </div>
+      </header>
+
+      {/* SAME CART LAYOUT */}
+      <div className="cart-layout">
+        {/* LEFT → ADDRESS FORM */}
+        <div className="cart-left">
+          <h2 className="cart-title">Delivery Address</h2>
+
+          <button
+            style={{
+              background: "#2563eb",
+              color: "white",
+              padding: "10px 14px",
+              border: "none",
+              borderRadius: "6px",
+              marginBottom: "20px",
+              cursor: "pointer",
+            }}
+            onClick={useCurrentLocation}
+          >
             📍 Use my current location
           </button>
 
-          <div className="form-grid">
-            <div>
-              <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
-              {errors.name && <span className="error">{errors.name}</span>}
-            </div>
+          {/* FORM GRID */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "14px",
+            }}
+          >
+            <input
+              name="name"
+              placeholder="Name"
+              value={form.name}
+              onChange={handleChange}
+            />
 
-            <div>
-              <input name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} />
-              {errors.phone && <span className="error">{errors.phone}</span>}
-            </div>
+            <input
+              name="phone"
+              placeholder="10-digit mobile number"
+              value={form.phone}
+              onChange={handleChange}
+            />
 
-            <div>
-              <input name="pincode" placeholder="Pincode" value={form.pincode} onChange={handleChange} />
-              {errors.pincode && <span className="error">{errors.pincode}</span>}
-            </div>
+            <input
+              name="pincode"
+              placeholder="Pincode"
+              value={form.pincode}
+              onChange={(e) => {
+                handleChange(e);
+                checkDeliverable(e.target.value);
+              }}
+            />
 
-            <input name="locality" placeholder="Locality" value={form.locality} onChange={handleChange} />
+            <input
+              name="locality"
+              placeholder="Locality"
+              value={form.locality}
+              onChange={handleChange}
+            />
 
-            <div className="full">
-              <textarea name="address" placeholder="Address (Area & Street)" value={form.address} onChange={handleChange} />
-              {errors.address && <span className="error">{errors.address}</span>}
-            </div>
+            <textarea
+              name="address"
+              placeholder="Address (Area and Street)"
+              value={form.address}
+              onChange={handleChange}
+              maxLength={100}
+              className="address-textarea"
+            />
 
-            <div>
-              <input name="city" placeholder="City/District/Town" value={form.city} onChange={handleChange} />
-              {errors.city && <span className="error">{errors.city}</span>}
-            </div>
+            <p className="char-count">
+              {form.address.length}/100
+            </p>
 
-            <select name="state" value={form.state} onChange={handleChange}>
+            <input
+              name="city"
+              placeholder="City/District/Town"
+              value={form.city}
+              onChange={handleChange}
+            />
+
+            {/* STATE DROPDOWN */}
+            <select disabled>
               <option>West Bengal</option>
-              <option>Bihar</option>
-              <option>Odisha</option>
             </select>
 
-            <input name="landmark" placeholder="Landmark (Optional)" value={form.landmark} onChange={handleChange} />
-            <input name="altPhone" placeholder="Alternate Phone (Optional)" value={form.altPhone} onChange={handleChange} />
+            <input
+              name="landmark"
+              placeholder="Landmark (Optional)"
+              value={form.landmark}
+              onChange={handleChange}
+            />
 
-            <div className="full address-type">
-              <label><input type="radio" name="type" value="Home" checked={form.type === "Home"} onChange={handleChange} /> Home</label>
-              <label><input type="radio" name="type" value="Work" checked={form.type === "Work"} onChange={handleChange} /> Work</label>
-            </div>
+            <input
+              name="altPhone"
+              placeholder="Alternate Phone (Optional)"
+              value={form.altPhone}
+              onChange={handleChange}
+            />
+          </div>
 
-            <div className="full">
-              <label className="default-check">
-                <input type="checkbox" name="isDefault" checked={form.isDefault} onChange={handleChange} />
-                Set as default address
-              </label>
-            </div>
+          {/* ADDRESS TYPE */}
+          <div style={{ marginTop: "20px" }}>
+            <p><b>Address Type</b></p>
 
-            <div className="full actions">
-              <button className="save-btn" onClick={handleSubmit}>
-                {editMode ? "UPDATE ADDRESS" : "SAVE AND DELIVER HERE"}
-              </button>
-              <button className="cancel-btn" onClick={() => setForm(emptyForm)}>CANCEL</button>
-            </div>
+            <label style={{ marginRight: "20px" }}>
+              <input
+                type="radio"
+                checked={form.addressType === "home"}
+                onChange={() =>
+                  setForm({ ...form, addressType: "home" })
+                }
+              />
+              Home
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                checked={form.addressType === "work"}
+                onChange={() =>
+                  setForm({ ...form, addressType: "work" })
+                }
+              />
+              Work
+            </label>
+          </div>
+
+          {/* STATUS */}
+          {status === "not-deliverable" && (
+            <p style={{ color: "red", marginTop: "10px" }}>
+              ❌ Currently not deliverable
+            </p>
+          )}
+
+          {status === "deliverable" && (
+            <p style={{ color: "green", marginTop: "10px" }}>
+              ✔ Deliverable to this address
+            </p>
+          )}
+
+          {/* ACTIONS */}
+          <div style={{ marginTop: "24px", display: "flex", gap: "16px" }}>
+            <button
+              className="place-order-btn"
+              disabled={status !== "deliverable"}
+              onClick={() => {
+                saveAddressToLocal();
+                navigate("/payment");
+              }}
+            >
+              SAVE AND CONTINUE
+            </button>
+
+            <button
+              className="clear-cart-link"
+              onClick={() => navigate(-1)}
+            >
+              CANCEL
+            </button>
           </div>
         </div>
 
-        {addresses.length > 0 && (
-          <div className="saved-list">
-            <h3>Saved Addresses</h3>
-            {addresses.map((a) => (
-              <div key={a.id} className="saved-card">
-                <p><b>{a.name}</b> ({a.type}) {a.isDefault && <span className="badge">DEFAULT</span>}</p>
-                <p>{a.address}</p>
-                <p>{a.city} - {a.pincode}</p>
-                <p>{a.phone}</p>
-                <div className="saved-actions">
-                  <button onClick={() => editAddress(a)}>Edit</button>
-                  <button onClick={() => deleteAddress(a.id)}>Delete</button>
-                </div>
-              </div>
-            ))}
+        {/* RIGHT → CART SUMMARY */}
+        <div className="cart-right">
+          <h3>PRICE DETAILS</h3>
+
+          <div className="price-row">
+            <span>Price ({cartItems.length} items)</span>
+            <span>₹{totalPrice}</span>
           </div>
-        )}
+
+          <div className="price-row">
+            <span>Platform Fee</span>
+            <span>₹7</span>
+          </div>
+
+          <hr />
+
+          <div className="price-row total">
+            <span>Total Amount</span>
+            <span>₹{totalPrice + 7}</span>
+          </div>
+
+          {/* <button
+            className="clear-cart-link"
+            onClick={clearCart}
+            style={{ marginTop: "20px" }}
+          >
+            Clear Cart
+          </button> */}
+        </div>
       </div>
+
+      {/* FOOTER */}
+      <footer className="cart-footer">
+        ⭐ 1000+ Happy Customers ❤️
+      </footer>
     </>
   );
-}
+};
+
+export default Address;

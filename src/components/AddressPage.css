@@ -1,125 +1,64 @@
-.address-page {
-  padding: 30px;
-  background: #f5faff;
-  min-height: 100vh;
-}
-
-.dark-mode .address-page {
-  background: #121212;
-  color: #e0e0e0;
-}
-
-.address-box {
-  max-width: 900px;
-  margin: auto;
-  background: #fff;
-  padding: 20px;
-}
-
-.dark-mode .address-box {
-  background: #1e1e1e;
-}
-
-.address-header {
-  background: #2874f0;
-  color: #fff;
-  padding: 12px;
-  font-weight: bold;
-}
-
-.location-btn {
-  margin: 15px 0;
-  background: #2874f0;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
-
-.form-grid input,
-.form-grid textarea,
-.form-grid select {
-  padding: 12px;
-  border: 1px solid #ccc;
-  width: 100%;
-}
-
-.dark-mode input,
-.dark-mode textarea,
-.dark-mode select {
-  background: #2a2a2a;
-  color: #fff;
-  border-color: #444;
-}
-
-.form-grid textarea {
-  height: 80px;
-}
-
-.full {
+/* ================================
+   ADDRESS TEXTAREA FIX
+================================ */
+/* Reduce gap specifically after address */
+.address-textarea {
   grid-column: span 2;
+  height: 80px;
+  resize: none;
+  margin-bottom: -6px;   /* 👈 reduces gap */
 }
 
-.address-type {
-  display: flex;
-  gap: 20px;
-}
-
-.actions {
-  display: flex;
-  gap: 15px;
-}
-
-.save-btn {
-  background: #ff6a00;
-  color: #fff;
-  padding: 12px 20px;
-  border: none;
-  cursor: pointer;
-}
-
-.cancel-btn {
-  background: none;
-  color: #2874f0;
-  border: none;
-  cursor: pointer;
-}
-
-.error {
-  color: #ff4d4f;
+/* Character counter */
+.char-count {
+  grid-column: span 2;
   font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-bottom: 6px;
 }
 
-.saved-list {
-  max-width: 900px;
-  margin: 30px auto;
+/* ================================
+   PREMIUM FORM INPUT STYLE
+================================ */
+.cart-left input,
+.cart-left select,
+.cart-left textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  background: linear-gradient(#ffffff, #ffffff);
+  transition: all 0.25s ease;
+  outline: none;
 }
 
-.saved-card {
+/* Hover */
+.cart-left input:hover,
+.cart-left textarea:hover,
+.cart-left select:hover {
+  border-color: #facc15;
+}
+
+/* Focus glow */
+.cart-left input:focus,
+.cart-left textarea:focus,
+.cart-left select:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
   background: #fff;
-  padding: 15px;
-  margin-bottom: 10px;
 }
 
-.dark-mode .saved-card {
-  background: #1e1e1e;
+/* Placeholder */
+.cart-left input::placeholder,
+.cart-left textarea::placeholder {
+  color: #9ca3af;
 }
 
-.saved-actions button {
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-.badge {
-  background: green;
-  color: #fff;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
+/* Disabled state */
+.cart-left select:disabled {
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
 }
