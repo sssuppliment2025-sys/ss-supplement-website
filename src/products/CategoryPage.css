@@ -1,9 +1,10 @@
 /* ======================= Category Page Styles ======================= */
 .category-page {
-  max-width: 1400px;
+  max-width: auto;
   margin: 0 auto;
   padding: 20px 20px; /* ✅ SAME side spacing as previous page */
   min-height: 70vh;
+  background-color: white;
 }
 
 /* ======================= Breadcrumb ======================= */
