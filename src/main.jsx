@@ -9,7 +9,6 @@ import OptimumNutration from "./products/ProductsDetailsPages/OptimumNutration.j
 import Layout from "./components/Layout";
 import AddressPage from "./components/AddressPage.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
-
 import { CartProvider } from "./context/CartContext.jsx";
 import PaymentPage from "./components/PaymentPage.jsx";
 import Cart from "./pages/Cart.jsx";
@@ -34,6 +33,7 @@ function MainApp() {
             }
           />
           <Route path="/AddressPage" element={<AddressPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
 
           <Route path="/cart" element={<Cart />} />
         </Routes>
