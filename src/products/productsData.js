@@ -16,12 +16,6 @@ export const productCategories = {
       { id: 2, name: "Optimum Nutrition", weight: "2LB/907GM", flavors: "Vanilla Ice Cream", price: 2499, image: "/image/Whey_protien/Optimum/Optimum_Vanilla_2lb.webp", route: "/Product" },
       { id: 3, name: "Optimum Nutrition", weight: "5LB/2.27KG", flavors: "Double Rich Chocolate", price: 5299, image: "/image/Whey_protien/Optimum/double_rich_5lb.webp", route: "/Product" },
       { id: 4, name: "Optimum Nutrition", weight: "5LB/2.27KG", flavors: "Vanilla Ice Cream", price: 5299, image: "/image/Whey_protien/Optimum/vanilla_5lb.png", route: "/Product" },
-<<<<<<< HEAD
-
-      { id: 5, name: "Dymatize Elite", weight: "5LB/2.27KG", flavors: "Rich Chocolate", price: 4899, image: "/image/Whey_protien/Dymatize/rich_choclate_5lb.webp", route: "/Product" },
-=======
->>>>>>> 0397ae2 (product image setup 1.2)
-
       { id: 5, name: "Dymatize Elite", weight: "5LB/2.27KG", flavors: "Rich Chocolate", price: 4899, image: "/image/Whey_protien/Dymatize/rich_choclate_5lb.webp", route: "/Product" },
       { id: 6, name: "Labrada Whey", weight: "500G", flavors: "Chocolate", price: 1299, image: "/image/Whey_protien/Labrada/labrada_chocolate_500gm.webp", route: "/Product" },
       { id: 7, name: "Labrada Whey", weight: "500G", flavors: "Vanilla", price: 1299, image: "/image/Whey_protien/Labrada/labrada_vanilla_500gm.webp", route: "/Product" },
@@ -32,16 +26,9 @@ export const productCategories = {
       { id: 12, name: "Labrada Whey", weight: "1.8KG", flavors: "Chocolate", price: 3999, image: "/image/Whey_protien/Labrada/labrada_chocolate_1.8kg.webp", route: "/Product" },
       { id: 13, name: "Labrada Whey", weight: "1.8KG", flavors: "Vanilla", price: 3999, image: "/image/Whey_protien/Labrada/labrada_vanilla_1.8kg.webp", route: "/Product" },
       { id: 14, name: "Labrada Whey", weight: "1.8KG", flavors: "Mocha", price: 3999, image: "/image/Whey_protien/Labrada/labrada_mocha_1.8kg.webp", route: "/Product" },
-<<<<<<< HEAD
-
-      { id: 15, name: "MuscleTech Nitro Tech Whey", weight: "450GM", flavors: "Double Rich Chocolate", price: 1599, image: "/image/Whey_protien/MuscleTech/MuscleTech_double_rich_chocolate_450gm.webp", route: "/Product" },
-      { id: 16, name: "MuscleTech Nitro Tech Whey", weight: "450GM", flavors: "Cookies & Cream", price: 1599, image: "/image/Whey_protien/MuscleTech/MuscleTech_cookies&cream_450gm.webp", route: "/Product" },
-      { id: 17, name: "MuscleTech Nitro Tech Whey", weight: "907GM", flavors: "Double Rich Chocolate", price: 1599, image: "/image/Whey_protien/MuscleTech/MuscleTech_double_rich_chocolate_907gm.jpg", route: "/Product" },
-=======
       { id: 15, name: "MuscleTech Nitro Tech Whey", weight: "450GM", flavors: "Double Rich Chocolate", price: 1599, image: "/image/Whey_protien/MuscleTech/MuscleTech_double_rich_chocolate_450gm.webp", route: "/Product" },
       { id: 16, name: "MuscleTech Nitro Tech Whey", weight: "450GM", flavors: "Cookies & Cream", price: 1599, image: "/image/Whey_protien/MuscleTech/MuscleTech_cookies&cream_450gm.webp", route: "/Product" },
       { id: 17, name: "MuscleTech Nitro Tech Whey", weight: "907GM", flavors: "Double Rich Chocolate", price: 2899, image: "/image/Whey_protien/MuscleTech/MuscleTech_double_rich_chocolate_907gm.jpg", route: "/Product" },
->>>>>>> 0397ae2 (product image setup 1.2)
       { id: 18, name: "MuscleTech Nitro Tech Whey", weight: "907GM", flavors: "Cookies & Cream", price: 2899, image: "/image/Whey_protien/MuscleTech/MuscleTech_cookies_&_cream_907gm.webp", route: "/Product" },
       { id: 19, name: "MuscleTech Nitro Tech Whey", weight: "1.8KG", flavors: "Double Rich Chocolate", price: 5299, image: "/image/Whey_protien/MuscleTech/MuscleTech_double_rich_chocolate_1.8kg.webp", route: "/Product" },
       { id: 20, name: "MuscleTech Nitro Tech Whey", weight: "1.8KG", flavors: "Cookies & Cream", price: 5299, image: "/image/Whey_protien/MuscleTech/MuscleTech_cookies&cream_1.8kg.webp", route: "/Product" },
@@ -64,16 +51,6 @@ export const productCategories = {
       { id: 34, name: "BPI Whey HD", weight: "1KG", flavors: "Chocolate Delight", price: 2499, image: "/image/Whey_protien/BPI/bpi_delight_1kg.webp", route: "/Product" },
       { id: 35, name: "BPI Whey HD", weight: "2KG", flavors: "Chocolate Delight", price: 4299, image: "/image/Whey_protien/BPI/bpi_delight_2kg.png", route: "/Product" },
 
-<<<<<<< HEAD
-      { id: 45, name: "MB Biozyme Whey PR", weight: "1KG/2KG", flavors: "Low Carbs Ice Cream Chocolate", price: 3499, image: "", route: "/Product" },
-      { id: 45, name: "MB Biozyme Whey PR", weight: "1KG/2KG", flavors: "Low Carbs Cookies & Cream", price: 3499, image: "", route: "/Product" },
-
-
-      { id: 47, name: "Avvatar Whey Protein", weight: "1KG/2KG", flavors: "Belgian Chocolate", price: 2899, image: "/image/Whey_protien/Avvatar/belgian_chocolate.webp", route: "/Product" },
-      { id: 48, name: "Avvatar Whey Protein", weight: "1KG/2KG", flavors: "Malai Kulfi", price: 2899, image: "/image/Whey_protien/Avvatar/malai_kulfi.webp", route: "/Product" },
-      { id: 49, name: "Avvatar Whey Protein", weight: "1KG/2KG", flavors: "Chocolate Hazelnut", price: 2899, image: "/image/Whey_protien/Avvatar/choco_hazelnut.webp", route: "/Product" },
-=======
->>>>>>> 0397ae2 (product image setup 1.2)
 
       { id: 36, name: "One Science Whey Protein", weight: "1LB", flavors: "Chocolate Charge", price: 1299, image: "/image/Whey_protien/OneScience/OneScience_choc_1lb.jpg", route: "/Product" },
       { id: 37, name: "One Science Whey Protein", weight: "2LB/907GM", flavors: "Chocolate Charge", price: 2399, image: "/image/Whey_protien/OneScience/OneScience_choc_2lb.png", route: "/Product" },
@@ -93,24 +70,14 @@ export const productCategories = {
       { id: 50, name: "MB Biozyme Whey Performance", weight: "2KG", flavors: "Magical Mango", price: 5999, image: "/image/Whey_protien/MB_performance/mb_magical_mango_2kg.jpg", route: "/Product" },
 
 
-<<<<<<< HEAD
-      { id: 58, name: "Attom Whey", weight: "1KG/2KG", flavors: "Double Rich Chocolate ", price: 2299, image: "", route: "/Product" },
-      { id: 59, name: "Attom Whey", weight: "1KG/2KG", flavors: "French Vanilla", price: 2299, image: "", route: "/Product" },
-
-      { id: 60, name: "Morphenlab Turbo Whey", weight: "1KG", flavors: "Butter Scotch", price: 1899, image: "", route: "/Product" },
-      { id: 61, name: "Morphenlab Whey Protein", weight: "2KG", flavors: "Chocolate", price: 3299, image: "", route: "/Product" },
-
-      { id: 62, name: "Absolute Whey Legender", weight: "1KG/2KG", flavors: "Chocolate", price: 2599, image: "", route: "/Product" },
-      { id: 63, name: "Absolute Whey Legender", weight: "1KG/2KG", flavors: "Cashew Saffron Pistachio", price: 2599, image: "", route: "/Product" },
-=======
-      { id: 51, name: "MB Biozyme Whey Isozero", weight: "1KG", flavors: "Chocolate Fudge", price: 3799, image: "/image/Whey_protien/MB/isozero_chocolate_fudge.webp", route: "/Product" },
-      { id: 52, name: "MB Biozyme Whey Isozero", weight: "2KG", flavors: "Chocolate Fudge", price: 6899, image: "/image/Whey_protien/MB/isozero_chocolate_fudge.webp", route: "/Product" },
+      { id: 51, name: "MB Biozyme Whey Isozero", weight: "1KG", flavors: "Ice Cream Chocolate", price: 3799, image: "/image/Whey_protien/MB/isozero_chocolate_fudge.webp", route: "/Product" },
+      { id: 52, name: "MB Biozyme Whey Isozero", weight: "2KG", flavors: "Ice Cream Chocolate", price: 6899, image: "/image/Whey_protien/MB/isozero_chocolate_fudge.webp", route: "/Product" },
       { id: 53, name: "MB Biozyme Whey Isozero", weight: "1KG", flavors: "Cookies & Cream", price: 3799, image: "/image/Whey_protien/MB/isozero_cookies_cream.webp", route: "/Product" },
       { id: 54, name: "MB Biozyme Whey Isozero", weight: "2KG", flavors: "Cookies & Cream", price: 6899, image: "/image/Whey_protien/MB/isozero_cookies_cream.webp", route: "/Product" },
-      { id: 55, name: "MB Biozyme Whey PR", weight: "1KG", flavors: "Low Carbs Ice Cream Chocolate", price: 3499, image: "", route: "/Product" },
-      { id: 56, name: "MB Biozyme Whey PR", weight: "2KG", flavors: "Low Carbs Ice Cream Chocolate", price: 6399, image: "", route: "/Product" },
-      { id: 57, name: "MB Biozyme Whey PR", weight: "1KG", flavors: "Low Carbs Cookies & Cream", price: 3499, image: "", route: "/Product" },
-      { id: 58, name: "MB Biozyme Whey PR", weight: "2KG", flavors: "Low Carbs Cookies & Cream", price: 6399, image: "", route: "/Product" },
+      { id: 55, name: "MB Biozyme Whey PR", weight: "1KG", flavors: "Chocolate Fudge", price: 3499, image: "", route: "/Product" },
+      { id: 56, name: "MB Biozyme Whey PR", weight: "2KG", flavors: "Chocolate Fudge", price: 6399, image: "", route: "/Product" },
+      { id: 57, name: "MB Biozyme Whey PR", weight: "1KG", flavors: "Cookies & Cream", price: 3499, image: "", route: "/Product" },
+      { id: 58, name: "MB Biozyme Whey PR", weight: "2KG", flavors: "Cookies & Cream", price: 6399, image: "", route: "/Product" },
       { id: 59, name: "Avvatar Whey Protein", weight: "1KG", flavors: "Belgian Chocolate", price: 2899, image: "/image/Whey_protien/Avvatar/belgian_chocolate.webp", route: "/Product" },
       { id: 60, name: "Avvatar Whey Protein", weight: "2KG", flavors: "Belgian Chocolate", price: 5299, image: "/image/Whey_protien/Avvatar/belgian_chocolate.webp", route: "/Product" },
       { id: 61, name: "Avvatar Whey Protein", weight: "1KG", flavors: "Malai Kulfi", price: 2899, image: "/image/Whey_protien/Avvatar/malai_kulfi.webp", route: "/Product" },
@@ -141,7 +108,6 @@ export const productCategories = {
       { id: 86, name: "Absolute Whey Legender", weight: "2KG", flavors: "Chocolate", price: 4799, image: "", route: "/Product" },
       { id: 87, name: "Absolute Whey Legender", weight: "1KG", flavors: "Cashew Saffron Pistachio", price: 2599, image: "", route: "/Product" },
       { id: 88, name: "Absolute Whey Legender", weight: "2KG", flavors: "Cashew Saffron Pistachio", price: 4799, image: "", route: "/Product" },
->>>>>>> 0397ae2 (product image setup 1.2)
     ]
   }
 ,
@@ -150,37 +116,6 @@ creatine: {
     slug: "creatine",
     description: "High-quality creatine supplements for strength and performance",
     products: [
-<<<<<<< HEAD
-      { id: 33, name: "MB Creapro", weight: "100GM", flavors: "Unflavoured", price: 599, image: "", route: "/Product" },
-      { id: 34, name: "MB Creapro", weight: "250GM", flavors: "Unflavoured", price: 1199, image: "", route: "/Product" },
-
-      { id: 35, name: "MB Creamp", weight: "120GM", flavors: "Citrus Blast", price: 699, image: "", route: "/Product" },
-      { id: 35, name: "MB Creamp", weight: "120GM", flavors: "Water Melon Kool Aid", price: 699, image: "", route: "/Product" },
-
-      { id: 36, name: "MB Creamp", weight: "320GM", flavors: "Citrus Blast", price: 1499, image: "", route: "/Product" },
-      { id: 36, name: "MB Creamp", weight: "320GM", flavors: "Water Melon Kool Aid", price: 1499, image: "", route: "/Product" },
-      { id: 36, name: "MB Creamp", weight: "320GM", flavors: "Juicy Berries", price: 1499, image: "", route: "/Product" },
-      { id: 36, name: "MB Creamp", weight: "320GM", flavors: "Candy Rush", price: 1499, image: "", route: "/Product" },
-
-      { id: 37, name: "Wellcore", weight: "100GM", flavors: "Unflavoured", price: 549, image: "", route: "/Product" },
-      { id: 38, name: "Wellcore", weight: "250GM", flavors: "Unflavoured", price: 1099, image: "", route: "/Product" },
-      
-      { id: 39, name: "Wellcore", weight: "123GM", flavors: "Tropical Tango / Fruit Fussion / Kiwi Kick", price: 749, image: "", route: "/Product" },
-      { id: 40, name: "Wellcore", weight: "307GM", flavors: "Tropical Tango / Fruit Fussion / Kiwi Kick", price: 1599, image: "", route: "/Product" },
-      { id: 41, name: "GNC", weight: "100GM", flavors: "Unflavoured / Orange / Blueberry / Cranberry / Lemon", price: 699, image: "", route: "/Product" },
-      { id: 42, name: "GNC", weight: "250GM", flavors: "Unflavoured / Orange / Blueberry / Cranberry / Lemon", price: 1399, image: "", route: "/Product" },
-      { id: 43, name: "GNC", weight: "400GM", flavors: "Unflavoured / Orange / Blueberry / Cranberry / Lemon", price: 1999, image: "", route: "/Product" },
-      { id: 44, name: "GNC Creatine + Electrolytes", weight: "100GM", flavors: "Unflavoured / Orange / Lemon", price: 799, image: "", route: "/Product" },
-      { id: 45, name: "GNC Creatine + Electrolytes", weight: "250GM", flavors: "Unflavoured / Orange / Lemon", price: 1599, image: "", route: "/Product" },
-      { id: 46, name: "GNC Creatine + Electrolytes", weight: "400GM", flavors: "Unflavoured / Orange / Lemon", price: 2299, image: "", route: "/Product" },
-      { id: 47, name: "Fast & Up Electrolytes", weight: "20N", flavors: "Orange", price: 899, image: "", route: "/Product" },
-      { id: 48, name: "Muscle Tech", weight: "100GM", flavors: "Unflavoured", price: 649, image: "", route: "/Product" },
-      { id: 49, name: "Muscle Tech", weight: "250GM", flavors: "Unflavoured", price: 1299, image: "", route: "/Product" },
-      { id: 50, name: "Muscle Tech", weight: "400GM", flavors: "Unflavoured", price: 1899, image: "", route: "/Product" },
-      { id: 51, name: "Labrada Creatine", weight: "100G/250G", flavors: "Unflavoured", price: 999, image: "", route: "/Product" },
-      { id: 52, name: "ON Creatine", weight: "100GM", flavors: "Unflavoured", price: 599, image: "", route: "/Product" },
-      { id: 53, name: "ON Creatine", weight: "250GM", flavors: "Unflavoured", price: 1199, image: "", route: "/Product" },
-=======
       { id: 89, name: "MB Creapro", weight: "100GM", flavors: "Unflavoured", price: 599, image: "", route: "/Product" },
       { id: 90, name: "MB Creapro", weight: "250GM", flavors: "Unflavoured", price: 1199, image: "", route: "/Product" },
       { id: 91, name: "MB Creamp", weight: "120GM", flavors: "Citrus Blast", price: 699, image: "", route: "/Product" },
@@ -229,7 +164,6 @@ creatine: {
       { id: 134, name: "Labrada Creatine", weight: "250G", flavors: "Unflavoured", price: 999, image: "", route: "/Product" },
       { id: 135, name: "ON Creatine", weight: "100GM", flavors: "Unflavoured", price: 599, image: "", route: "/Product" },
       { id: 136, name: "ON Creatine", weight: "250GM", flavors: "Unflavoured", price: 1199, image: "", route: "/Product" },
->>>>>>> 0397ae2 (product image setup 1.2)
     ]
   },
   massGainer: {
