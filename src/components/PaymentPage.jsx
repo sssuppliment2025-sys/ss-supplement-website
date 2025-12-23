@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "../pages/Cart.css";
+import "./AddressPage.css";
 
 const PaymentPage = () => {
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ Please confirm this order.
     }
 
     const numbers = [
-      "919876543210",
+      "918900299008",
       "919123456789",
     ];
 

@@ -5,8 +5,21 @@ import "../pages/Cart.css";
 import "./AddressPage.css";
 
 const SERVICEABLE_PINCODES = ["721652", "721101", "700001"];
-const STORAGE_KEY = "ss_addresses";      // final saved address
-const DRAFT_KEY = "ss_address_draft";    // temp draft
+const STORAGE_KEY = "ss_addresses";   // final address (single)
+const DRAFT_KEY = "ss_address_draft"; // live draft
+
+const BASE_FORM = {
+  name: "",
+  phone: "",
+  pincode: "",
+  locality: "",
+  address: "",
+  city: "",
+  state: "West Bengal",
+  landmark: "",
+  altPhone: "",
+  addressType: "home",
+};
 
 const Address = () => {
   const navigate = useNavigate();
@@ -14,31 +27,18 @@ const Address = () => {
 
   const initialized = useRef(false);
 
-  /* ================= ADDRESS FORM STATE ================= */
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    pincode: "",
-    locality: "",
-    address: "",
-    city: "",
-    state: "West Bengal",
-    landmark: "",
-    altPhone: "",
-    addressType: "home",
-  });
-
+  const [form, setForm] = useState(BASE_FORM);
   const [status, setStatus] = useState("");
 
-  /* ================= RESTORE ADDRESS ON LOAD ================= */
+  /* ================= RESTORE ON FIRST LOAD ================= */
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     const draft = localStorage.getItem(DRAFT_KEY);
 
     if (saved) {
-      setForm(JSON.parse(saved));          // highest priority
+      setForm({ ...BASE_FORM, ...JSON.parse(saved) });
     } else if (draft) {
-      setForm(JSON.parse(draft));
+      setForm({ ...BASE_FORM, ...JSON.parse(draft) });
     }
 
     initialized.current = true;
@@ -46,35 +46,17 @@ const Address = () => {
 
   /* ================= AUTO-SAVE DRAFT ================= */
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const draft = localStorage.getItem(DRAFT_KEY);
+    if (!initialized.current) return;
 
-    const baseForm = {
-      name: "",
-      phone: "",
-      pincode: "",
-      locality: "",
-      address: "",
-      city: "",
-      state: "West Bengal",
-      landmark: "",
-      altPhone: "",
-      addressType: "home",
-    };
-
-    if (saved) {
-      setForm({ ...baseForm, ...JSON.parse(saved) });
-    } else if (draft) {
-      setForm({ ...baseForm, ...JSON.parse(draft) });
+    const hasData = Object.values(form).some(Boolean);
+    if (hasData) {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
     }
-
-    initialized.current = true;
-  }, []);
-
+  }, [form]);
 
   /* ================= HANDLERS ================= */
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setStatus("");
   };
 
@@ -86,11 +68,9 @@ const Address = () => {
     );
   };
 
-  /* ================= SAVE ADDRESS (OVERWRITE OLD) ================= */
+  /* ================= SAVE FINAL ADDRESS ================= */
   const saveAddressToLocal = () => {
-    // ✅ overwrite previous address completely
     localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
-    // keep draft same as final
     localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
   };
 
@@ -110,7 +90,7 @@ const Address = () => {
             `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1`,
             {
               headers: {
-                "Accept": "application/json",
+                Accept: "application/json",
                 "User-Agent": "ss-supplement-app/1.0",
               },
             }
@@ -122,13 +102,8 @@ const Address = () => {
           const pincode = a.postcode || "";
           const city =
             a.city || a.town || a.village || a.county || "";
-
           const locality =
-            a.suburb ||
-            a.neighbourhood ||
-            a.village ||
-            city ||
-            "";
+            a.suburb || a.neighbourhood || a.village || city || "";
 
           const addressLine = [
             a.house_number,
@@ -148,7 +123,7 @@ const Address = () => {
           }));
 
           checkDeliverable(pincode);
-        } catch (err) {
+        } catch {
           alert("Unable to fetch address. Please fill manually.");
         }
       },
@@ -188,9 +163,7 @@ const Address = () => {
     <>
       {/* HEADER */}
       <header className="cart-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          ←
-        </button>
+        <button className="back-btn" onClick={() => navigate(-1)}>←</button>
         <div className="brand">
           <img src="/logo.jpg" alt="SS Supplement" />
           <span>SS Supplement</span>
@@ -226,6 +199,7 @@ const Address = () => {
           >
             <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
             <input name="phone" placeholder="10-digit mobile number" value={form.phone} onChange={handleChange} />
+
             <input
               name="pincode"
               placeholder="Pincode"
@@ -235,6 +209,7 @@ const Address = () => {
                 checkDeliverable(e.target.value);
               }}
             />
+
             <input name="locality" placeholder="Locality" value={form.locality} onChange={handleChange} />
 
             <textarea
@@ -246,10 +221,7 @@ const Address = () => {
               className="address-textarea"
             />
 
-            <p className="char-count">
-              {(form.address || "").length}/100
-            </p>
-
+            <p className="char-count">{(form.address || "").length}/100</p>
 
             <input name="city" placeholder="City/District/Town" value={form.city} onChange={handleChange} />
 
@@ -285,7 +257,6 @@ const Address = () => {
             </div>
           </div>
 
-          {/* STATUS */}
           {status === "not-deliverable" && (
             <p style={{ color: "red", marginTop: "10px" }}>
               ❌ Currently not deliverable
@@ -298,12 +269,10 @@ const Address = () => {
             </p>
           )}
 
-          {/* ACTIONS */}
           <div style={{ marginTop: "24px", display: "flex", gap: "16px" }}>
             <button className="place-order-btn" onClick={handleSubmit}>
               SAVE AND CONTINUE
             </button>
-
             <button className="clear-cart-link" onClick={() => navigate(-1)}>
               CANCEL
             </button>
@@ -313,19 +282,15 @@ const Address = () => {
         {/* RIGHT */}
         <div className="cart-right">
           <h3>PRICE DETAILS</h3>
-
           <div className="price-row">
             <span>Price ({cartItems.length} items)</span>
             <span>₹{totalPrice}</span>
           </div>
-
           <div className="price-row">
             <span>Platform Fee</span>
             <span>₹7</span>
           </div>
-
           <hr />
-
           <div className="price-row total">
             <span>Total Amount</span>
             <span>₹{totalPrice + 7}</span>

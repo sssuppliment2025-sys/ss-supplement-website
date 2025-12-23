@@ -89,6 +89,7 @@
   gap: 3200px;              /* space between radio options */
   margin-top: 20px;
   white-space: nowrap;   /* desktop: force single line */
+  gap: 14px
 }
 
 .address-type-inline label {
@@ -102,9 +103,9 @@
 /* Mobile: allow wrapping into two lines */
 @media (max-width: 480px) {
   .address-type-inline {
-    white-space: normal; /* allow wrap */
-    flex-wrap: wrap;     /* break into 2 lines */
-    gap: 14px;           /* tighter spacing on mobile */
+    white-space: normal; 
+    flex-wrap: wrap;     
+    gap: 14px;           
   }
 }
 
@@ -129,4 +130,22 @@
 
 .shake {
   animation: shake 0.3s ease-in-out;
+}
+
+
+/* ================================
+   PAYMENT PAGE – LAPTOP FIX
+   Fix middle section stretching
+================================ */
+
+/* Laptop screens only */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .cart-layout {
+    align-items: start; /* 🔥 stop vertical stretch */
+  }
+
+  .cart-layout > .cart-left {
+    height: fit-content;
+    align-self: flex-start;
+  }
 }

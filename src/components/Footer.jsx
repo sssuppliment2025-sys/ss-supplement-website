@@ -82,11 +82,11 @@ const Footer = () => {
             <div className="mb-footer-contact">
               <div>
                 <span className="mb-footer-contact-icon">📞</span>
-                <span>+91 9547899170</span>
+                <span>+91 num</span>
               </div>
               <div>
                 <span className="mb-footer-contact-icon">✉️</span>
-                <span classname="email">sssuppliment@gmail.com</span>
+                <span classname="email">mail</span>
               </div>
             </div>
 
