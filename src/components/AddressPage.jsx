@@ -184,6 +184,7 @@ const AddressPage = () => {
               borderRadius: "6px",
               marginBottom: "20px",
               cursor: "pointer",
+              display: "none",
             }}
             onClick={useCurrentLocation}
           >
@@ -236,7 +237,9 @@ const AddressPage = () => {
           {/* ADDRESS TYPE */}
           <div className="address-type">
             <p><b>Address Type</b></p>
-            <div className="address-type-options">
+            <div className="address-type-options"
+            style={{display: "grid", gap: "2px"}}
+            >
               <label>
                 <input
                   type="radio"
