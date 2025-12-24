@@ -31,8 +31,13 @@ body {
 ============================================================ */
 .main-wrapper {
   width: 100%;
+<<<<<<< HEAD
   max-width: 100%;
   padding: 15px;
+=======
+  max-width: 200%;
+  padding: 20px;
+>>>>>>> e8d3593cd6f2e85a3da7ff88bfbfcb7f657f865e
   margin: 0;
   text-align: center;
   overflow-x: hidden;
@@ -87,7 +92,7 @@ body {
   margin: 20px auto;
   border-radius: 12px;
   width: 50%;
-  color: #ffffff;
+  color: #050505;
 }
 
 .open-time {
@@ -178,7 +183,11 @@ body.dark-mode {
 }
 
 body.dark-mode .main-wrapper {
+<<<<<<< HEAD
   background-color: #1a1a1a;
+=======
+  background-color: black;
+>>>>>>> e8d3593cd6f2e85a3da7ff88bfbfcb7f657f865e
 }
 
 body.dark-mode .hero {
