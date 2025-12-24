@@ -37,8 +37,8 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: #32FF6A;
-  color: #232323;
+  background: linear-gradient(90deg, #dc2626, #facc15);
+  color: #ffffff;
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.7rem;
@@ -93,12 +93,12 @@
 .product-price {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #32FF6A;
+  color: #000000;
 }
 
 .add-to-cart-btn {
   background: linear-gradient(90deg, #dc2626, #facc15);
-  color: #efefef;
+  color: #ffffff;
   border: none;
   padding: 8px 15px;
   border-radius: 20px;
@@ -109,7 +109,7 @@
 }
 
 .add-to-cart-btn:hover {
-  background: #28d658;
+  background: #d67928;
   transform: scale(1.05);
 }
 
@@ -135,9 +135,18 @@ body.dark-mode .product-flavors {
 }
 
 body.dark-mode .add-to-cart-btn {
-  background: #32FF6A;
-  color: #232323;
+  background: linear-gradient(90deg, #b02020, #ab8c0e);
+  color: #f0f0f0;
 }
+
+body.dark-mode .product-price {
+  color: #f0f0f0;
+}
+
+body.dark-mode .product-category-tag{
+  background: linear-gradient(90deg, #b02020, #ab8c0e);
+  color: #f0f0f0;
+} 
 
 /* ======================= Responsive ======================= */
 @media (max-width: 768px) {

@@ -18,11 +18,12 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-body.dark-mode {
+body.dark-mode #root{
   background-color: #1a1a1a;
   color: #e0e0e0;
 }
 
 #root {
   min-height: 100vh;
+  background-color: #fffcf9;
 }

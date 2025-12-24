@@ -24,7 +24,7 @@
 }
 
 .breadcrumb a:hover {
-  color: #32FF6A;
+  color: #ffb732;
 }
 
 .breadcrumb span {
@@ -38,7 +38,7 @@
 
 /* ======================= Category Header ======================= */
 .category-header {
-  background: linear-gradient(135deg, #32FF6A 0%, #28d658 100%);
+  background: linear-gradient(135deg, #ffc375 0%, #ffa42c 100%);
   border-radius: 16px;
   padding: 40px 30px;
   margin-bottom: 30px;
@@ -57,7 +57,8 @@
 }
 
 .product-count {
-  background: rgba(255, 255, 255, 0.3);
+  /* background: rgba(150, 79, 8, 0.429); */
+  /* color: #1e7e34; */
   padding: 8px 16px;
   border-radius: 20px;
   font-weight: 600;
@@ -97,7 +98,7 @@
 
 .sort-section select:focus {
   outline: none;
-  border-color: #32FF6A;
+  border-color: #ff8732;
 }
 
 /* ======================= Products Grid ======================= */
@@ -121,16 +122,16 @@
 /* Highlight Animation */
 .product-wrapper.highlighted {
   animation: highlightPulse 1s ease-in-out 3;
-  box-shadow: 0 0 0 4px #32FF6A, 0 8px 32px rgba(50, 255, 106, 0.4);
+  box-shadow: 0 0 0 4px #ffad32, 0 8px 32px rgba(255, 166, 50, 0.4);
 }
 
 @keyframes highlightPulse {
   0%, 100% {
-    box-shadow: 0 0 0 4px #32FF6A, 0 8px 32px rgba(50, 255, 106, 0.4);
+    box-shadow: 0 0 0 4px #ffad32, 0 8px 32px rgba(255, 180, 50, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(50, 255, 106, 0.5),
-                0 12px 40px rgba(50, 255, 106, 0.5);
+    box-shadow: 0 0 0 8px rgba(255, 180, 50, 0.5),
+                0 12px 40px rgba(255, 163, 50, 0.5);
   }
 }
 
@@ -159,7 +160,7 @@
 .back-btn {
   display: inline-block;
   padding: 12px 30px;
-  border: 2px solid #32FF6A;
+  border: 2px solid #ffaa32;
   background: transparent;
   color: #232323;
   text-decoration: none;
@@ -169,7 +170,7 @@
 }
 
 .back-btn:hover {
-  background: #32FF6A;
+  background: #ff9f32;
 }
 
 /* ======================= Dark Mode ======================= */
@@ -190,7 +191,7 @@ body.dark-mode .breadcrumb .current {
 }
 
 body.dark-mode .category-header {
-  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  background: linear-gradient(135deg, #a77028 0%, #7e561e 100%);
 }
 
 body.dark-mode .filter-bar {

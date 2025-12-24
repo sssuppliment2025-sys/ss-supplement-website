@@ -92,7 +92,8 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #32FF6A;
+  border-bottom: 2px solid;
+  border-bottom-color:  #cb4c11;
 }
 
 .section-title {
@@ -147,6 +148,10 @@ body.dark-mode .product-count {
 
 body.dark-mode .featured-section {
   background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+}
+
+body.dark-mode .category-header{
+  background-color: #cb4c11;
 }
 
 /* ======================= LAPTOP / DESKTOP (🔥 5 COLUMNS) ======================= */

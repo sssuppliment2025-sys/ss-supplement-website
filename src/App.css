@@ -36,7 +36,7 @@ body {
   margin: 0;
   text-align: center;
   overflow-x: hidden;
-  background-color: #fff7ed; /* FIX: avoid side gaps */
+  background-color: #fffcf9; /* FIX: avoid side gaps */
 }
 
 /* main-content controlled by Layout.css */
@@ -254,9 +254,9 @@ body.dark-mode .category-btn:hover {
 }
 
 .carousel-no-padding {
-  margin-left: -20px;
-  margin-right: -20px;
-  margin-top: -20px;
-  width: calc(100% + 40px);
-  border-radius: 0%;
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-top: -10px;
+  width: calc(100% + 20px);
+  border-radius: 10%;
 }

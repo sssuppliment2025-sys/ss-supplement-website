@@ -1,100 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import './ImageCarousel.css';
+import React, { useState, useEffect, useRef } from "react";
+import "./ImageCarousel.css";
 
 const ImageCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // 🔹 swipe refs
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   const images = [
-    { id: 1, src: '/body1.jpg', alt: 'Body 1' },
-    { id: 2, src: '/body2.jpg', alt: 'Body 2' },
-    { id: 3, src: '/body3.jpg', alt: 'Body 3' },
+    { id: 1, src: "/body1.jpg", alt: "Body 1" },
+    { id: 2, src: "/body2.jpg", alt: "Body 2" },
+    { id: 3, src: "/body3.jpg", alt: "Body 3" },
   ];
 
+  // 🔹 autoplay (unchanged)
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      setCurrentIndex((prev) =>
+        prev === images.length - 1 ? 0 : prev + 1
       );
     }, 3000);
 
     return () => clearInterval(interval);
   }, [images.length]);
 
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
+  // 🔹 swipe handlers (MUST be inside component)
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
   };
 
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
   };
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) < 50) return; // ignore small swipe
+
+    if (diff > 0) {
+      // swipe left → next
+      setCurrentIndex((prev) =>
+        prev === images.length - 1 ? 0 : prev + 1
+      );
+    } else {
+      // swipe right → prev
+      setCurrentIndex((prev) =>
+        prev === 0 ? images.length - 1 : prev - 1
+      );
+    }
   };
 
   return (
     <div className="carousel-no-padding">
       <div className="carousel-container">
-        <div className="carousel-wrapper">
-          {/* Previous Button */}
-          <button
-            className="carousel-btn carousel-btn-prev"
-            onClick={goToPrevious}
-            aria-label="Previous slide"
+        <div
+          className="carousel-wrapper"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* SLIDES */}
+          <div
+            className="carousel-slides"
+            style={{
+              transform: `translateX(-${currentIndex * 100}%)`,
+            }}
           >
-            &#10094;
-          </button>
-
-          {/* Image Display */}
-          <div className="carousel-slides">
-            {images.map((image, index) => (
-              <div
-                key={image.id}
-                className={`carousel-slide ${index === currentIndex ? 'active' : ''
-                  }`}
-              >
+            {images.map((image) => (
+              <div className="carousel-slide" key={image.id}>
                 <img
                   src={image.src}
                   alt={image.alt}
                   className="carousel-image"
                 />
-                {/* Text Overlay */}
-                <div className="carousel-text-overlay">
-                  <div className="discount-tag">50% OFF</div>
-                  <h1 className="carousel-title">SS SUPPLEMENT</h1>
-                  <h2 className="carousel-subtitle">Premium Nutrition for Your Fitness Journey</h2>
-                  <p className="carousel-tagline">Fuel Your Body. Transform Your Strength.</p>
-                </div>
               </div>
             ))}
           </div>
 
-          {/* Next Button */}
-          <button
-            className="carousel-btn carousel-btn-next"
-            onClick={goToNext}
-            aria-label="Next slide"
-          >
-            &#10095;
-          </button>
-        </div>
-
-        {/* Dot Indicators */}
-        <div className="carousel-dots">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              className={`carousel-dot ${index === currentIndex ? 'active' : ''
+          {/* FLOATING DOTS */}
+          <div className="carousel-dots carousel-dots-inside">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                className={`carousel-dot ${
+                  index === currentIndex ? "active" : ""
                 }`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+                onClick={() => setCurrentIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
