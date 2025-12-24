@@ -36,6 +36,10 @@
   font-weight: 600;
 }
 
+.category-page{
+  background-color: #f0f0f0;
+}
+
 /* ======================= Category Header ======================= */
 .category-header {
   background: linear-gradient(135deg, #ffc375 0%, #ffa42c 100%);
@@ -240,6 +244,9 @@ body.dark-mode .back-btn:hover {
   .filter-bar {
     justify-content: center;
   }
+}
+.category-page{
+  
 }
 
 /* ======================= Mobile ======================= */

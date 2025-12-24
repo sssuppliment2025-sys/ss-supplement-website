@@ -9,19 +9,19 @@
 .view-all-products-btn {
   display: inline-block;
   padding: 15px 40px;
-  background: linear-gradient(135deg, #32FF6A 0%, #28d658 100%);
+  background: linear-gradient(135deg, #ffaa32 0%, #d68828 100%);
   color: #ff0000;
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: 700;
   border-radius: 30px;
-  box-shadow: 0 4px 15px rgba(50, 255, 106, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 173, 50, 0.3);
   transition: all 0.3s ease;
 }
 
 .view-all-products-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(50, 255, 106, 0.4);
+  box-shadow: 0 8px 25px rgba(255, 159, 50, 0.4);
 }
 
 /* ======================= Category Grid Section ======================= */
@@ -61,8 +61,8 @@
 
 .category-card-link:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(50, 255, 106, 0.2);
-  border-color: #32FF6A;
+  box-shadow: 0 8px 25px rgba(255, 170, 50, 0.2);
+  border-color: #ffa332;
 }
 
 .cat-icon {
@@ -152,6 +152,11 @@ body.dark-mode .featured-section {
 
 body.dark-mode .category-header{
   background-color: #cb4c11;
+  /* color: #f0f0f0; */
+}
+
+body.dark-mode .category-info{
+  color:#f0f0f0;
 }
 
 /* ======================= LAPTOP / DESKTOP (🔥 5 COLUMNS) ======================= */

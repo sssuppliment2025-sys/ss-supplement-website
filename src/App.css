@@ -156,7 +156,7 @@ body.light-mode .open-time {
 
 body.light-mode .category-btn {
   background: #ffffff;
-  border: 2px solid #32FF6A;
+  border: 2px solid #ff9832;
   color: #232323;
 }
 
@@ -165,7 +165,7 @@ body.light-mode .category-btn a {
 }
 
 body.light-mode .category-btn:hover {
-  background: #32FF6A;
+  background: #ffaa32;
   transform: translateY(-2px);
 }
 
