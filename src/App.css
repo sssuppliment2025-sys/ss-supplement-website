@@ -31,7 +31,7 @@ body {
 ============================================================ */
 .main-wrapper {
   width: 100%;
-  max-width: 100%;
+  max-width: 200%;
   padding: 20px;
   margin: 0;
   text-align: center;
@@ -87,7 +87,7 @@ body {
   margin: 20px auto;
   border-radius: 12px;
   width: 50%;
-  color: #ffffff;
+  color: #050505;
 }
 
 .open-time {
@@ -178,7 +178,7 @@ body.dark-mode {
 }
 
 body.dark-mode .main-wrapper {
-  background-color: transparent;
+  background-color: black;
 }
 
 body.dark-mode .hero {
