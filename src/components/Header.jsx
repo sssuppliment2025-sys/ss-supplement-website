@@ -144,7 +144,7 @@ const Header = ({ darkMode, toggleDarkMode }) => {
             <nav className="nav-links">
               <Link to="/">Home</Link>
               <Link to="/UnderConstruction">About</Link>
-              <Link to="/UnderConstruction">Contact Us</Link>
+              <Link to="">Contact Us</Link>
               <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="whatsapp-link">
                 <FaWhatsapp className="whatsapp-icon" />
               </a>

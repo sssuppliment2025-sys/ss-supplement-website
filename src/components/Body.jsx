@@ -9,6 +9,7 @@ const categoryNavItems = getCategoryNames();
 
 const Body = () => {
   const [featuredProducts] = useState(() => getRandomProducts(8));
+  
 
   const handleAddToCart = (product) => {
     // alert(`Added ${product.name} to cart!`);
