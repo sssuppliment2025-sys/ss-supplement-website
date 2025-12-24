@@ -36,7 +36,7 @@ const PaymentPage = () => {
       .map(
         (item) =>
           `• ${item.name} (${item.weight || ""}, ${
-            item.flavour || "No flavour"
+            item.flavors || "No flavour"
           }) x ${item.qty} = ₹${item.price * item.qty}`
       )
       .join("\n");

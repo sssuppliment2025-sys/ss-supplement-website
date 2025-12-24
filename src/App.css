@@ -32,11 +32,11 @@ body {
 .main-wrapper {
   width: 100%;
   max-width: 100%;
-  padding: 20px;
+  padding: 15px;
   margin: 0;
   text-align: center;
   overflow-x: hidden;
-  background-color: white; /* FIX: avoid side gaps */
+  background-color: #fff7ed; /* FIX: avoid side gaps */
 }
 
 /* main-content controlled by Layout.css */
@@ -178,7 +178,7 @@ body.dark-mode {
 }
 
 body.dark-mode .main-wrapper {
-  background-color: transparent;
+  background-color: #1a1a1a;
 }
 
 body.dark-mode .hero {
@@ -251,4 +251,12 @@ body.dark-mode .category-btn:hover {
     padding: 8px 16px;
     font-size: 0.9rem;
   }
+}
+
+.carousel-no-padding {
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-top: -20px;
+  width: calc(100% + 40px);
+  border-radius: 0%;
 }

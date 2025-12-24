@@ -3,7 +3,7 @@
   width: 100%;
   box-sizing: border-box;
   height: 70px;
-  background: linear-gradient(90deg, #fff7eb 0%, #fff1d6 35%, #ffe7c6 65%, #ffd89b 100%);
+  background: linear-gradient(90deg, #dc2626, #facc15);
   display: flex;
   align-items: center;
   justify-content: space-between;
