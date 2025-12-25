@@ -317,4 +317,83 @@ body.dark-mode {
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
+.cart-popup {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #28a745;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===================== FLOATING CART LOGO ===================== */
+.floating-cart {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--orange-main), var(--orange-dark));
+  color: white;
+  font-size: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  animation: cartPop 0.3s ease;
+}
+
+
+.cart-count {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: #dc2626;
+  color: white;
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+@keyframes cartPop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+
+
+
+
 
