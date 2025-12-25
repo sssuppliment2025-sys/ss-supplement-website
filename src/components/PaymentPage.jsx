@@ -34,9 +34,8 @@ const PaymentPage = () => {
   const buildWhatsAppMessage = () => {
     const products = cartItems
       .map(
-        (item) =>
-          `• ${item.name} (${item.weight || ""}, ${
-            item.flavors || "No flavour"
+        (item, index) =>
+          `${index+1}. ${item.name} (${item.weight || ""}, ${item.flavors || "No flavour"
           }) x ${item.qty} = ₹${item.price * item.qty}`
       )
       .join("\n");
@@ -55,11 +54,10 @@ Total: ₹${totalPrice + 7}
 💳 *Payment Method*
 ${paymentMethod === "online" ? "Online Payment" : "Cash on Delivery"}
 
-${
-  paymentMethod === "online"
-    ? `🔐 *Transaction ID*\n${transactionId}`
-    : ""
-}
+${paymentMethod === "online"
+        ? `🔐 *Transaction ID*\n${transactionId}`
+        : ""
+      }
 
 🏠 *Delivery Address*
 ${address?.name || "N/A"}
@@ -85,14 +83,14 @@ Please confirm this order.
       return;
     }
 
-    const numbers = ["918900299008", "919123456789"];
-    const randomNumber =
-      numbers[Math.floor(Math.random() * numbers.length)];
+    // const numbers = ["918900299008", "919123456789"];
+    // const randomNumber =
+    //   numbers[Math.floor(Math.random() * numbers.length)];
 
     const message = encodeURIComponent(buildWhatsAppMessage());
 
     window.open(
-      `https://wa.me/${randomNumber}?text=${message}`,
+      `https://wa.me/918900299008?text=${message}`,
       "_blank"
     );
 
@@ -148,7 +146,7 @@ Please confirm this order.
           {paymentMethod === "online" && (
             <div className="online-payment-box">
               <p className="online-info">
-                Scan the QR or pay via UPI.  
+                Scan the QR or pay via UPI.
                 After payment, enter the <b>Transaction ID</b>.
               </p>
 
