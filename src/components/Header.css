@@ -146,6 +146,7 @@
 .search-result-item:hover {
   background: rgba(79, 70, 229, 0.08);
 }
+
 .theme-toggle {
   background: none;
   border: none;
@@ -441,7 +442,9 @@ body.dark-mode .search-box {
 body.dark-mode .search-input {
   color: #fff;
 }
-
+body.dark-mode .search-result-item{
+  color: #000000;
+}
 body.dark-mode .mobile-menu {
   background: #1a1a1a;
 }
