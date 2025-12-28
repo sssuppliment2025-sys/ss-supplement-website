@@ -72,25 +72,57 @@ const Header = ({ darkMode, toggleDarkMode }) => {
   const closeMenu = () => setMenuOpen(false);
 
   // Search functionality
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
+  // const handleSearchChange = (e) => {
+  //   const query = e.target.value;
+  //   setSearchQuery(query);
 
-    if (query.trim().length >= 2) {
-      const allProducts = getAllProducts();
-      const filtered = allProducts.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.flavors?.toLowerCase().includes(query.toLowerCase()) ||
-        product.weight?.toLowerCase().includes(query.toLowerCase()) ||
-        product.category?.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8); // Limit to 8 results
-      setSearchResults(filtered);
-      setShowResults(true);
-    } else {
-      setSearchResults([]);
-      setShowResults(false);
-    }
-  };
+  //   if (query.trim().length >= 2) {
+  //     const allProducts = getAllProducts();
+  //     const filtered = allProducts.filter(product =>
+  //       product.name.toLowerCase().includes(query.toLowerCase()) ||
+  //       product.flavors?.toLowerCase().includes(query.toLowerCase()) ||
+  //       product.weight?.toLowerCase().includes(query.toLowerCase()) ||
+  //       product.category?.toLowerCase().includes(query.toLowerCase())
+  //     ).slice(0, 8); // Limit to 8 results
+  //     setSearchResults(filtered);
+  //     setShowResults(true);
+  //   } else {
+  //     setSearchResults([]);
+  //     setShowResults(false);
+  //   }
+  // };
+  const handleSearchChange = (e) => {
+  const query = e.target.value;
+  setSearchQuery(query);
+
+  if (query.trim().length >= 2) {
+    const allProducts = getAllProducts();
+
+    const filtered = allProducts.filter(product =>
+      product.name?.toLowerCase().includes(query.toLowerCase()) ||
+      product.flavors?.toLowerCase().includes(query.toLowerCase()) ||
+      product.weight?.toLowerCase().includes(query.toLowerCase()) ||
+      product.category?.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // 🔥 REMOVE DUPLICATES
+    const uniqueProducts = filtered.filter(
+      (item, index, self) =>
+        index === self.findIndex(p =>
+          p.name === item.name &&
+          p.weight === item.weight &&
+          p.price === item.price
+        )
+    );
+
+    setSearchResults(uniqueProducts.slice(0, 8));
+    setShowResults(true);
+  } else {
+    setSearchResults([]);
+    setShowResults(false);
+  }
+};
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
