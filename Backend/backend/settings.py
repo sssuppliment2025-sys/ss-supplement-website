@@ -1,24 +1,34 @@
 """
 Django settings for the Referral Coin Backend.
 """
+
 import os
 from pathlib import Path
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ---------------------------------------------------------------------------
+# Core
+# ---------------------------------------------------------------------------
+
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-this-in-production-abc123xyz789",
+    "django-insecure-change-this-in-production",
 )
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("true", "1", "yes")
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = [
+    "ss-supplement-website.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 # ---------------------------------------------------------------------------
-# Application definition
+# Applications
 # ---------------------------------------------------------------------------
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -26,49 +36,63 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # Third-party
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+
     # Local
     "accounts",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://supliment-project.vercel.app",
-    "https://www.supliment-project.vercel.app",
-    "https://suplimentproject.onrender.com",
-    "https://ss-supplement-website.vercel.app",
-]
-
-CORS_ALLOWED_ORIGINS = [
-    "https://supliment-project.vercel.app",
-    "https://ss-supplement-website.vercel.app"
-    "https://suplimentproject.onrender.com",
-    "https://ss-supplement-website.onrender.com",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-
-
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
-
-
+# ---------------------------------------------------------------------------
+# Middleware
+# ---------------------------------------------------------------------------
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+
+    # ❌ CSRF stays enabled globally (safe)
     "django.middleware.csrf.CsrfViewMiddleware",
+
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# ---------------------------------------------------------------------------
+# CORS (REACT → DJANGO)
+# ---------------------------------------------------------------------------
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://ss-supplement-website.vercel.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# ---------------------------------------------------------------------------
+# CSRF (ONLY FOR DJANGO ADMIN / TEMPLATES)
+# React + JWT APIs DO NOT USE CSRF
+# ---------------------------------------------------------------------------
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://ss-supplement-website.vercel.app",
+    "https://ss-supplement-website.onrender.com",
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+
+# ---------------------------------------------------------------------------
+# URLs / Templates
+# ---------------------------------------------------------------------------
 
 ROOT_URLCONF = "backend.urls"
 
@@ -91,8 +115,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 # ---------------------------------------------------------------------------
-# Database – SQLite (built-in, no extra setup needed)
+# Database
 # ---------------------------------------------------------------------------
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -101,36 +126,32 @@ DATABASES = {
 }
 
 # ---------------------------------------------------------------------------
-# Auth
+# Authentication
 # ---------------------------------------------------------------------------
+
 AUTH_USER_MODEL = "accounts.User"
 
 AUTHENTICATION_BACKENDS = [
     "accounts.backends.PhoneBackend",
 ]
 
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
+# ---------------------------------------------------------------------------
+# Django REST Framework (JWT ONLY — NO CSRF)
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# REST Framework
-# ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",
     ),
 }
 
 # ---------------------------------------------------------------------------
-# Simple JWT
+# JWT
 # ---------------------------------------------------------------------------
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -139,28 +160,21 @@ SIMPLE_JWT = {
 }
 
 # ---------------------------------------------------------------------------
-# CORS – allow your React frontend
+# Referral Points
 # ---------------------------------------------------------------------------
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://192.168.1.102:3000,https://supliment-project.vercel.app,https://ss-supplement-website.vercel.app"
-).split(",")
 
-CORS_ALLOW_CREDENTIALS = True
-
+REFERRAL_POINTS_FOR_REFERRER = 4
+REFERRAL_POINTS_FOR_REFEREE = 2
 
 # ---------------------------------------------------------------------------
-# Referral points config
+# Internationalization / Static
 # ---------------------------------------------------------------------------
-REFERRAL_POINTS_FOR_REFERRER = 4   # points the referrer earns
-REFERRAL_POINTS_FOR_REFEREE = 2    # points the new user earns
 
-# ---------------------------------------------------------------------------
-# Internationalization & static
-# ---------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+
 STATIC_URL = "static/"
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
