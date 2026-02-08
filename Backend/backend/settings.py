@@ -38,10 +38,14 @@ CSRF_TRUSTED_ORIGINS = [
     "https://supliment-project.vercel.app",
     "https://www.supliment-project.vercel.app",
     "https://suplimentproject.onrender.com",
+    "ss-supplement-website.vercel.app",
+    "https://ss-supplement-website.vercel.app",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "https://supliment-project.vercel.app",
+    "https://ss-supplement-website.vercel.app"
+    "ss-supplement-website.vercel.app",
     "https://suplimentproject.onrender.com",
 ]
 
@@ -140,7 +144,7 @@ SIMPLE_JWT = {
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://192.168.1.102:3000,https://supliment-project.vercel.app"
+    "http://localhost:3000,http://192.168.1.102:3000,https://supliment-project.vercel.app","ss-supplement-website.vercel.app","https://ss-supplement-website.vercel.app"
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
