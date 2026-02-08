@@ -38,15 +38,14 @@ CSRF_TRUSTED_ORIGINS = [
     "https://supliment-project.vercel.app",
     "https://www.supliment-project.vercel.app",
     "https://suplimentproject.onrender.com",
-    "ss-supplement-website.vercel.app",
     "https://ss-supplement-website.vercel.app",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "https://supliment-project.vercel.app",
     "https://ss-supplement-website.vercel.app"
-    "ss-supplement-website.vercel.app",
     "https://suplimentproject.onrender.com",
+    "https://ss-supplement-website.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
