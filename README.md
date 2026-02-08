@@ -1,3 +1,3 @@
-Frontend : ss-supplement-website.vercel.app
+Frontend : https://ss-supplement-website.vercel.app
 
 Backend : https://ss-supplement-website.onrender.com
