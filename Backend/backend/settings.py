@@ -36,17 +36,28 @@ INSTALLED_APPS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://supliment-project.vercel.app",
-    "https://www.supliment-project.vercel.app",
-    "https://suplimentproject.onrender.com",
     "https://ss-supplement-website.vercel.app",
-]
-
-CORS_ALLOWED_ORIGINS = [
-    "https://supliment-project.vercel.app",
-    "https://ss-supplement-website.vercel.app"
     "https://suplimentproject.onrender.com",
     "https://ss-supplement-website.onrender.com",
 ]
+
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://supliment-project.vercel.app",
+    "https://ss-supplement-website.vercel.app",
+    "https://suplimentproject.onrender.com",
+    "https://ss-supplement-website.onrender.com",
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+CORS_ALLOW_CREDENTIALS = True
+
+
 
 CORS_ALLOW_CREDENTIALS = True
 
