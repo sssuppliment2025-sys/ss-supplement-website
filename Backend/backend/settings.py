@@ -71,6 +71,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://ss-supplement-website.vercel.app",
+    "https://www.sssupplement.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -81,6 +82,7 @@ CORS_ALLOW_CREDENTIALS = True
 # ---------------------------------------------------------------------------
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://www.sssupplement.com",
     "https://ss-supplement-website.vercel.app",
     "https://ss-supplement-website.onrender.com",
 ]
@@ -178,3 +180,24 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+
+
+
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
+MONGO_URI = os.getenv("MONGO_URI")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+}

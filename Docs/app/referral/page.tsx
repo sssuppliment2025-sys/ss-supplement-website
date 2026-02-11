@@ -15,6 +15,9 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
+
+
 /* ================= TYPES ================= */
 
 interface Profile {
@@ -112,7 +115,7 @@ export default function ReferralPage() {
   /* ================= SHARE LOGIC ================= */
 
   const referralLink =
-  `https://supliment-project.vercel.app/login?ref=${profile.referral_code}`
+  `www.sssupplement.com/login?ref=${profile.referral_code}`
 
   const shareText = "Join using my referral link and earn rewards 🎉"
 

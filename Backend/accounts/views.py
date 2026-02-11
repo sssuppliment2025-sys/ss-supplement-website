@@ -1,128 +1,199 @@
-from django.contrib.auth import authenticate, get_user_model
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from datetime import datetime
+from bson import ObjectId
+from bson.errors import InvalidId
+
 from django.http import JsonResponse
-from .models import Referral
-from .serializers import (
-    LeaderboardSerializer,
-    LoginSerializer,
-    ReferralSerializer,
-    SignupSerializer,
-    UserProfileSerializer,
-)
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
 
-User = get_user_model()
+from mongo.collections import users_col, referrals_col
+from utils.password import hash_password, verify_password
+from utils.jwt import generate_tokens_for_user
+from utils.jwt_helper import decode_token
 
-# -------------------- WAKE UP --------------------
+
+# ================== HEALTH CHECK ==================
 def wake_up(request):
-    print("Server awake")
     return JsonResponse({"status": "backend awake"})
 
 
-# ---------------------------------------------------------------------------
-# Auth views
-# ---------------------------------------------------------------------------
+# ================== SIGNUP ==================
 class SignupView(APIView):
-    """
-    POST /api/signup/
-    Body: { name, email, phone, password, confirmPassword, referralCode? }
-    Returns the created user + JWT tokens.
-    """
-
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = SignupSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        data = request.data
+        phone = data.get("phone")
+        password = data.get("password")
+        name = data.get("name")
+        email = data.get("email")
+        referral_code = data.get("referralCode")  # optional
 
-        refresh = RefreshToken.for_user(user)
+        if not phone or not password or not name:
+            return Response({"detail": "Required fields missing"}, status=400)
 
-        return Response(
-            {
-                "user": UserProfileSerializer(user).data,
-                "tokens": {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
+        if users_col.find_one({"phone": phone}):
+            return Response({"detail": "Phone already registered"}, status=400)
+
+        # --- Create new user ---
+        user_doc = {
+            "phone": phone,
+            "email": email,
+            "name": name,
+            "password": hash_password(password),
+            "points": 0,  # start with 0 points
+            "created_at": datetime.utcnow(),
+        }
+        result = users_col.insert_one(user_doc)
+        user_id = str(result.inserted_id)
+
+        # --- REFERRAL LOGIC ---
+        if referral_code:
+            try:
+                referrer = users_col.find_one({"_id": ObjectId(referral_code)})
+            except InvalidId:
+                referrer = None
+
+            if referrer and str(referrer["_id"]) != user_id:
+                # Update points
+                users_col.update_one(
+                    {"_id": referrer["_id"]}, {"$inc": {"points": 4}}
+                )
+                users_col.update_one(
+                    {"_id": ObjectId(user_id)}, {"$inc": {"points": 2}}
+                )
+
+                # Save referral record
+                referrals_col.insert_one({
+                    "referrer_id": str(referrer["_id"]),
+                    "referred_user": {
+                        "id": user_id,
+                        "name": name,
+                        "phone": phone,
+                        "email": email,
+                    },
+                    "referrer_points": 4,
+                    "referee_points": 2,
+                    "created_at": datetime.utcnow(),
+                })
+
+        # --- Generate JWT tokens ---
+        tokens = generate_tokens_for_user(user_id)
+        user = users_col.find_one({"_id": ObjectId(user_id)})
+
+        return Response({
+            "user": {
+                "id": user_id,
+                "name": user["name"],
+                "phone": user["phone"],
+                "email": user.get("email"),
+                "points": user.get("points", 0),
             },
-            status=status.HTTP_201_CREATED,
-        )
+            "tokens": tokens,
+        }, status=201)
 
 
+# ================== LOGIN ==================
 class LoginView(APIView):
-    """
-    POST /api/login/
-    Body: { phone, password }
-    Returns JWT tokens + user profile.
-    """
-
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        phone = request.data.get("phone")
+        password = request.data.get("password")
 
-        user = authenticate(
-            request,
-            phone=serializer.validated_data["phone"],
-            password=serializer.validated_data["password"],
-        )
+        if not phone or not password:
+            return Response({"detail": "Phone and password required"}, status=400)
 
-        if user is None:
-            return Response(
-                {"detail": "Invalid phone number or password."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        user = users_col.find_one({"phone": phone})
+        if not user or not verify_password(password, user["password"]):
+            return Response({"detail": "Invalid credentials"}, status=401)
 
-        refresh = RefreshToken.for_user(user)
+        tokens = generate_tokens_for_user(str(user["_id"]))
 
-        return Response(
+        return Response({
+            "user": {
+                "id": str(user["_id"]),
+                "name": user["name"],
+                "phone": user["phone"],
+                "email": user.get("email"),
+                "points": user.get("points", 0),
+            },
+            "tokens": tokens,
+        })
+
+
+# ================== PROFILE ==================
+class ProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        auth = request.headers.get("Authorization")
+        if not auth or not auth.startswith("Bearer "):
+            return Response({"detail": "Unauthorized"}, status=401)
+
+        try:
+            token = auth.replace("Bearer ", "")
+            payload = decode_token(token)
+            user = users_col.find_one({"_id": ObjectId(payload["user_id"])})
+            if not user:
+                return Response({"detail": "User not found"}, status=404)
+
+            return Response({
+                "id": str(user["_id"]),
+                "name": user["name"],
+                "phone": user["phone"],
+                "email": user.get("email"),
+                "points": user.get("points", 0),
+                "referral_code": str(user["_id"]),
+            })
+        except Exception as e:
+            print("PROFILE ERROR:", e)
+            return Response({"detail": "Invalid token"}, status=401)
+
+
+# ================== MY REFERRALS ==================
+class MyReferralsView(APIView):
+    def get(self, request):
+        auth = request.headers.get("Authorization")
+        if not auth or not auth.startswith("Bearer "):
+            return Response([], status=200)
+
+        try:
+            token = auth.replace("Bearer ", "")
+            payload = decode_token(token)
+
+            referrals = referrals_col.find({"referrer_id": payload["user_id"]})
+
+            return Response([
+                {
+                    "id": str(r["_id"]),
+                    "referee_name": r["referred_user"]["name"],
+                    "referee_phone": r["referred_user"]["phone"],
+                    "referrer_points": r["referrer_points"],
+                    "referee_points": r["referee_points"],
+                    "created_at": r["created_at"],
+                }
+                for r in referrals
+            ], status=200)
+        except Exception as e:
+            print("REFERRAL ERROR:", e)
+            return Response([], status=200)
+
+
+# ================== LEADERBOARD ==================
+class LeaderboardView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        users = users_col.find().sort("points", -1).limit(50)
+
+        return Response([
             {
-                "user": UserProfileSerializer(user).data,
-                "tokens": {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
+                "id": str(u["_id"]),
+                "name": u["name"],
+                "points": u.get("points", 0),
             }
-        )
-
-
-# ---------------------------------------------------------------------------
-# Profile & referral views
-# ---------------------------------------------------------------------------
-class ProfileView(generics.RetrieveAPIView):
-    """
-    GET /api/profile/
-    Returns authenticated user's full profile including points.
-    """
-
-    serializer_class = UserProfileSerializer
-
-    def get_object(self):
-        return self.request.user
-
-
-class MyReferralsView(generics.ListAPIView):
-    """
-    GET /api/referrals/
-    Lists all referral records where the current user is the referrer.
-    """
-
-    serializer_class = ReferralSerializer
-
-    def get_queryset(self):
-        return Referral.objects.filter(referrer=self.request.user)
-
-
-class LeaderboardView(generics.ListAPIView):
-    """
-    GET /api/leaderboard/
-    Public endpoint - top 50 users ranked by points.
-    """
-
-    serializer_class = LeaderboardSerializer
-    permission_classes = [permissions.AllowAny]
-    queryset = User.objects.order_by("-points")[:50]
+            for u in users
+        ])
