@@ -204,6 +204,7 @@ class LeaderboardView(APIView):
 
 
 
+
 # =============================== Order placed with coin =====================
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -245,32 +246,47 @@ def create_order(request):
         
         data = request.data
         
-       
+   
         subtotal = sum(float(item.get('price', 0)) * int(item.get('quantity', 0)) for item in data.get('items', []))
         coins_used = float(data.get('coins_used', 0))
-        final_total = max(subtotal - coins_used, 0)
+        final_total = float(data.get('total', 0))  
+        
+        
+        min_cash_payment = max(subtotal * 0.2, 50)  
+        if final_total < min_cash_payment:
+            return Response({
+                'error': f'Minimum 20% cash payment required. Min: ₹{int(min_cash_payment)}, Got: ₹{int(final_total)}'
+            }, status=400)
+        
+        
+        max_coins_allowed = subtotal * 0.8
+        if coins_used > max_coins_allowed:
+            return Response({
+                'error': f'Maximum 80% coins allowed. Max: ₹{int(max_coins_allowed)}, Requested: ₹{int(coins_used)}'
+            }, status=400)
         
         
         if coins_used > 0:
             current_points = user.get('points', 0)
             if current_points < coins_used:
                 return Response({
-                    'error': f'Insufficient coins. Available: {current_points}, Required: {coins_used}'
+                    'error': f'Insufficient coins. Available: {int(current_points)}, Required: {int(coins_used)}'
                 }, status=400)
             
+          
             users_collection.update_one(
                 {"_id": ObjectId(user_id)},
                 {"$inc": {"points": -coins_used}}
             )
         
-      
+       
         updated_user = users_collection.find_one({"_id": ObjectId(user_id)})
         new_points = int(updated_user.get('points', 0))
         
-       
+        
         order_id = str(uuid.uuid4())[:8].upper()
         
-       
+        
         address_data = data.get('address', {})
         address_array = [
             {"type": "fullName", "value": address_data.get('fullName', '')},
@@ -291,7 +307,7 @@ def create_order(request):
                      item.get('variant') or 
                      item.get('flavour') or 
                      'N/A')
-             
+            
             weight = (item.get('selectedWeight') or 
                      item.get('weight') or 
                      item.get('size') or 
@@ -308,8 +324,10 @@ def create_order(request):
                 "weight": weight
             })
         
-    
+       
         earned_points = int(final_total * 0.05)
+        
+     
         order_data = {
             '_id': ObjectId(),
             'order_id': order_id,
@@ -330,27 +348,32 @@ def create_order(request):
             'updated_at': datetime.utcnow(),
         }
         
-    
+     
         orders_collection.insert_one(order_data)
+        
+        print(f"✅ Order created: {order_id}")
+        print(f"💰 Subtotal: ₹{subtotal}, Coins: ₹{coins_used}, Final: ₹{final_total}")
+        print(f"👛 User coins before: {int(current_points)}, after: {new_points}")
         
         return Response({
             'success': True,
             'order': {
                 'id': order_id,
-                'earnedPoints': earned_points
+                'earnedPoints': earned_points  
             },
             'user': {
-                'points': new_points  
+                'points': new_points
             }
         }, status=201)
         
     except Exception as e:
-        print(f"Order error: {str(e)}")
-        print(f"Request data: {request.data}")  
+        print(f"❌ Order error: {str(e)}")
+        print(f"📦 Request data: {request.data}")
         return Response({
             'error': str(e),
             'detail': 'Order creation failed'
         }, status=500)
+
 
 
 @api_view(['GET'])
