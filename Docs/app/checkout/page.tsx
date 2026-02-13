@@ -66,7 +66,7 @@ export default function CheckoutPage() {
       return
     }
 
-    fetch(`${API_URL}/api/profile/`, {  // ✅ FIXED: Use correct endpoint
+    fetch(`${API_URL}/api/profile/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -85,11 +85,26 @@ export default function CheckoutPage() {
       .finally(() => setLoadingPoints(false))
   }, [isAuthenticated, toast])
 
-  /* ================= PRICE CALCULATIONS ================= */
+  /* ================= ✅ FIXED PRICE CALCULATIONS - 20% MIN PAYMENT ================= */
   const subtotal = getCartTotal()
-  const maxCoinsUsable = Math.min(points, subtotal)
-  const coinsUsed = useCoins ? maxCoinsUsable : 0
-  const finalTotal = Math.max(subtotal - coinsUsed, 0)
+  
+  // ✅ RULE 1: Max 80% coins usage (20% minimum cash payment)
+  const maxCoinsAllowed = Math.floor(subtotal * 0.8)  // 80% max coins
+  const availableCoinsForDiscount = Math.min(points, maxCoinsAllowed)
+  const coinsUsed = useCoins ? availableCoinsForDiscount : 0
+  
+  // ✅ RULE 2: Never go below 20% cash payment (minimum ₹50)
+  const minimumCashPayment = Math.max(subtotal * 0.2, 50)
+  const finalTotal = Math.max(subtotal - coinsUsed, minimumCashPayment)
+
+  console.log("🪙 COINS CALC:", {
+    subtotal,
+    points,
+    maxCoinsAllowed,
+    coinsUsed,
+    minimumCashPayment,
+    finalTotal
+  })
 
   /* ================= WHATSAPP MESSAGE ================= */
   const generateWhatsAppMessage = (backendCoins: number, backendEarned: number) => {
@@ -175,7 +190,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     }
   }
 
-  /* ================= ✅ FIXED: SENDS FLAVOR/WEIGHT TO BACKEND ================= */
+  /* ================= ✅ ORDER SUBMIT ================= */
   const handleSubmit = async () => {
     if (paymentMethod === "upi" && !utrNumber.trim()) {
       toast({
@@ -205,11 +220,11 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             price: typeof item.product.flavors === "string"
               ? item.product.price
               : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price,
-            // ✅ FIXED: NOW SENDS FLAVOR & WEIGHT TO BACKEND
             selectedFlavor: item.selectedFlavor,
             selectedWeight: item.selectedWeight,
           })),
-          coins_used: coinsUsed,  // Backend deducts exactly this amount
+          total: finalTotal,  // ✅ FIXED: Send finalTotal (NOT 0)
+          coins_used: coinsUsed,
           payment_method: paymentMethod,
           utr_number: paymentMethod === "upi" ? utrNumber : null,
           address: formData,
@@ -219,10 +234,12 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
       const orderData = await orderRes.json()
       
       if (!orderRes.ok) {
+        const errorText = await orderRes.text()
+        console.error("Order error response:", errorText)
         throw new Error(orderData.error || orderData.detail || "Failed to create order")
       }
 
-      // ✅ REFRESH COINS FROM BACKEND (Shows correct 0 balance)
+      // ✅ REFRESH COINS FROM BACKEND
       const profileRes = await fetch(`${API_URL}/api/profile/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -231,23 +248,19 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
       const profileData = await profileRes.json()
       setPoints(profileData.points || 0)
 
-      // Set order ID
       setOrderId(orderData.order?.id || orderData.id || "SUCCESS")
 
-      // ✅ Send WhatsApp WITH ACTUAL BACKEND COINS
       const whatsappUrl = generateWhatsAppMessage(
         profileData.points || 0,
         orderData.order?.earnedPoints || orderData.earnedPoints || 0
       )
       window.open(whatsappUrl, '_blank')
 
-      // Success feedback
       toast({
         title: "✅ Order Placed Successfully! 🎉",
-        description: `Order #${orderId}. New balance: ${profileData.points || 0} coins.`,
+        description: `Order #${orderId}. New balance: ${profileData.points || 0} coins. Pay ₹${finalTotal.toLocaleString()}`,
       })
 
-      // Clear cart & show success
       clearCart()
       setOrderPlaced(true)
 
@@ -286,9 +299,9 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed Successfully!</h1>
             <p className="text-muted-foreground mb-6">
-              Order details sent to WhatsApp. We will confirm within 30 minutes.
+              Order details sent to WhatsApp. Please pay ₹{finalTotal.toLocaleString()}.
               <span className="block mt-2 bg-success/10 text-success px-3 py-1 rounded-full text-sm">
-                ✅ New coin balance: {points} coins
+                ✅ New coin balance: {points.toLocaleString()} coins
               </span>
             </p>
             <div className="space-y-3">
@@ -317,7 +330,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
               <CardHeader className="text-center">
                 <CardTitle className="text-foreground flex items-center justify-center gap-2">
                   <QrCode className="h-6 w-6 text-primary" />
-                  Pay ₹{finalTotal} via UPI
+                  Pay ₹{finalTotal.toLocaleString()} via UPI
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -333,7 +346,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
                 <div className="text-center space-y-1">
                   <p className="text-sm text-muted-foreground">Amount to Pay</p>
-                  <p className="text-3xl font-bold text-primary">₹{finalTotal}</p>
+                  <p className="text-3xl font-bold text-primary">₹{finalTotal.toLocaleString()}</p>
                 </div>
 
                 <div className="bg-secondary/50 rounded-lg p-4">
@@ -420,6 +433,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Form fields - SAME AS BEFORE */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
@@ -531,7 +545,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                       <Banknote className="h-5 w-5 text-success" />
                       <div>
                         <p className="font-medium text-foreground">Cash on Delivery</p>
-                        <p className="text-sm text-muted-foreground">Pay when you receive order</p>
+                        <p className="text-sm text-muted-foreground">Pay ₹{finalTotal.toLocaleString()} when you receive order</p>
                       </div>
                     </Label>
                   </div>
@@ -546,7 +560,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                       <QrCode className="h-5 w-5 text-primary" />
                       <div>
                         <p className="font-medium text-foreground">UPI Payment</p>
-                        <p className="text-sm text-muted-foreground">Instant payment via QR/PhonePe/GPay</p>
+                        <p className="text-sm text-muted-foreground">Pay ₹{finalTotal.toLocaleString()} via QR/PhonePe/GPay</p>
                       </div>
                     </Label>
                   </div>
@@ -596,13 +610,13 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   })}
                 </div>
 
-                {/* Coins Section */}
+                {/* ✅ FIXED Coins Section - 80% MAX */}
                 <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Coins className="h-4 w-4 text-yellow-500" />
                       <span className="text-sm font-medium">
-                        Available Coins: {loadingPoints ? "Loading..." : points}
+                        Available Coins: {loadingPoints ? "Loading..." : points.toLocaleString()}
                       </span>
                     </div>
                     <Checkbox
@@ -611,12 +625,21 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                       disabled={loadingPoints || points === 0}
                     />
                   </div>
+                  
                   {useCoins && points > 0 && (
-                    <div className="flex justify-between items-center p-2 bg-success/10 border border-success/20 rounded-md">
-                      <span className="text-xs text-success font-medium">
-                        Max discount: ₹{maxCoinsUsable.toLocaleString()}
-                      </span>
-                      <span className="text-sm font-bold text-success">-₹{coinsUsed.toLocaleString()}</span>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center p-2 bg-success/10 border border-success/20 rounded-md">
+                        <span className="text-xs text-success font-medium">
+                          Max 80% discount: ₹{maxCoinsAllowed.toLocaleString()}
+                        </span>
+                        <span className="text-sm font-bold text-success">
+                          -₹{coinsUsed.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Min cash payment:</span>
+                        <span>₹{minimumCashPayment.toLocaleString()}</span>
+                      </div>
                     </div>
                   )}
                   {useCoins && points === 0 && (
@@ -635,7 +658,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   
                   {useCoins && coinsUsed > 0 && (
                     <div className="flex justify-between text-success font-semibold text-sm">
-                      <span>🪙 Coins Discount</span>
+                      <span>🪙 Coins Discount (80% max)</span>
                       <span>-₹{coinsUsed.toLocaleString()}</span>
                     </div>
                   )}
@@ -643,21 +666,26 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   <div className="h-px bg-border my-2" />
 
                   <div className="flex justify-between text-xl font-bold">
-                    <span>Total</span>
+                    <span>Total to Pay</span>
                     <span className="text-2xl text-primary">₹{finalTotal.toLocaleString()}</span>
                   </div>
+                  {finalTotal === minimumCashPayment && (
+                    <p className="text-xs text-success text-center font-medium">
+                      💰 Minimum 20% cash payment required
+                    </p>
+                  )}
                 </div>
 
-                {/* Place Order Button */}
+                {/* Place Order Button - REMOVED finalTotal === 0 check */}
                 <Button
                   onClick={handleProceedToPayment}
                   className="w-full h-12 text-lg"
                   size="lg"
-                  disabled={isSubmitting || finalTotal === 0}
+                  disabled={isSubmitting}
                 >
                   {paymentMethod === "upi" 
                     ? `Proceed to UPI Payment (₹${finalTotal.toLocaleString()})` 
-                    : "Place Order (Cash on Delivery)"
+                    : `Place Order - Pay ₹${finalTotal.toLocaleString()} (COD)`
                   }
                 </Button>
 
