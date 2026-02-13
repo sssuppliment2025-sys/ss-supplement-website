@@ -9,8 +9,9 @@ urlpatterns = [
     path("signup/", views.SignupView.as_view(), name="signup"),
     path("login/", views.LoginView.as_view(), name="login"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    # Profile & referrals
     path("profile/", views.ProfileView.as_view(), name="profile"),
     path("referrals/", views.MyReferralsView.as_view(), name="my_referrals"),
     path("leaderboard/", views.LeaderboardView.as_view(), name="leaderboard"),
+    path('profileForOrderPlaced/', views.profile_view, name='profile'),
+    path('orders/', views.create_order, name='create_order'),
 ]

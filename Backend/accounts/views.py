@@ -197,3 +197,183 @@ class LeaderboardView(APIView):
             }
             for u in users
         ])
+
+
+
+
+
+
+
+# =============================== Order placed with coin =====================
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from pymongo import MongoClient
+from bson import ObjectId
+from utils.jwt_helper import decode_token
+import uuid
+from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MONGO_URI = os.getenv(
+    "MONGO_URI",
+    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
+)
+
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["sssuppliment_db"]  
+orders_collection = db['orders']
+users_collection = db['users']
+
+@api_view(['POST'])
+def create_order(request):
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return Response({'error': 'Token required'}, status=401)
+        
+        token = auth_header.split(' ')[1]
+        payload = decode_token(token)
+        user_id = payload['user_id']
+        
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return Response({'error': 'User not found'}, status=404)
+        
+        data = request.data
+        
+       
+        subtotal = sum(float(item.get('price', 0)) * int(item.get('quantity', 0)) for item in data.get('items', []))
+        coins_used = float(data.get('coins_used', 0))
+        final_total = max(subtotal - coins_used, 0)
+        
+        
+        if coins_used > 0:
+            current_points = user.get('points', 0)
+            if current_points < coins_used:
+                return Response({
+                    'error': f'Insufficient coins. Available: {current_points}, Required: {coins_used}'
+                }, status=400)
+            
+            users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$inc": {"points": -coins_used}}
+            )
+        
+      
+        updated_user = users_collection.find_one({"_id": ObjectId(user_id)})
+        new_points = int(updated_user.get('points', 0))
+        
+       
+        order_id = str(uuid.uuid4())[:8].upper()
+        
+       
+        address_data = data.get('address', {})
+        address_array = [
+            {"type": "fullName", "value": address_data.get('fullName', '')},
+            {"type": "phone", "value": address_data.get('phone', '')},
+            {"type": "email", "value": address_data.get('email', '')},
+            {"type": "address", "value": address_data.get('address', '')},
+            {"type": "city", "value": address_data.get('city', '')},
+            {"type": "state", "value": address_data.get('state', '')},
+            {"type": "pincode", "value": address_data.get('pincode', '')},
+            {"type": "landmark", "value": address_data.get('landmark', '')}
+        ]
+        
+        
+        enhanced_items = []
+        for item in data.get('items', []):
+            flavor = (item.get('selectedFlavor') or 
+                     item.get('flavor') or 
+                     item.get('variant') or 
+                     item.get('flavour') or 
+                     'N/A')
+             
+            weight = (item.get('selectedWeight') or 
+                     item.get('weight') or 
+                     item.get('size') or 
+                     item.get('variantWeight') or
+                     'N/A')
+            
+            enhanced_items.append({
+                "product_id": str(item.get('productId', '')),
+                "name": item.get('name', ''),
+                "quantity": int(item.get('quantity', 0)),
+                "price": float(item.get('price', 0)),
+                "total": float(item.get('price', 0)) * int(item.get('quantity', 0)),
+                "flavor": flavor,
+                "weight": weight
+            })
+        
+    
+        earned_points = int(final_total * 0.05)
+        order_data = {
+            '_id': ObjectId(),
+            'order_id': order_id,
+            'user_id': user_id,
+            'user_phone': user.get('phone', ''),
+            'user_name': user.get('name', ''),
+            'user_email': user.get('email', ''),
+            'address_details': address_array,
+            'order_items': enhanced_items,
+            'subtotal': float(subtotal),
+            'coins_used': float(coins_used),
+            'final_total': float(final_total),
+            'payment_method': data.get('payment_method', 'cod'),
+            'utr_number': data.get('utr_number'),
+            'status': 'pending',
+            'earned_points': earned_points,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow(),
+        }
+        
+    
+        orders_collection.insert_one(order_data)
+        
+        return Response({
+            'success': True,
+            'order': {
+                'id': order_id,
+                'earnedPoints': earned_points
+            },
+            'user': {
+                'points': new_points  
+            }
+        }, status=201)
+        
+    except Exception as e:
+        print(f"Order error: {str(e)}")
+        print(f"Request data: {request.data}")  
+        return Response({
+            'error': str(e),
+            'detail': 'Order creation failed'
+        }, status=500)
+
+
+@api_view(['GET'])
+def profile_view(request):
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return Response({'error': 'Token required'}, status=401)
+        
+        token = auth_header.split(' ')[1]
+        payload = decode_token(token)
+        user_id = payload['user_id']
+        
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return Response({'error': 'User not found'}, status=404)
+        
+        return Response({
+            'points': int(user.get('points', 0)),
+            'phone': user.get('phone', ''),
+            'name': user.get('name', ''),
+            'email': user.get('email', ''),
+            'referral_code': user.get('referral_code', '')
+        })
+    except Exception as e:
+        return Response({'error': 'Invalid token'}, status=401)

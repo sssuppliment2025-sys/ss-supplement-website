@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle } from "lucide-react"
+import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle, Coins } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -13,37 +13,129 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
 
-// Admin WhatsApp number (change this to your actual number)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL
 const ADMIN_WHATSAPP = "919547899170"
 const ADMIN_UPI_ID = "sssupplement@upi"
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, getCartTotal, clearCart } = useCart()
-  const { user, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
   const { toast } = useToast()
 
+  // ✅ FIXED COINS STATE
+  const [points, setPoints] = useState<number>(0)
+  const [loadingPoints, setLoadingPoints] = useState(true)
+  const [useCoins, setUseCoins] = useState(false)
+
+  // Form & UI state
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("cod")
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [showQRCode, setShowQRCode] = useState(false)
   const [utrNumber, setUtrNumber] = useState("")
   const [copied, setCopied] = useState(false)
+  const [orderId, setOrderId] = useState("")
 
   const [formData, setFormData] = useState({
-    fullName: user?.name || "",
-    phone: user?.phone || "",
-    email: user?.email || "",
+    fullName: "",
+    phone: "",
+    email: "",
     address: "",
     city: "",
     state: "",
     pincode: "",
     landmark: "",
   })
+
+  /* ================= FETCH USER COINS ================= */
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setLoadingPoints(false)
+      return
+    }
+
+    const token = localStorage.getItem("token") || localStorage.getItem("access")
+    if (!token) {
+      setLoadingPoints(false)
+      return
+    }
+
+    fetch(`${API_URL}/api/profile/`, {  // ✅ FIXED: Use correct endpoint
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setPoints(data.points || 0)
+      })
+      .catch(() => {
+        toast({
+          title: "Error",
+          description: "Failed to load reward coins",
+          variant: "destructive",
+        })
+      })
+      .finally(() => setLoadingPoints(false))
+  }, [isAuthenticated, toast])
+
+  /* ================= PRICE CALCULATIONS ================= */
+  const subtotal = getCartTotal()
+  const maxCoinsUsable = Math.min(points, subtotal)
+  const coinsUsed = useCoins ? maxCoinsUsable : 0
+  const finalTotal = Math.max(subtotal - coinsUsed, 0)
+
+  /* ================= WHATSAPP MESSAGE ================= */
+  const generateWhatsAppMessage = (backendCoins: number, backendEarned: number) => {
+    const orderItems = items
+      .map((item) => {
+        const price =
+          typeof item.product.flavors === "string"
+            ? item.product.price
+            : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+        return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${price * item.quantity}`
+      })
+      .join("\n")
+
+    const paymentInfo = paymentMethod === "upi" 
+      ? `💳 *Payment:* UPI\n📱 UTR: ${utrNumber}\n👛 UPI ID: ${ADMIN_UPI_ID}`
+      : "💰 *Payment:* Cash on Delivery"
+
+    const message = `
+🛒 *NEW ORDER #${orderId || "TEMP"} - SS Supplement*
+
+📦 *Order Items:*
+${orderItems}
+
+💰 *Billing:*
+Subtotal: ₹${subtotal}
+${coinsUsed > 0 ? `🎁 Coins Used: ${coinsUsed}` : ""}
+Total: *₹${finalTotal}*
+
+👛 *COINS BALANCE:* ${backendCoins} (Earned: +${backendEarned})
+
+${paymentInfo}
+
+👤 *Customer Details:*
+Name: ${formData.fullName}
+Phone: ${formData.phone}
+Email: ${formData.email || "N/A"}
+
+📍 *Delivery Address:*
+${formData.address}, ${formData.landmark ? `Landmark: ${formData.landmark}` : ""}
+${formData.city}, ${formData.state} - ${formData.pincode}
+
+⏰ *Order Time:* ${new Date().toLocaleString("en-IN")}
+    `.trim()
+
+    return `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(message)}`
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -58,44 +150,7 @@ export default function CheckoutPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const generateOrderMessage = () => {
-    const orderItems = items
-      .map((item) => {
-        const price =
-          typeof item.product.flavors === "string"
-            ? item.product.price
-            : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
-        return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${price * item.quantity}`
-      })
-      .join("\n")
-
-    const message = `
-🛒 *NEW ORDER - SS Supplement*
-
-📦 *Order Details:*
-${orderItems}
-
-💰 *Total Amount:* ₹${getCartTotal()}
-
-👤 *Customer Details:*
-Name: ${formData.fullName}
-Phone: ${formData.phone}
-Email: ${formData.email}
-
-📍 *Delivery Address:*
-${formData.address}
-${formData.landmark ? `Landmark: ${formData.landmark}` : ""}
-${formData.city}, ${formData.state} - ${formData.pincode}
-
-💳 *Payment Method:* ${paymentMethod === "upi" ? `UPI Payment\nUTR Number: ${utrNumber}` : "Cash on Delivery"}
-
----
-Order Time: ${new Date().toLocaleString("en-IN")}
-    `.trim()
-
-    return encodeURIComponent(message)
-  }
-
+  /* ================= FORM VALIDATION ================= */
   const handleProceedToPayment = () => {
     if (
       !formData.fullName ||
@@ -120,11 +175,12 @@ Order Time: ${new Date().toLocaleString("en-IN")}
     }
   }
 
+  /* ================= ✅ FIXED: SENDS FLAVOR/WEIGHT TO BACKEND ================= */
   const handleSubmit = async () => {
     if (paymentMethod === "upi" && !utrNumber.trim()) {
       toast({
         title: "UTR Number Required",
-        description: "Please enter the UTR/Transaction number after payment.",
+        description: "Please enter UTR/Transaction number after payment.",
         variant: "destructive",
       })
       return
@@ -132,49 +188,82 @@ Order Time: ${new Date().toLocaleString("en-IN")}
 
     setIsSubmitting(true)
 
-    // Simulate order processing
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("access")
+      
+      const orderRes = await fetch(`${API_URL}/api/orders/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.product.id,
+            name: item.product.name,
+            quantity: item.quantity,
+            price: typeof item.product.flavors === "string"
+              ? item.product.price
+              : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price,
+            // ✅ FIXED: NOW SENDS FLAVOR & WEIGHT TO BACKEND
+            selectedFlavor: item.selectedFlavor,
+            selectedWeight: item.selectedWeight,
+          })),
+          coins_used: coinsUsed,  // Backend deducts exactly this amount
+          payment_method: paymentMethod,
+          utr_number: paymentMethod === "upi" ? utrNumber : null,
+          address: formData,
+        }),
+      })
 
-    // Generate WhatsApp message and open WhatsApp
-    const message = generateOrderMessage()
-    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${message}`
+      const orderData = await orderRes.json()
+      
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || orderData.detail || "Failed to create order")
+      }
 
-    // Open WhatsApp in new tab
-    window.open(whatsappUrl, "_blank")
+      // ✅ REFRESH COINS FROM BACKEND (Shows correct 0 balance)
+      const profileRes = await fetch(`${API_URL}/api/profile/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const profileData = await profileRes.json()
+      setPoints(profileData.points || 0)
 
-    // Save order to localStorage
-    const orders = JSON.parse(localStorage.getItem("ss_orders") || "[]")
-    const newOrder = {
-      id: `ORD${Date.now()}`,
-      items: items.map((item) => ({
-        productId: item.product.id,
-        product: item.product.name,
-        flavor: item.selectedFlavor,
-        weight: item.selectedWeight,
-        quantity: item.quantity,
-        price:
-          typeof item.product.flavors === "string"
-            ? item.product.price
-            : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price,
-      })),
-      total: getCartTotal(),
-      address: formData,
-      paymentMethod,
-      utrNumber: paymentMethod === "upi" ? utrNumber : null,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      userId: user?.id || "guest",
-      userName: formData.fullName,
-      userPhone: formData.phone,
+      // Set order ID
+      setOrderId(orderData.order?.id || orderData.id || "SUCCESS")
+
+      // ✅ Send WhatsApp WITH ACTUAL BACKEND COINS
+      const whatsappUrl = generateWhatsAppMessage(
+        profileData.points || 0,
+        orderData.order?.earnedPoints || orderData.earnedPoints || 0
+      )
+      window.open(whatsappUrl, '_blank')
+
+      // Success feedback
+      toast({
+        title: "✅ Order Placed Successfully! 🎉",
+        description: `Order #${orderId}. New balance: ${profileData.points || 0} coins.`,
+      })
+
+      // Clear cart & show success
+      clearCart()
+      setOrderPlaced(true)
+
+    } catch (err: any) {
+      console.error("Order error:", err)
+      toast({
+        title: "❌ Order Failed",
+        description: err.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-    orders.push(newOrder)
-    localStorage.setItem("ss_orders", JSON.stringify(orders))
-
-    clearCart()
-    setOrderPlaced(true)
-    setIsSubmitting(false)
   }
 
+  // Early returns
   if (!isAuthenticated) {
     router.push("/login?redirect=/checkout")
     return null
@@ -185,6 +274,7 @@ Order Time: ${new Date().toLocaleString("en-IN")}
     return null
   }
 
+  // Success screen
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-background">
@@ -196,10 +286,13 @@ Order Time: ${new Date().toLocaleString("en-IN")}
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed Successfully!</h1>
             <p className="text-muted-foreground mb-6">
-              Your order details have been sent to our WhatsApp. We will confirm your order shortly.
+              Order details sent to WhatsApp. We will confirm within 30 minutes.
+              <span className="block mt-2 bg-success/10 text-success px-3 py-1 rounded-full text-sm">
+                ✅ New coin balance: {points} coins
+              </span>
             </p>
             <div className="space-y-3">
-              <Button onClick={() => router.push("/orders")} className="w-full bg-primary hover:bg-primary/90">
+              <Button onClick={() => router.push("/orders")} className="w-full bg-primary">
                 View My Orders
               </Button>
               <Button onClick={() => router.push("/")} variant="outline" className="w-full">
@@ -213,6 +306,7 @@ Order Time: ${new Date().toLocaleString("en-IN")}
     )
   }
 
+  // UPI QR Code screen
   if (showQRCode) {
     return (
       <div className="min-h-screen bg-background">
@@ -223,14 +317,13 @@ Order Time: ${new Date().toLocaleString("en-IN")}
               <CardHeader className="text-center">
                 <CardTitle className="text-foreground flex items-center justify-center gap-2">
                   <QrCode className="h-6 w-6 text-primary" />
-                  Pay via UPI
+                  Pay ₹{finalTotal} via UPI
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* QR Code */}
-                <div className="bg-white p-4 rounded-xl mx-auto w-fit">
+                <div className="bg-white p-4 rounded-xl mx-auto w-fit shadow-lg">
                   <Image
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${ADMIN_UPI_ID}&pn=SS%20Supplement&am=${getCartTotal()}&cu=INR`}
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${ADMIN_UPI_ID}&pn=SS%20Supplement&am=${finalTotal}&cu=INR`}
                     alt="UPI QR Code"
                     width={200}
                     height={200}
@@ -238,44 +331,47 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                   />
                 </div>
 
-                {/* Amount */}
-                <div className="text-center">
+                <div className="text-center space-y-1">
                   <p className="text-sm text-muted-foreground">Amount to Pay</p>
-                  <p className="text-3xl font-bold text-primary">₹{getCartTotal()}</p>
+                  <p className="text-3xl font-bold text-primary">₹{finalTotal}</p>
                 </div>
 
-                {/* UPI ID */}
-                <div className="bg-secondary rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground mb-2">Or pay using UPI ID</p>
+                <div className="bg-secondary/50 rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-3">Or send to UPI ID:</p>
                   <div className="flex items-center justify-between gap-2">
-                    <code className="text-foreground font-mono text-lg">{ADMIN_UPI_ID}</code>
+                    <code className="text-foreground font-mono text-lg bg-background px-2 py-1 rounded">
+                      {ADMIN_UPI_ID}
+                    </code>
                     <Button variant="outline" size="sm" onClick={copyUpiId}>
                       {copied ? <CheckCircle className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
 
-                {/* UTR Input */}
                 <div className="space-y-2">
-                  <Label htmlFor="utr" className="text-foreground">
-                    Enter UTR/Transaction Number *
+                  <Label htmlFor="utr" className="text-foreground font-medium">
+                    Enter UTR/Transaction Number <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="utr"
                     value={utrNumber}
                     onChange={(e) => setUtrNumber(e.target.value)}
                     className="bg-secondary border-border"
-                    placeholder="Enter 12-digit UTR number"
+                    placeholder="Enter 12-digit UTR number from your UPI app"
                   />
                   <p className="text-xs text-muted-foreground">
-                    You can find UTR number in your UPI app transaction history
+                    Find UTR in your UPI app → Transaction History
                   </p>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1 bg-transparent" onClick={() => setShowQRCode(false)}>
-                    Back
+                  <Button 
+                    variant="outline" 
+                    className="flex-1" 
+                    onClick={() => setShowQRCode(false)}
+                    disabled={isSubmitting}
+                  >
+                    Back to Checkout
                   </Button>
                   <Button
                     className="flex-1 bg-primary hover:bg-primary/90"
@@ -285,16 +381,16 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Processing...
+                        Confirming...
                       </>
                     ) : (
-                      "Confirm Payment"
+                      "Confirm & Send to WhatsApp"
                     )}
                   </Button>
                 </div>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  After payment, enter UTR number and click Confirm to complete your order
+                  After payment, enter UTR and confirm to send order to WhatsApp
                 </p>
               </CardContent>
             </Card>
@@ -305,6 +401,7 @@ Order Time: ${new Date().toLocaleString("en-IN")}
     )
   }
 
+  // Main checkout form
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -314,7 +411,7 @@ Order Time: ${new Date().toLocaleString("en-IN")}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Forms */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Delivery Address */}
+            {/* Delivery Address form */}
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
@@ -325,18 +422,17 @@ Order Time: ${new Date().toLocaleString("en-IN")}
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
                     <Input
                       id="fullName"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
                       className="bg-secondary border-border"
-                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
                     <Input
                       id="phone"
                       name="phone"
@@ -344,12 +440,11 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="bg-secondary border-border"
-                      required
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email (Optional)</Label>
                   <Input
                     id="email"
                     name="email"
@@ -360,49 +455,45 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="address">Complete Address *</Label>
+                  <Label htmlFor="address">Complete Address <span className="text-destructive">*</span></Label>
                   <Textarea
                     id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="bg-secondary border-border"
-                    placeholder="House No., Building, Street, Area"
-                    required
+                    className="bg-secondary border-border min-h-[80px]"
+                    placeholder="House No., Street, Area, Colony"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="city">City *</Label>
+                    <Label htmlFor="city">City <span className="text-destructive">*</span></Label>
                     <Input
                       id="city"
                       name="city"
                       value={formData.city}
                       onChange={handleInputChange}
                       className="bg-secondary border-border"
-                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="state">State *</Label>
+                    <Label htmlFor="state">State <span className="text-destructive">*</span></Label>
                     <Input
                       id="state"
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
                       className="bg-secondary border-border"
-                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pincode">Pincode *</Label>
+                    <Label htmlFor="pincode">Pincode <span className="text-destructive">*</span></Label>
                     <Input
                       id="pincode"
                       name="pincode"
                       value={formData.pincode}
                       onChange={handleInputChange}
                       className="bg-secondary border-border"
-                      required
                     />
                   </div>
                 </div>
@@ -414,7 +505,7 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                     value={formData.landmark}
                     onChange={handleInputChange}
                     className="bg-secondary border-border"
-                    placeholder="Near temple, opposite mall, etc."
+                    placeholder="Near temple, opposite school, etc."
                   />
                 </div>
               </CardContent>
@@ -430,27 +521,32 @@ Order Time: ${new Date().toLocaleString("en-IN")}
               </CardHeader>
               <CardContent>
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
-                  <div
-                    className={`flex items-center space-x-3 p-4 rounded-lg border ${paymentMethod === "cod" ? "border-primary bg-primary/5" : "border-border"}`}
-                  >
+                  <div className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                    paymentMethod === "cod" 
+                      ? "border-primary bg-primary/5 shadow-sm" 
+                      : "border-border hover:border-border hover:bg-accent"
+                  }`}>
                     <RadioGroupItem value="cod" id="cod" />
-                    <Label htmlFor="cod" className="flex items-center gap-3 cursor-pointer flex-1">
+                    <Label htmlFor="cod" className="flex items-center gap-3 flex-1 p-0 m-0 h-auto">
                       <Banknote className="h-5 w-5 text-success" />
                       <div>
                         <p className="font-medium text-foreground">Cash on Delivery</p>
-                        <p className="text-sm text-muted-foreground">Pay when you receive your order</p>
+                        <p className="text-sm text-muted-foreground">Pay when you receive order</p>
                       </div>
                     </Label>
                   </div>
-                  <div
-                    className={`flex items-center space-x-3 p-4 rounded-lg border ${paymentMethod === "upi" ? "border-primary bg-primary/5" : "border-border"}`}
-                  >
+
+                  <div className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                    paymentMethod === "upi" 
+                      ? "border-primary bg-primary/5 shadow-sm" 
+                      : "border-border hover:border-border hover:bg-accent"
+                  }`}>
                     <RadioGroupItem value="upi" id="upi" />
-                    <Label htmlFor="upi" className="flex items-center gap-3 cursor-pointer flex-1">
+                    <Label htmlFor="upi" className="flex items-center gap-3 flex-1 p-0 m-0 h-auto">
                       <QrCode className="h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-medium text-foreground">UPI Payment (QR Code)</p>
-                        <p className="text-sm text-muted-foreground">Scan QR code to pay instantly</p>
+                        <p className="font-medium text-foreground">UPI Payment</p>
+                        <p className="text-sm text-muted-foreground">Instant payment via QR/PhonePe/GPay</p>
                       </div>
                     </Label>
                   </div>
@@ -463,10 +559,10 @@ Order Time: ${new Date().toLocaleString("en-IN")}
           <div className="lg:col-span-1">
             <Card className="bg-card border-border sticky top-24">
               <CardHeader>
-                <CardTitle className="text-foreground">Order Summary</CardTitle>
+                <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Items */}
+                {/* Cart Items */}
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {items.map((item) => {
                     const price =
@@ -475,11 +571,8 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                         : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
 
                     return (
-                      <div
-                        key={`${item.product.id}-${item.selectedFlavor}-${item.selectedWeight}`}
-                        className="flex gap-3"
-                      >
-                        <div className="relative w-16 h-16 bg-secondary rounded-lg overflow-hidden flex-shrink-0">
+                      <div key={`${item.product.id}-${item.selectedFlavor}-${item.selectedWeight}`} className="flex gap-3 p-2 rounded-lg hover:bg-accent">
+                        <div className="relative w-16 h-16 bg-secondary rounded overflow-hidden flex-shrink-0">
                           <Image
                             src={item.product.image || "/placeholder.svg"}
                             alt={item.product.name}
@@ -488,12 +581,14 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
+                          <p className="text-sm font-medium line-clamp-1 text-foreground">
+                            {item.product.name}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {item.selectedFlavor} • {item.selectedWeight}
                           </p>
-                          <p className="text-sm text-foreground">
-                            ₹{price} x {item.quantity} = ₹{price * item.quantity}
+                          <p className="text-sm font-medium">
+                            ₹{price} × {item.quantity} = <span className="font-bold">₹{price * item.quantity}</span>
                           </p>
                         </div>
                       </div>
@@ -501,32 +596,73 @@ Order Time: ${new Date().toLocaleString("en-IN")}
                   })}
                 </div>
 
-                <div className="border-t border-border pt-4 space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="text-foreground">₹{getCartTotal()}</span>
+                {/* Coins Section */}
+                <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Coins className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm font-medium">
+                        Available Coins: {loadingPoints ? "Loading..." : points}
+                      </span>
+                    </div>
+                    <Checkbox
+                      checked={useCoins}
+                      onCheckedChange={setUseCoins}
+                      disabled={loadingPoints || points === 0}
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="text-success">FREE</span>
+                  {useCoins && points > 0 && (
+                    <div className="flex justify-between items-center p-2 bg-success/10 border border-success/20 rounded-md">
+                      <span className="text-xs text-success font-medium">
+                        Max discount: ₹{maxCoinsUsable.toLocaleString()}
+                      </span>
+                      <span className="text-sm font-bold text-success">-₹{coinsUsed.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {useCoins && points === 0 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      No coins available
+                    </p>
+                  )}
+                </div>
+
+                {/* Price Summary */}
+                <div className="space-y-2 pt-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal ({items.length} items)</span>
+                    <span>₹{subtotal.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">
-                    <span className="text-foreground">Total</span>
-                    <span className="text-foreground">₹{getCartTotal()}</span>
+                  
+                  {useCoins && coinsUsed > 0 && (
+                    <div className="flex justify-between text-success font-semibold text-sm">
+                      <span>🪙 Coins Discount</span>
+                      <span>-₹{coinsUsed.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  <div className="h-px bg-border my-2" />
+
+                  <div className="flex justify-between text-xl font-bold">
+                    <span>Total</span>
+                    <span className="text-2xl text-primary">₹{finalTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
+                {/* Place Order Button */}
                 <Button
                   onClick={handleProceedToPayment}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full h-12 text-lg"
                   size="lg"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || finalTotal === 0}
                 >
-                  {paymentMethod === "upi" ? "Proceed to Pay" : "Place Order"}
+                  {paymentMethod === "upi" 
+                    ? `Proceed to UPI Payment (₹${finalTotal.toLocaleString()})` 
+                    : "Place Order (Cash on Delivery)"
+                  }
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  By placing this order, you agree to our Terms & Conditions
+                  By placing order, you agree to our Terms & Conditions
                 </p>
               </CardContent>
             </Card>

@@ -2,8 +2,9 @@ import jwt
 from datetime import datetime, timedelta
 from django.conf import settings
 
-ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
+ACCESS_TOKEN_LIFETIME = timedelta(hours=24)
 REFRESH_TOKEN_LIFETIME = timedelta(days=7)
+ACCESS_TOKEN_EXPIRY = 24 * 60 * 60  
 
 def generate_tokens_for_user(user_id: str):
     now = datetime.utcnow()
