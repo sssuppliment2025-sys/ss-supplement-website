@@ -251,7 +251,7 @@ export const products: Product[] = [
     ...PRICING.ON_WHEY_5LB,
     rating: 4.9,
     reviews: 15600,
-    image: "/image/Whey_protien/Optimum/double_rich_5lb1.webp",
+    image: "/image/Whey_protien/Optimum/Optimum_Double_Rich_5lb1.jpg",
     image1: "/image/Whey_protien/Optimum/double_rich_5lb2.webp",
     image2: "/image/Whey_protien/Optimum/double_rich_5lb3.webp",
     image3: "/image/Whey_protien/Optimum/double_rich_5lb4.webp",
