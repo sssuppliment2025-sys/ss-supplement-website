@@ -43,7 +43,7 @@ export default function HomePage() {
                   href={`/category/${encodeURIComponent(cat)}`}
                   className="relative h-48 rounded-xl overflow-hidden group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-60 group-hover:opacity-90 transition-opacity" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <h3 className="text-2xl font-bold text-white">{cat}</h3>
                   </div>

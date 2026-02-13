@@ -13,7 +13,7 @@ const banners = [
     subtitle: "Up to 40% OFF on Whey Proteins",
     cta: "Shop Now",
     link: "/category/Whey Protein",
-    image: "/placeholder.svg?height=500&width=1200",
+    image: "/All_product.png?height=500&width=1200",
     gradient: "from-primary/80 to-transparent",
   },
   {
@@ -22,16 +22,16 @@ const banners = [
     subtitle: "Premium Creatine Collection",
     cta: "Explore",
     link: "/category/Creatine",
-    image: "/placeholder.svg?height=500&width=1200",
+    image: "/All_product.png?height=500&width=1200",
     gradient: "from-accent/80 to-transparent",
   },
   {
     id: 3,
     title: "Bulk Up Season",
-    subtitle: "Mass Gainers Starting ₹1999",
+    subtitle: "Mass Gainers Starting ₹999",
     cta: "Get Started",
     link: "/category/Mass Gainer",
-    image: "/placeholder.svg?height=500&width=1200",
+    image: "/All_product.png?height=500&width=1200",
     gradient: "from-primary/80 to-transparent",
   },
 ]
