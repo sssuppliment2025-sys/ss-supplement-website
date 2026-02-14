@@ -244,11 +244,11 @@ const PRICING = {
   MB_BURNER_PRO_60N: getPrice(849, 1029),
 
   //GNC
-  GNC_TRI_LC: getPrice(1199, 1378),
-  GNC_LC_3000MG: getPrice(899, 1033),
+  GNC_TRI_LC: getPrice(1399, 2049),
+  GNC_LC_3000MG: getPrice(649, 849),
 
   //WELLBEINGS
-  WB_ACV_500ML: getPrice(399, 459),
+  WB_ACV_500ML: getPrice(385, 649),
 
   //*********** Recovery & Misc *************
   MB_GLUT: getPrice(899, 1034),
