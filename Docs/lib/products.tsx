@@ -169,26 +169,52 @@ const PRICING = {
   AVV_MUSCLE_GAINER_2KG: getPrice(3099, 3559),
   AVV_MASS_GAINER_2KG: getPrice(2099, 2309),
 
-  // ******Vitamins & Health**********
-  MB_VITE_60: getPrice(599, 689),
-  MB_VITE_120: getPrice(799, 919),
-  MB_5IN1: getPrice(799, 919),
-  GNC_MEGA_30: getPrice(899, 1034),
-  GNC_MEGA_60: getPrice(1599, 1839),
-  MT_MULTI: getPrice(749, 861),
-  ON_MULTI: getPrice(699, 803),
-  BM_MULTI: getPrice(549, 631),
-  C4_MULTI: getPrice(1299, 1493),
-  MB_FISH_60: getPrice(599, 689),
-  MB_FISH_90: getPrice(799, 919),
-  MB_FISH_G: getPrice(899, 1034),
-  GNC_FISH_60: getPrice(749, 861),
-  GNC_FISH_90: getPrice(1049, 1206),
-  GNC_FISH_T: getPrice(1199, 1378),
-  ON_FISH: getPrice(649, 746),
-  ALA_FISH: getPrice(799, 918),
-  MT_FISH: getPrice(899, 1033),
-  NEU_FISH: getPrice(699, 803),
+  // ******MULTI Vitamins**********
+  //MB
+  MB_VITE_60N: getPrice(499, 629),
+  MB_VITE_90N: getPrice(699, 999),
+
+  MB_5IN1_90N: getPrice(799, 919),
+
+  //GNC
+  GNC_MEGA_30N: getPrice(399, 579),
+  GNC_MEGA_60N: getPrice(549, 979),
+  
+  //MUSCLETECH
+  MT_PLAT_MULTI_60N: getPrice(699, 1419),
+
+  //ON
+  ON_MULTI_60N: getPrice(605, 839),
+
+  //BIGMUSCLE
+  BM_MULTI_60N: getPrice(299, 499),
+
+
+
+  // *******FISH OIL*************
+  // C4_MULTI: getPrice(1299, 1493),
+
+  //MB
+  MB_FISH_60N: getPrice(450, 679),
+  MB_FISH_90N: getPrice(549, 949),
+  MB_FISH_GOLD_60N: getPrice(799, 1209),
+
+  //GNC
+  GNC_FISH_60N: getPrice(349, 619),
+  GNC_FISH_90N: getPrice(499, 889),
+  GNC_FISH_TRI_S_120N: getPrice(899, 1859),
+
+  //ON
+  ON_FISH_60N: getPrice(480, 666),
+
+  //ALASKA
+  ALA_FISH_100N: getPrice(449, 999),
+
+  //MUSCLETECH
+  MT_FISH_100N: getPrice(699, 1329),
+
+  //NEUHERBS
+  NEU_FISH_60N: getPrice(649, 999),
 
   // Pre Workout
   MB_PRE_100: getPrice(899, 1034),
@@ -3850,10 +3876,10 @@ export const products: Product[] = [
   // MULTIVITAMINS
   {
     id: "159",
-    name: "MB-Vite Daily Multivitamin",
+    name: "MuscleBlaze MB-VITE Daily Multivitamin | 60N",
     brand: "MuscleBlaze",
     category: "Multivitamin",
-    ...PRICING.MB_VITE_60,
+    ...PRICING.MB_VITE_60N,
     rating: 4.5,
     reviews: 4200,
     image: "/image/Multivitamin/MB/MB_vite_60n.jpg",
@@ -3861,7 +3887,7 @@ export const products: Product[] = [
     image2: "/image/Multivitamin/MB/MB_vite_60n.jpg",
     image3: "/image/Multivitamin/MB/MB_vite_60n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MB_VITE_60.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MB_VITE_60N.price }],
     weight: "60N",
     weights: ["60N", "120N"],
     description: "Complete daily multivitamin",
@@ -3871,10 +3897,10 @@ export const products: Product[] = [
   },
   {
     id: "160",
-    name: "MB-Vite Daily Multivitamin",
+    name: "MuscleBlaze MB-VITE Daily Multivitamin | 90N",
     brand: "MuscleBlaze",
     category: "Multivitamin",
-    ...PRICING.MB_VITE_120,
+    ...PRICING.MB_VITE_90N,
     rating: 4.6,
     reviews: 5100,
     image: "/image/Multivitamin/MB/MB_vite_120n.jpg",
@@ -3882,20 +3908,21 @@ export const products: Product[] = [
     image2: "/image/Multivitamin/MB/MB_vite_120n.jpg",
     image3: "/image/Multivitamin/MB/MB_vite_120n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MB_VITE_120.price }],
-    weight: "120N",
-    weights: ["60N", "120N"],
+    flavors: [{ name: "Unflavoured", price: PRICING.MB_VITE_90N.price }],
+    weight: "90N",
+    weights: ["60N", "90N"],
     description: "Complete daily multivitamin",
     keyBenefits: ["Essential vitamins", "Minerals", "Daily nutrition"],
     nutritionalInfo: "Per Tablet: 24 Vitamins & Minerals",
     inStock: true,
   },
+
   {
     id: "161",
-    name: "MB 5in1 Multivitamin",
+    name: "MuscleBlaze Biozyme 5 in 1 Multivitamin | 90N",
     brand: "MuscleBlaze",
     category: "Multivitamin",
-    ...PRICING.MB_5IN1,
+    ...PRICING.MB_5IN1_90N,
     rating: 4.6,
     reviews: 4800,
     image: "/image/Multivitamin/MB_5_in_one/Mb_5_in_one_multivitamin.webp",
@@ -3903,7 +3930,7 @@ export const products: Product[] = [
     image2: "/image/Multivitamin/MB_5_in_one/Mb_5_in_one_multivitamin.webp",
     image3: "/image/Multivitamin/MB_5_in_one/Mb_5_in_one_multivitamin.webp",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MB_5IN1.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MB_5IN1_90N.price }],
     weight: "90N",
     weights: ["90N"],
     description: "5-in-1 comprehensive multivitamin",
@@ -3911,12 +3938,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Tablet: 5 Blends, 30+ Nutrients",
     inStock: true,
   },
+
+  //GNC
   {
     id: "162",
-    name: "GNC Mega Men Daily Multivitamin",
+    name: "GNC MEGA MEN One Daily Multivitamin | 30N",
     brand: "GNC",
     category: "Multivitamin",
-    ...PRICING.GNC_MEGA_30,
+    ...PRICING.GNC_MEGA_30N,
     rating: 4.5,
     reviews: 3800,
     image: "/image/Multivitamin/GNC/mega_men_30n.jpg",
@@ -3924,7 +3953,7 @@ export const products: Product[] = [
     image2: "/image/Multivitamin/GNC/mega_men_30n.jpg",
     image3: "/image/Multivitamin/GNC/mega_men_30n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.GNC_MEGA_30.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.GNC_MEGA_30N.price }],
     weight: "30N",
     weights: ["30N", "60N"],
     description: "Men's daily multivitamin",
@@ -3934,10 +3963,10 @@ export const products: Product[] = [
   },
   {
     id: "163",
-    name: "GNC Mega Men Daily Multivitamin",
+    name: "GNC MEGA MEN One Daily Multivitamin | 60N",
     brand: "GNC",
     category: "Multivitamin",
-    ...PRICING.GNC_MEGA_60,
+    ...PRICING.GNC_MEGA_60N,
     rating: 4.6,
     reviews: 4600,
     image: "/image/Multivitamin/GNC/mega_men_60n.jpg",
@@ -3945,7 +3974,7 @@ export const products: Product[] = [
     image2: "/image/Multivitamin/GNC/mega_men_60n.jpg",
     image3: "/image/Multivitamin/GNC/mega_men_60n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.GNC_MEGA_60.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.GNC_MEGA_60N.price }],
     weight: "60N",
     weights: ["30N", "60N"],
     description: "Men's daily multivitamin",
@@ -3953,12 +3982,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Tablet: 40+ Nutrients",
     inStock: true,
   },
+
+  //MUSCLETECH
   {
     id: "164",
-    name: "MuscleTech Multivitamin",
+    name: "MUSCLETECH PLATINUM MULTIVITAMIN | 60N",
     brand: "MuscleTech",
     category: "Multivitamin",
-    ...PRICING.MT_MULTI,
+    ...PRICING.MT_PLAT_MULTI_60N,
     rating: 4.5,
     reviews: 3200,
     image: "",
@@ -3966,7 +3997,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MT_MULTI.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MT_PLAT_MULTI_60N.price }],
     weight: "60N",
     weights: ["60N"],
     description: "MuscleTech multivitamin for daily wellness",
@@ -3974,12 +4005,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 20+ Essential Vitamins & Minerals",
     inStock: true
   },
+
+  //ON
   {
     id: "165",
-    name: "On Multivitamine For Men",
+    name: "ON Multivitamin for MEN",
     brand: "Optimum Nutrition",
     category: "Multivitamin",
-    ...PRICING.ON_MULTI,
+    ...PRICING.ON_MULTI_60N,
     rating: 4.6,
     reviews: 4500,
     image: "",
@@ -3987,7 +4020,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.ON_MULTI.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.ON_MULTI_60N.price }],
     weight: "60N",
     weights: ["60N"],
     description: "Optimum Nutrition multivitamin specially formulated for men",
@@ -3995,12 +4028,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 25+ Vitamins & Minerals for Men",
     inStock: true
   },
+
+  //BIGMUSCLE
   {
     id: "166",
-    name: "BigMuscle Multivitamine",
+    name: "BIGMUSCLE True Vitamin MultivitaminM |60N",
     brand: "BigMuscle",
     category: "Multivitamin",
-    ...PRICING.BM_MULTI,
+    ...PRICING.BM_MULTI_60N,
     rating: 4.3,
     reviews: 2800,
     image: "",
@@ -4008,7 +4043,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.BM_MULTI.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.BM_MULTI_60N.price }],
     weight: "60N",
     weights: ["60N"],
     description: "BigMuscle multivitamin for overall health",
@@ -4016,35 +4051,35 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: Essential Vitamins & Minerals",
     inStock: true
   },
-  {
-    id: "167",
-    name: "C4 Multivitamin",
-    brand: "C4",
-    category: "Multivitamin",
-    ...PRICING.C4_MULTI,
-    rating: 4.4,
-    reviews: 3600,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.C4_MULTI.price }],
-    weight: "180N",
-    weights: ["180N"],
-    description: "C4 multivitamin for peak performance",
-    keyBenefits: ["180 tablets", "Premium formula", "Performance support"],
-    nutritionalInfo: "Per Serving: 30+ Essential Nutrients",
-    inStock: true
-  },
+  // {
+  //   id: "167",
+  //   name: "C4 Multivitamin",
+  //   brand: "C4",
+  //   category: "Multivitamin",
+  //   ...PRICING.C4_MULTI,
+  //   rating: 4.4,
+  //   reviews: 3600,
+  //   image: "",
+  //   image1: "",
+  //   image2: "",
+  //   image3: "",
+  //   images: [],
+  //   flavors: [{ name: "Unflavoured", price: PRICING.C4_MULTI.price }],
+  //   weight: "180N",
+  //   weights: ["180N"],
+  //   description: "C4 multivitamin for peak performance",
+  //   keyBenefits: ["180 tablets", "Premium formula", "Performance support"],
+  //   nutritionalInfo: "Per Serving: 30+ Essential Nutrients",
+  //   inStock: true
+  // },
 
-  // FISH OIL
+  // ************FISH OIL************
   {
     id: "168",
-    name: "MB Omega3 FishOil 1000mg",
+    name: "MuscleBlaze Omega 3 Fish Oil 1000MG | 60N",
     brand: "MuscleBlaze",
     category: "Fish Oil",
-    ...PRICING.MB_FISH_60,
+    ...PRICING.MB_FISH_60N,
     rating: 4.5,
     reviews: 4800,
     image: "/image/Fishoil/MB/MB_fishoil_60N.jpg",
@@ -4052,7 +4087,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/MB/MB_fishoil_60N.jpg",
     image3: "/image/Fishoil/MB/MB_fishoil_60N.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MB_FISH_60.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MB_FISH_60N.price }],
     weight: "60N",
     weights: ["60N", "90N"],
     description: "Omega-3 fish oil for heart health",
@@ -4062,10 +4097,10 @@ export const products: Product[] = [
   },
   {
     id: "169",
-    name: "MB Omega3 FishOil 1000mg",
+    name: "MuscleBlaze Omega 3 Fish Oil 1000mg | 90N",
     brand: "MuscleBlaze",
     category: "Fish Oil",
-    ...PRICING.MB_FISH_90,
+    ...PRICING.MB_FISH_90N,
     rating: 4.6,
     reviews: 5600,
     image: "/image/Fishoil/MB/MB_fishoil_90N.jpg",
@@ -4073,7 +4108,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/MB/MB_fishoil_90N.jpg",
     image3: "/image/Fishoil/MB/MB_fishoil_90N.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MB_FISH_90.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MB_FISH_90N.price }],
     weight: "90N",
     weights: ["60N", "90N"],
     description: "Omega-3 fish oil for heart health",
@@ -4083,10 +4118,10 @@ export const products: Product[] = [
   },
   {
     id: "170",
-    name: "MB Omega3 FishOil Gold",
+    name: "MuscleBlaze Omega 3 Fish Oil Gold 3x Triple Strength | 60N",
     brand: "MuscleBlaze",
     category: "Fish Oil",
-    ...PRICING.MB_FISH_G,
+    ...PRICING.MB_FISH_GOLD_60N,
     rating: 4.7,
     reviews: 4200,
     image: "/image/Fishoil/MB/MB_fishoil_gold_60N.jpg",
@@ -4094,7 +4129,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/MB/MB_fishoil_gold_60N.jpg",
     image3: "/image/Fishoil/MB/MB_fishoil_gold_60N.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MB_FISH_G.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MB_FISH_GOLD_60N.price }],
     weight: "60N",
     weights: ["60N"],
     description: "Premium gold fish oil with higher EPA DHA",
@@ -4102,12 +4137,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Softgel: EPA 360mg, DHA 240mg",
     inStock: true,
   },
+
+  //GNC
   {
     id: "171",
-    name: "GNC Omega3 Fish Oil",
+    name: "GNC Fish Oil Omega 3 Capsules - 1000mg | 60N",
     brand: "GNC",
     category: "Fish Oil",
-    ...PRICING.GNC_FISH_60,
+    ...PRICING.GNC_FISH_60N,
     rating: 4.5,
     reviews: 3800,
     image: "/image/Fishoil/GNC/gnc_omega3_fishoil_60N.webp",
@@ -4115,7 +4152,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/GNC/gnc_omega3_fishoil_60N.webp",
     image3: "/image/Fishoil/GNC/gnc_omega3_fishoil_60N.webp",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.GNC_FISH_60.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.GNC_FISH_60N.price }],
     weight: "60N",
     weights: ["60N", "90N"],
     description: "GNC fish oil for overall health",
@@ -4125,10 +4162,10 @@ export const products: Product[] = [
   },
   {
     id: "172",
-    name: "GNC Omega3 Fish Oil",
+    name: "GNC Fish Oil Omega 3 Capsules - 1000mg | 90N",
     brand: "GNC",
     category: "Fish Oil",
-    ...PRICING.GNC_FISH_90,
+    ...PRICING.GNC_FISH_90N,
     rating: 4.6,
     reviews: 4500,
     image: "/image/Fishoil/GNC/gnc_omega3_fishoil_90N.webp",
@@ -4136,7 +4173,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/GNC/gnc_omega3_fishoil_90N.webp",
     image3: "/image/Fishoil/GNC/gnc_omega3_fishoil_90N.webp",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.GNC_FISH_90.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.GNC_FISH_90N.price }],
     weight: "90N",
     weights: ["60N", "90N"],
     description: "GNC fish oil for overall health",
@@ -4146,10 +4183,10 @@ export const products: Product[] = [
   },
   {
     id: "173",
-    name: "GNC Triple Strength Fish Oil",
+    name: "GNC Triple Strength Fish Oil | 120N",
     brand: "GNC",
     category: "Fish Oil",
-    ...PRICING.GNC_FISH_T,
+    ...PRICING.GNC_FISH_TRI_S_120N,
     rating: 4.6,
     reviews: 4200,
     image: "/image/Fishoil/GNC/gnc_triplestrength_fishoil_60N.webp",
@@ -4157,20 +4194,22 @@ export const products: Product[] = [
     image2: "/image/Fishoil/GNC/gnc_triplestrength_fishoil_60N.webp",
     image3: "/image/Fishoil/GNC/gnc_triplestrength_fishoil_60N.webp",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.GNC_FISH_T.price }],
-    weight: "60N",
-    weights: ["60N"],
+    flavors: [{ name: "Unflavoured", price: PRICING.GNC_FISH_TRI_S_120N.price }],
+    weight: "120N",
+    weights: ["120N"],
     description: "GNC triple strength fish oil for heart and brain health",
     keyBenefits: ["Triple strength formula", "Heart health", "Brain support"],
     nutritionalInfo: "Per Serving: 900mg EPA, 600mg DHA",
     inStock: true
   },
+
+  //ON
   {
     id: "174",
-    name: "On FishOil",
+    name: "ON Omega-3 Fishoil | 60N",
     brand: "Optimum Nutrition",
     category: "Fish Oil",
-    ...PRICING.ON_FISH,
+    ...PRICING.ON_FISH_60N,
     rating: 4.5,
     reviews: 5600,
     image: "/image/Fishoil/ON/on_fishoil_60N.webp",
@@ -4178,7 +4217,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/ON/on_fishoil_60N.webp",
     image3: "/image/Fishoil/ON/on_fishoil_60N.webp",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.ON_FISH.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.ON_FISH_60N.price }],
     weight: "60N",
     weights: ["60N"],
     description: "Optimum Nutrition fish oil for omega-3 fatty acids",
@@ -4188,10 +4227,10 @@ export const products: Product[] = [
   },
   {
     id: "175",
-    name: "Alaska Omega3 Fish Oil",
+    name: "Sunline Alaska Deep Sea Fish Oil Omega-3 | 100N",
     brand: "Alaska",
     category: "Fish Oil",
-    ...PRICING.ALA_FISH,
+    ...PRICING.ALA_FISH_100N,
     rating: 4.4,
     reviews: 3800,
     image: "/image/Fishoil/ALASKA/alaska_omega3_fishoil_100n.jpg",
@@ -4199,7 +4238,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/ALASKA/alaska_omega3_fishoil_100n.jpg",
     image3: "/image/Fishoil/ALASKA/alaska_omega3_fishoil_100n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.ALA_FISH.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.ALA_FISH_100N.price }],
     weight: "100N",
     weights: ["100N"],
     description: "Alaska omega-3 fish oil for overall wellness",
@@ -4209,10 +4248,10 @@ export const products: Product[] = [
   },
   {
     id: "176",
-    name: "MuscleTech Omega3 Fish Oil",
+    name: "MUSCLETECH PLATINUM 100% OMEGA FISH OIL | 100N",
     brand: "MuscleTech",
     category: "Fish Oil",
-    ...PRICING.MT_FISH,
+    ...PRICING.MT_FISH_100N,
     rating: 4.5,
     reviews: 4500,
     image: "/image/Fishoil/MuscleTech/muscletech_omega3_fishoil_100n.jpg",
@@ -4220,7 +4259,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/MuscleTech/muscletech_omega3_fishoil_100n.jpg",
     image3: "/image/Fishoil/MuscleTech/muscletech_omega3_fishoil_100n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.MT_FISH.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.MT_FISH_100N.price }],
     weight: "100N",
     weights: ["100N"],
     description: "MuscleTech omega-3 fish oil for athletic performance",
@@ -4230,10 +4269,10 @@ export const products: Product[] = [
   },
   {
     id: "177",
-    name: "Neuherbs Deep Sea Fish Oil 2500mg",
+    name: "NEUHERBS Deep Sea Fish Oil - 2500 mg Omega 3 | 60N",
     brand: "Neuherbs",
     category: "Fish Oil",
-    ...PRICING.NEU_FISH,
+    ...PRICING.NEU_FISH_60N,
     rating: 4.3,
     reviews: 3200,
     image: "/image/Fishoil/NEUHERBS/neuherbs_fishoil_2500mg_60n.jpg",
@@ -4241,7 +4280,7 @@ export const products: Product[] = [
     image2: "/image/Fishoil/NEUHERBS/neuherbs_fishoil_2500mg_60n.jpg",
     image3: "/image/Fishoil/NEUHERBS/neuherbs_fishoil_2500mg_60n.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.NEU_FISH.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.NEU_FISH_60N.price }],
     weight: "60N",
     weights: ["60N"],
     description: "Neuherbs deep sea fish oil 2500mg for maximum potency",
