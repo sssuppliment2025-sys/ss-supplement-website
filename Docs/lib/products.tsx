@@ -216,21 +216,31 @@ const PRICING = {
   //NEUHERBS
   NEU_FISH_60N: getPrice(649, 999),
 
-  // Pre Workout
-  MB_PRE_100: getPrice(899, 1034),
-  MB_PRE_200: getPrice(1599, 1839),
-  MB_IMP_340: getPrice(1499, 1723),
-  MB_IMP_510: getPrice(2099, 2413),
-  BD_PRE: getPrice(1299, 1493),
-  GNC_PRE: getPrice(1699, 1953),
-  BM_PRE: getPrice(1199, 1378),
-  WV_PRE: getPrice(1399, 1608),
-  FU_CIT: getPrice(799, 918),
-  GNC_ARG: getPrice(1099, 1263),
+  // **********Pre Workout**************//
+  //MB
+  MB_PRE_100G: getPrice(549, 669),
+  MB_PRE_200G: getPrice(999, 1249),
+  MB_WRATHX_340G: getPrice(1199, 2099),
+  MB_WRATHX_510G: getPrice(1699, 2669),
 
-  // Weight Loss
+  //BIG DADDY
+  BD_PRE_300GM: getPrice(1350, 2135),
+
+  //GNC
+  GNC_PRE_PER_360GM: getPrice(999, 1869),
+  GNC_L_ARG_60N: getPrice(799, 1329),
+
+  //BIG MUSCLE
+  BM_KARN_PRE_300GM: getPrice(1149, 1849),
+  // WV_PRE: getPrice(1399, 1608),
+
+  //FAST&UP
+  FU_CITR_200GM: getPrice(751, 1155),
+
+  //******** Weight Loss ************
   MB_LC_1100: getPrice(799, 919),
   MB_LC_3300: getPrice(749, 861),
+
   GNC_LC: getPrice(1199, 1378),
   FU_LC: getPrice(899, 1033),
   MB_BURN: getPrice(699, 804),
@@ -4292,10 +4302,10 @@ export const products: Product[] = [
   // PRE-WORKOUT
   {
     id: "178",
-    name: "MB Pre Workout 200 XTreme",
+    name: "MuscleBlaze PRE Workout 200 Xtreme | 100G",
     brand: "MuscleBlaze",
     category: "Pre Workout",
-    ...PRICING.MB_PRE_100,
+    ...PRICING.MB_PRE_100G,
     rating: 4.6,
     reviews: 5200,
     image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_100g.jpg",
@@ -4303,7 +4313,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_100g3.jpg",
     image3: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_100g4.jpg",
     images: [],
-    flavors: [{ name: "Fruit Punch", price: PRICING.MB_PRE_100.price }],
+    flavors: [{ name: "Fruit Punch", price: PRICING.MB_PRE_100G.price }],
     weight: "100G",
     weights: ["100G", "200G"],
     description: "Explosive pre-workout for intense training",
@@ -4313,10 +4323,10 @@ export const products: Product[] = [
   },
   {
     id: "179",
-    name: "MB Pre Workout 200 XTreme",
+    name: "MuscleBlaze PRE Workout 200 Xtreme | 200G",
     brand: "MuscleBlaze",
     category: "Pre Workout",
-    ...PRICING.MB_PRE_200,
+    ...PRICING.MB_PRE_200G,
     rating: 4.7,
     reviews: 6800,
     image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_200g.jpg",
@@ -4324,7 +4334,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_200g2.jpg",
     image3: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_fruitPunch_200g3.jpg",
     images: [],
-    flavors: [{ name: "Fruit Punch", price: PRICING.MB_PRE_200.price }],
+    flavors: [{ name: "Fruit Punch", price: PRICING.MB_PRE_200G.price }],
     weight: "200G",
     weights: ["100G", "200G"],
     description: "Explosive pre-workout for intense training",
@@ -4334,10 +4344,10 @@ export const products: Product[] = [
   },
   {
     id: "180",
-    name: "MB Pre Workout 200 XTreme",
+    name: "MuscleBlaze PRE Workout 200 Xtreme | 100G",
     brand: "MuscleBlaze",
     category: "Pre Workout",
-    ...PRICING.MB_PRE_100,
+    ...PRICING.MB_PRE_100G,
     rating: 4.6,
     reviews: 4900,
     image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_100g.jpg",
@@ -4345,7 +4355,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_100g2.jpg",
     image3: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_100g3.jpg",
     images: [],
-    flavors: [{ name: "Tangy Orange", price: PRICING.MB_PRE_100.price }],
+    flavors: [{ name: "Tangy Orange", price: PRICING.MB_PRE_100G.price }],
     weight: "100G",
     weights: ["100G", "200G"],
     description: "Explosive pre-workout for intense training",
@@ -4355,10 +4365,10 @@ export const products: Product[] = [
   },
   {
     id: "181",
-    name: "MB Pre Workout 200 XTreme",
+    name: "MuscleBlaze PRE Workout 200 Xtreme | 200G",
     brand: "MuscleBlaze",
     category: "Pre Workout",
-    ...PRICING.MB_PRE_200,
+    ...PRICING.MB_PRE_200G,
     rating: 4.7,
     reviews: 6400,
     image: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_200g.webp",
@@ -4366,7 +4376,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_100g2.jpg",
     image3: "/image/Pre_Workout/MB/mb_preWorkout_200_xTreme_tangyOrange_100g3.jpg",
     images: [],
-    flavors: [{ name: "Tangy Orange", price: PRICING.MB_PRE_200.price }],
+    flavors: [{ name: "Tangy Orange", price: PRICING.MB_PRE_200G.price }],
     weight: "200G",
     weights: ["100G", "200G"],
     description: "Explosive pre-workout for intense training",
@@ -4374,12 +4384,13 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: Caffeine 200mg, Beta-Alanine 2g",
     inStock: true,
   },
+
   {
     id: "182",
-    name: "MB Pre Workout IMPAktix",
+    name: "MuscleBlaze Pre Workout WrathX | 340G",
     brand: "MB",
     category: "Pre Workout",
-    ...PRICING.MB_IMP_340,
+    ...PRICING.MB_WRATHX_340G,
     rating: 4.4,
     reviews: 2800,
     image: "/image/Pre_Workout/MB/warthx_fruit_340g.jpg",
@@ -4387,7 +4398,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/warthx_fruit_340g2.jpg",
     image3: "/image/Pre_Workout/MB/warthx_fruit_340g3.jpg",
     images: [],
-    flavors: [{ name: "Fruit Fury", price: PRICING.MB_IMP_340.price }],
+    flavors: [{ name: "Fruit Fury", price: PRICING.MB_WRATHX_340G.price }],
     weight: "340G",
     weights: ["340G", "510G"],
     description: "MB IMPAktix pre-workout for explosive energy and focus",
@@ -4397,10 +4408,10 @@ export const products: Product[] = [
   },
   {
     id: "183",
-    name: "MB Pre Workout IMPAktix",
+    name: "MuscleBlaze Pre Workout WrathX | 510G",
     brand: "MB",
     category: "Pre Workout",
-    ...PRICING.MB_IMP_510,
+    ...PRICING.MB_WRATHX_510G,
     rating: 4.4,
     reviews: 2800,
     image: "/image/Pre_Workout/MB/warthx_fruit_510g.jpg",
@@ -4408,7 +4419,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/warthx_fruit_510g2.jpg",
     image3: "/image/Pre_Workout/MB/warthx_fruit_510g3.jpg",
     images: [],
-    flavors: [{ name: "Fruit Fury", price: PRICING.MB_IMP_510.price }],
+    flavors: [{ name: "Fruit Fury", price: PRICING.MB_WRATHX_510G.price }],
     weight: "510G",
     weights: ["340G", "510G"],
     description: "MB IMPAktix pre-workout for explosive energy and focus",
@@ -4418,10 +4429,10 @@ export const products: Product[] = [
   },
   {
     id: "184",
-    name: "MB Pre Workout IMPAktix",
+    name: "MuscleBlaze Pre Workout WrathX | 340G",
     brand: "MB",
     category: "Pre Workout",
-    ...PRICING.MB_IMP_340,
+    ...PRICING.MB_WRATHX_340G,
     rating: 4.4,
     reviews: 2800,
     image: "/image/Pre_Workout/MB/warthx_cola_340g.jpg",
@@ -4429,7 +4440,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/warthx_cola_340g2.jpg",
     image3: "/image/Pre_Workout/MB/warthx_cola_340g3.jpg",
     images: [],
-    flavors: [{ name: "Cola Frost", price: PRICING.MB_IMP_340.price }],
+    flavors: [{ name: "Cola Frost", price: PRICING.MB_WRATHX_340G.price }],
     weight: "340G",
     weights: ["340G", "510G"],
     description: "MB IMPAktix pre-workout for explosive energy and focus",
@@ -4439,10 +4450,10 @@ export const products: Product[] = [
   },
   {
     id: "185",
-    name: "MB Pre Workout IMPAktix",
+    name: "MuscleBlaze Pre Workout WrathX | 510G",
     brand: "MB",
     category: "Pre Workout",
-    ...PRICING.MB_IMP_510,
+    ...PRICING.MB_WRATHX_510G,
     rating: 4.4,
     reviews: 2800,
     image: "/image/Pre_Workout/MB/warthx_cola_510g.jpg",
@@ -4450,7 +4461,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/MB/warthx_cola_510g2.jpg",
     image3: "/image/Pre_Workout/MB/warthx_cola_510g3.jpg",
     images: [],
-    flavors: [{ name: "Cola Frost", price: PRICING.MB_IMP_510.price }],
+    flavors: [{ name: "Cola Frost", price: PRICING.MB_WRATHX_510G.price }],
     weight: "510G",
     weights: ["340G", "510G"],
     description: "MB IMPAktix pre-workout for explosive energy and focus",
@@ -4458,12 +4469,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 200mg Caffeine, 6g Citrulline, 3.2g Beta-Alanine",
     inStock: true
   },
+
+  //BIGDADDY
   {
     id: "186",
-    name: "The Big Daddy Inferno",
+    name: "Black Beast The Big Daddy Inferno Pre workout | 300GM",
     brand: "Big Daddy",
     category: "Pre Workout",
-    ...PRICING.BD_PRE,
+    ...PRICING.BD_PRE_300GM,
     rating: 4.3,
     reviews: 2400,
     image: "/image/Pre_Workout/BigDaddy/FruitPrinch_300g.jpg",
@@ -4471,7 +4484,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/BigDaddy/FruitPrinch_300g2.jpg",
     image3: "/image/Pre_Workout/BigDaddy/FruitPrinch_300g3.jpg",
     images: [],
-    flavors: [{ name: "Fruit Punch", price: PRICING.BD_PRE.price }],
+    flavors: [{ name: "Fruit Punch", price: PRICING.BD_PRE_300GM.price }],
     weight: "300GM",
     weights: ["300GM"],
     description: "Big Daddy Inferno pre-workout for intense workouts",
@@ -4479,12 +4492,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 175mg Caffeine, Pre-workout blend",
     inStock: true
   },
+
+  //GNC
   {
     id: "187",
-    name: "GNC Pro Performance Pre Workout",
+    name: "GNC Pre Performance Pre-Workout | 360GM",
     brand: "GNC",
     category: "Pre Workout",
-    ...PRICING.GNC_PRE,
+    ...PRICING.GNC_PRE_PER_360GM,
     rating: 4.5,
     reviews: 3600,
     image: "/image/Pre_Workout/Gnc/fruit_punch_340gm.webp",
@@ -4492,7 +4507,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/Gnc/fruit_punch_340gm2.webp",
     image3: "/image/Pre_Workout/Gnc/fruit_punch_340gm3.webp",
     images: [],
-    flavors: [{ name: "Fruit Punch", price: PRICING.GNC_PRE.price }],
+    flavors: [{ name: "Fruit Punch", price: PRICING.GNC_PRE_PER_360GM.price }],
     weight: "360GM",
     weights: ["360GM"],
     description: "GNC Pro Performance pre-workout for elite athletes",
@@ -4500,12 +4515,36 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 200mg Caffeine, 5g Creatine, 3g Beta-Alanine",
     inStock: true
   },
+
+  {
+    id: "195",
+    name: "GNC L-ARGININE 1100mg | 90N",
+    brand: "GNC",
+    category: "Pre Workout",
+    ...PRICING.GNC_L_ARG_60N,
+    rating: 4.4,
+    reviews: 2200,
+    image: "/image/Pre_Workout/Gnc/Arginine_90N.jpg",
+    image1: "/image/Pre_Workout/Gnc/Arginine_90N1.jpg",
+    image2: "/image/Pre_Workout/Gnc/Arginine_90N2.jpg",
+    image3: "/image/Pre_Workout/Gnc/Arginine_90N3.jpg",
+    images: [],
+    flavors: [{ name: "Unflavoured", price: PRICING.GNC_L_ARG_60N.price }],
+    weight: "90N",
+    weights: ["90N"],
+    description: "GNC L-Arginine for nitric oxide production and muscle pump",
+    keyBenefits: ["Nitric oxide boost", "Muscle pump", "Circulation support"],
+    nutritionalInfo: "Per Serving: 1000mg L-Arginine",
+    inStock: true
+  },
+
+  //BIG MUSCLE
   {
     id: "188",
-    name: "BigMuscle Karnage Pre Workout",
+    name: "BIGMUSCLE Karnage PreWorkout | 300GM",
     brand: "BigMuscle",
     category: "Pre Workout",
-    ...PRICING.BM_PRE,
+    ...PRICING.BM_KARN_PRE_300GM,
     rating: 4.4,
     reviews: 3200,
     image: "/image/Pre_Workout/BigMuscle/Watermelon_lime_300gm.jpg",
@@ -4513,7 +4552,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/BigMuscle/Watermelon_lime_300gm2.jpg",
     image3: "/image/Pre_Workout/BigMuscle/Watermelon_lime_300gm3.jpg",
     images: [],
-    flavors: [{ name: "Watermelon Lime", price: PRICING.BM_PRE.price }],
+    flavors: [{ name: "Watermelon Lime", price: PRICING.BM_KARN_PRE_300GM.price }],
     weight: "300GM",
     weights: ["300GM"],
     description: "BigMuscle Karnage pre-workout for maximum performance",
@@ -4523,10 +4562,10 @@ export const products: Product[] = [
   },
   {
     id: "189",
-    name: "BigMuscle Karnage Pre Workout",
+    name: "BIGMUSCLE Karnage PreWorkout | 300GM",
     brand: "BigMuscle",
     category: "Pre Workout",
-    ...PRICING.BM_PRE,
+    ...PRICING.BM_KARN_PRE_300GM,
     rating: 4.4,
     reviews: 3200,
     image: "/image/Pre_Workout/BigMuscle/Artic_blast_300gm.jpg",
@@ -4534,7 +4573,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/BigMuscle/Artic_blast_300gm2.jpg",
     image3: "/image/Pre_Workout/BigMuscle/Artic_blast_300gm3.jpg",
     images: [],
-    flavors: [{ name: "Arctic Blast", price: PRICING.BM_PRE.price }],
+    flavors: [{ name: "Arctic Blast", price: PRICING.BM_KARN_PRE_300GM.price }],
     weight: "300GM",
     weights: ["300GM"],
     description: "BigMuscle Karnage pre-workout for maximum performance",
@@ -4544,10 +4583,10 @@ export const products: Product[] = [
   },
   {
     id: "190",
-    name: "BigMuscle Karnage Pre Workout",
+    name: "BIGMUSCLE Karnage PreWorkout | 300GM",
     brand: "BigMuscle",
     category: "Pre Workout",
-    ...PRICING.BM_PRE,
+    ...PRICING.BM_KARN_PRE_300GM,
     rating: 4.4,
     reviews: 3200,
     image: "/image/Pre_Workout/BigMuscle/sex_on_beach_300gm.jpg",
@@ -4555,7 +4594,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/BigMuscle/sex_on_beach_300gm2.jpg",
     image3: "/image/Pre_Workout/BigMuscle/sex_on_beach_300gm3.jpg",
     images: [],
-    flavors: [{ name: "Sex On The Beach", price: PRICING.BM_PRE.price }],
+    flavors: [{ name: "Sex On The Beach", price: PRICING.BM_KARN_PRE_300GM.price }],
     weight: "300GM",
     weights: ["300GM"],
     description: "BigMuscle Karnage pre-workout for maximum performance",
@@ -4563,6 +4602,8 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 180mg Caffeine, 4g Citrulline, 2.5g Beta-Alanine",
     inStock: true
   },
+
+  /*
   {
     id: "191",
     name: "Wellversed Dynamite",
@@ -4626,12 +4667,15 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 150mg Caffeine, 3g Citrulline",
     inStock: true
   },
+  */
+
+  //FAST & UP
   {
     id: "194",
-    name: "Fast & Up Citirun",
+    name: "Fast&Up Citrulline Malate | 200GM",
     brand: "Fast & Up",
     category: "Pre Workout",
-    ...PRICING.FU_CIT,
+    ...PRICING.FU_CITR_200GM,
     rating: 4.2,
     reviews: 1800,
     image: "/image/Pre_Workout/FAST_&_UP_CITRULIN/unflavoured_200gm.jpg",
@@ -4639,7 +4683,7 @@ export const products: Product[] = [
     image2: "/image/Pre_Workout/FAST_&_UP_CITRULIN/unflavoured_200gm2.jpg",
     image3: "/image/Pre_Workout/FAST_&_UP_CITRULIN/unflavoured_200gm3.jpg",
     images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.FU_CIT.price }],
+    flavors: [{ name: "Unflavoured", price: PRICING.FU_CITR_200GM.price }],
     weight: "200GM",
     weights: ["200GM"],
     description: "Fast & Up Citirun for nitric oxide boost and muscle pump",
@@ -4647,27 +4691,7 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 5g L-Citrulline",
     inStock: true
   },
-  {
-    id: "195",
-    name: "GNC L-Arginine",
-    brand: "GNC",
-    category: "Pre Workout",
-    ...PRICING.GNC_ARG,
-    rating: 4.4,
-    reviews: 2200,
-    image: "/image/Pre_Workout/Gnc/Arginine_90N.jpg",
-    image1: "/image/Pre_Workout/Gnc/Arginine_90N1.jpg",
-    image2: "/image/Pre_Workout/Gnc/Arginine_90N2.jpg",
-    image3: "/image/Pre_Workout/Gnc/Arginine_90N3.jpg",
-    images: [],
-    flavors: [{ name: "Unflavoured", price: PRICING.GNC_ARG.price }],
-    weight: "90N",
-    weights: ["90N"],
-    description: "GNC L-Arginine for nitric oxide production and muscle pump",
-    keyBenefits: ["Nitric oxide boost", "Muscle pump", "Circulation support"],
-    nutritionalInfo: "Per Serving: 1000mg L-Arginine",
-    inStock: true
-  },
+  
 
   // WEIGHT LOSS
   {
