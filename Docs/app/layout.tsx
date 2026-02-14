@@ -13,11 +13,14 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SS Supplement - Premium Health & Fitness Supplements",
+  title: "Buy Genuine Supplements Online | Whey, Creatine & Protein – SS Supplement",
   description:
-    "Your one-stop destination for 100% authentic health supplements. Shop Whey Protein, Creatine, Mass Gainers, Pre-Workout & more from top brands.",
+    "Buy 100% genuine health supplements online in India. Shop whey protein, creatine, mass gainers, pre-workout & more from top brands at SS Supplement with fast delivery.",
   keywords: ["supplements", "whey protein", "creatine", "mass gainer", "fitness", "health", "gym"],
   generator: "SS Supplement",
+  verification: {
+    google: "Q5uqD1LgrSUbzpG58xJJsYFZ2OVF2FAfrzZX0H2arUU", 
+  },
   icons: {
     icon: [
       {
