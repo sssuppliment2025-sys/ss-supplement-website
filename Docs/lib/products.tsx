@@ -3597,11 +3597,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_choc_3kg3.jpg",
     image3: "/image/Mass_Gainner/MuscleTech/img4.jpg",
     images: [],
-<<<<<<< HEAD
-    flavors: [{ name: "Triple Chocolate Brownie", price: PRICING.MT_MASS.price }],
-=======
     flavors: [{ name: "Chocolate", price: PRICING.MT_EXTREME_MASS.price }],
->>>>>>> 068269d360d869cb8a898a097b98e19b3b3215f7
     weight: "3KG",
     weights: ["3KG"],
     description: "MuscleTech mass gainer for muscle building",
@@ -3622,11 +3618,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_vanilla_3kg3.jpg",
     image3: "/image/Mass_Gainner/MuscleTech/img4.jpg",
     images: [],
-<<<<<<< HEAD
-    flavors: [{ name: "Vanilla Milkshake", price: PRICING.MT_MASS.price }],
-=======
     flavors: [{ name: "Vanilla", price: PRICING.MT_EXTREME_MASS.price }],
->>>>>>> 068269d360d869cb8a898a097b98e19b3b3215f7
     weight: "3KG",
     weights: ["3KG"],
     description: "MuscleTech mass gainer for muscle building",
@@ -3649,11 +3641,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/On/on_1kg3.jpg",
     image3: "/image/Mass_Gainner/On/img4.jpg",
     images: [],
-<<<<<<< HEAD
-    flavors: [{ name: "Chocolate", price: PRICING.ON_MASS_1KG.price }],
-=======
     flavors: [{ name: "Dutch Chocolate", price: PRICING.ON_S_MASS_1KG.price }],
->>>>>>> 068269d360d869cb8a898a097b98e19b3b3215f7
     weight: "1KG",
     weights: ["1KG", "3KG"],
     description: "Optimum Nutrition mass gainer for serious gains",
@@ -3674,11 +3662,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/On/on_3kg3.jpg",
     image3: "/image/Mass_Gainner/On/img4.jpg",
     images: [],
-<<<<<<< HEAD
-    flavors: [{ name: "Chocolate", price: PRICING.ON_MASS_3KG.price }],
-=======
     flavors: [{ name: "Dutch Chocolate", price: PRICING. ON_S_MASS_3KG.price }],
->>>>>>> 068269d360d869cb8a898a097b98e19b3b3215f7
     weight: "3KG",
     weights: ["1KG", "3KG"],
     description: "Optimum Nutrition mass gainer for serious gains",
@@ -3732,13 +3716,8 @@ export const products: Product[] = [
   //DR. MOREPEN
   {
     id: "151",
-<<<<<<< HEAD
-    name: "Morepen Mass Gainer",
-    brand: "Morepen",
-=======
     name: "Dr. Morepen  Mass Gainer",
     brand: "Morphen",
->>>>>>> 068269d360d869cb8a898a097b98e19b3b3215f7
     category: "Mass Gainer",
     ...PRICING.MOR_MASS,
     rating: 4.3,
@@ -3758,13 +3737,8 @@ export const products: Product[] = [
   },
   {
     id: "152",
-<<<<<<< HEAD
-    name: "Morepen Mass Gainer",
-    brand: "Morepen",
-=======
     name: "Dr. Morepen  Mass Gainer",
     brand: "Morphen",
->>>>>>> 068269d360d869cb8a898a097b98e19b3b3215f7
     category: "Mass Gainer",
     ...PRICING.MOR_MASS,
     rating: 4.3,
