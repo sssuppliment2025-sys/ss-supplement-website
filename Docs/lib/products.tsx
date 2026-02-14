@@ -3915,7 +3915,7 @@ export const products: Product[] = [
   // MULTIVITAMINS
   {
     id: "159",
-    name: "MuscleBlaze MB-VITE Daily Multivitamin | 60N",
+    name: "MuscleBlaze MB-VITE Daily Multivitamin",
     brand: "MuscleBlaze",
     category: "Multivitamin",
     ...PRICING.MB_VITE_60N,
@@ -3936,7 +3936,7 @@ export const products: Product[] = [
   },
   {
     id: "160",
-    name: "MuscleBlaze MB-VITE Daily Multivitamin | 90N",
+    name: "MuscleBlaze MB-VITE Daily Multivitamin",
     brand: "MuscleBlaze",
     category: "Multivitamin",
     ...PRICING.MB_VITE_90N,
@@ -3958,7 +3958,7 @@ export const products: Product[] = [
 
   {
     id: "161",
-    name: "MuscleBlaze Biozyme 5 in 1 Multivitamin | 90N",
+    name: "MuscleBlaze Biozyme 5 in 1 Multivitamin",
     brand: "MuscleBlaze",
     category: "Multivitamin",
     ...PRICING.MB_5IN1_90N,
@@ -3981,7 +3981,7 @@ export const products: Product[] = [
   //GNC
   {
     id: "162",
-    name: "GNC MEGA MEN One Daily Multivitamin | 30N",
+    name: "GNC MEGA MEN One Daily Multivitamin",
     brand: "GNC",
     category: "Multivitamin",
     ...PRICING.GNC_MEGA_30N,
@@ -4002,7 +4002,7 @@ export const products: Product[] = [
   },
   {
     id: "163",
-    name: "GNC MEGA MEN One Daily Multivitamin | 60N",
+    name: "GNC MEGA MEN One Daily Multivitamin",
     brand: "GNC",
     category: "Multivitamin",
     ...PRICING.GNC_MEGA_60N,
@@ -4025,7 +4025,7 @@ export const products: Product[] = [
   //MUSCLETECH
   {
     id: "164",
-    name: "MUSCLETECH PLATINUM MULTIVITAMIN | 60N",
+    name: "MUSCLETECH PLATINUM MULTIVITAMIN",
     brand: "MuscleTech",
     category: "Multivitamin",
     ...PRICING.MT_PLAT_MULTI_60N,
@@ -4071,7 +4071,7 @@ export const products: Product[] = [
   //BIGMUSCLE
   {
     id: "166",
-    name: "BIGMUSCLE True Vitamin MultivitaminM |60N",
+    name: "BIGMUSCLE True Vitamin MultivitaminM",
     brand: "BigMuscle",
     category: "Multivitamin",
     ...PRICING.BM_MULTI_60N,
@@ -4115,7 +4115,7 @@ export const products: Product[] = [
   // ************FISH OIL************
   {
     id: "168",
-    name: "MuscleBlaze Omega 3 Fish Oil 1000MG | 60N",
+    name: "MuscleBlaze Omega 3 Fish Oil 1000MG",
     brand: "MuscleBlaze",
     category: "Fish Oil",
     ...PRICING.MB_FISH_60N,
@@ -4136,7 +4136,7 @@ export const products: Product[] = [
   },
   {
     id: "169",
-    name: "MuscleBlaze Omega 3 Fish Oil 1000mg | 90N",
+    name: "MuscleBlaze Omega 3 Fish Oil 1000mg",
     brand: "MuscleBlaze",
     category: "Fish Oil",
     ...PRICING.MB_FISH_90N,
@@ -4157,7 +4157,7 @@ export const products: Product[] = [
   },
   {
     id: "170",
-    name: "MuscleBlaze Omega 3 Fish Oil Gold 3x Triple Strength | 60N",
+    name: "MuscleBlaze Omega 3 Fish Oil Gold 3x Triple Strength",
     brand: "MuscleBlaze",
     category: "Fish Oil",
     ...PRICING.MB_FISH_GOLD_60N,
@@ -4180,7 +4180,7 @@ export const products: Product[] = [
   //GNC
   {
     id: "171",
-    name: "GNC Fish Oil Omega 3 Capsules - 1000mg | 60N",
+    name: "GNC Fish Oil Omega 3 Capsules - 1000mg",
     brand: "GNC",
     category: "Fish Oil",
     ...PRICING.GNC_FISH_60N,
@@ -4201,7 +4201,7 @@ export const products: Product[] = [
   },
   {
     id: "172",
-    name: "GNC Fish Oil Omega 3 Capsules - 1000mg | 90N",
+    name: "GNC Fish Oil Omega 3 Capsules - 1000mg",
     brand: "GNC",
     category: "Fish Oil",
     ...PRICING.GNC_FISH_90N,
@@ -4222,7 +4222,7 @@ export const products: Product[] = [
   },
   {
     id: "173",
-    name: "GNC Triple Strength Fish Oil | 120N",
+    name: "GNC Triple Strength Fish Oil",
     brand: "GNC",
     category: "Fish Oil",
     ...PRICING.GNC_FISH_TRI_S_120N,
@@ -4245,7 +4245,7 @@ export const products: Product[] = [
   //ON
   {
     id: "174",
-    name: "ON Omega-3 Fishoil | 60N",
+    name: "ON Omega-3 Fishoil",
     brand: "Optimum Nutrition",
     category: "Fish Oil",
     ...PRICING.ON_FISH_60N,
@@ -4266,7 +4266,7 @@ export const products: Product[] = [
   },
   {
     id: "175",
-    name: "Sunline Alaska Deep Sea Fish Oil Omega-3 | 100N",
+    name: "Sunline Alaska Deep Sea Fish Oil Omega-3",
     brand: "Alaska",
     category: "Fish Oil",
     ...PRICING.ALA_FISH_100N,
@@ -4287,7 +4287,7 @@ export const products: Product[] = [
   },
   {
     id: "176",
-    name: "MUSCLETECH PLATINUM 100% OMEGA FISH OIL | 100N",
+    name: "MUSCLETECH PLATINUM 100% OMEGA FISH OIL",
     brand: "MuscleTech",
     category: "Fish Oil",
     ...PRICING.MT_FISH_100N,
@@ -4308,7 +4308,7 @@ export const products: Product[] = [
   },
   {
     id: "177",
-    name: "NEUHERBS Deep Sea Fish Oil - 2500 mg Omega 3 | 60N",
+    name: "NEUHERBS Deep Sea Fish Oil - 2500 mg Omega 3",
     brand: "Neuherbs",
     category: "Fish Oil",
     ...PRICING.NEU_FISH_60N,
@@ -4331,7 +4331,7 @@ export const products: Product[] = [
   // PRE-WORKOUT
   {
     id: "178",
-    name: "MuscleBlaze PRE Workout 200 Xtreme | 100G",
+    name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
     ...PRICING.MB_PRE_100G,
@@ -4352,7 +4352,7 @@ export const products: Product[] = [
   },
   {
     id: "179",
-    name: "MuscleBlaze PRE Workout 200 Xtreme | 200G",
+    name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
     ...PRICING.MB_PRE_200G,
@@ -4373,7 +4373,7 @@ export const products: Product[] = [
   },
   {
     id: "180",
-    name: "MuscleBlaze PRE Workout 200 Xtreme | 100G",
+    name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
     ...PRICING.MB_PRE_100G,
@@ -4394,7 +4394,7 @@ export const products: Product[] = [
   },
   {
     id: "181",
-    name: "MuscleBlaze PRE Workout 200 Xtreme | 200G",
+    name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
     ...PRICING.MB_PRE_200G,
@@ -4416,7 +4416,7 @@ export const products: Product[] = [
 
   {
     id: "182",
-    name: "MuscleBlaze Pre Workout WrathX | 340G",
+    name: "MuscleBlaze Pre Workout WrathX",
     brand: "MB",
     category: "Pre Workout",
     ...PRICING.MB_WRATHX_340G,
@@ -4437,7 +4437,7 @@ export const products: Product[] = [
   },
   {
     id: "183",
-    name: "MuscleBlaze Pre Workout WrathX | 510G",
+    name: "MuscleBlaze Pre Workout WrathX",
     brand: "MB",
     category: "Pre Workout",
     ...PRICING.MB_WRATHX_510G,
@@ -4458,7 +4458,7 @@ export const products: Product[] = [
   },
   {
     id: "184",
-    name: "MuscleBlaze Pre Workout WrathX | 340G",
+    name: "MuscleBlaze Pre Workout WrathX",
     brand: "MB",
     category: "Pre Workout",
     ...PRICING.MB_WRATHX_340G,
@@ -4479,7 +4479,7 @@ export const products: Product[] = [
   },
   {
     id: "185",
-    name: "MuscleBlaze Pre Workout WrathX | 510G",
+    name: "MuscleBlaze Pre Workout WrathX",
     brand: "MB",
     category: "Pre Workout",
     ...PRICING.MB_WRATHX_510G,
@@ -4502,7 +4502,7 @@ export const products: Product[] = [
   //BIGDADDY
   {
     id: "186",
-    name: "Black Beast The Big Daddy Inferno Pre workout | 300GM",
+    name: "Black Beast The Big Daddy Inferno Pre workout",
     brand: "Big Daddy",
     category: "Pre Workout",
     ...PRICING.BD_PRE_300GM,
@@ -4525,7 +4525,7 @@ export const products: Product[] = [
   //GNC
   {
     id: "187",
-    name: "GNC Pre Performance Pre-Workout | 360GM",
+    name: "GNC Pre Performance Pre-Workout",
     brand: "GNC",
     category: "Pre Workout",
     ...PRICING.GNC_PRE_PER_360GM,
@@ -4547,7 +4547,7 @@ export const products: Product[] = [
 
   {
     id: "195",
-    name: "GNC L-ARGININE 1100mg | 90N",
+    name: "GNC L-ARGININE 1100mg",
     brand: "GNC",
     category: "Pre Workout",
     ...PRICING.GNC_L_ARG_60N,
@@ -4570,7 +4570,7 @@ export const products: Product[] = [
   //BIG MUSCLE
   {
     id: "188",
-    name: "BIGMUSCLE Karnage PreWorkout | 300GM",
+    name: "BIGMUSCLE Karnage PreWorkout",
     brand: "BigMuscle",
     category: "Pre Workout",
     ...PRICING.BM_KARN_PRE_300GM,
@@ -4591,7 +4591,7 @@ export const products: Product[] = [
   },
   {
     id: "189",
-    name: "BIGMUSCLE Karnage PreWorkout | 300GM",
+    name: "BIGMUSCLE Karnage PreWorkout",
     brand: "BigMuscle",
     category: "Pre Workout",
     ...PRICING.BM_KARN_PRE_300GM,
@@ -4612,7 +4612,7 @@ export const products: Product[] = [
   },
   {
     id: "190",
-    name: "BIGMUSCLE Karnage PreWorkout | 300GM",
+    name: "BIGMUSCLE Karnage PreWorkout",
     brand: "BigMuscle",
     category: "Pre Workout",
     ...PRICING.BM_KARN_PRE_300GM,
@@ -4701,7 +4701,7 @@ export const products: Product[] = [
   //FAST & UP
   {
     id: "194",
-    name: "Fast&Up Citrulline Malate | 200GM",
+    name: "Fast&Up Citrulline Malate",
     brand: "Fast & Up",
     category: "Pre Workout",
     ...PRICING.FU_CITR_200GM,
@@ -4725,7 +4725,7 @@ export const products: Product[] = [
   // WEIGHT LOSS
   {
     id: "196",
-    name: "MuscleBlaze Liquid L-Carnitine 1100mg | 450ML",
+    name: "MuscleBlaze Liquid L-Carnitine 1100mg",
     brand: "MuscleBlaze",
     category: "Weight Loss",
     ...PRICING.MB_LC_1100MG,
@@ -4746,7 +4746,7 @@ export const products: Product[] = [
   },
   {
     id: "197",
-    name: "MuscleBlaze Liquid L-Carnitine 1100mg | 450ML",
+    name: "MuscleBlaze Liquid L-Carnitine 1100mg",
     brand: "MuscleBlaze",
     category: "Weight Loss",
     ...PRICING.MB_LC_1100MG,
@@ -4767,7 +4767,7 @@ export const products: Product[] = [
   },
   {
     id: "198",
-    name: "MuscleBlaze Liquid L-Carnitine PRO - 3300mg | 450ML",
+    name: "MuscleBlaze Liquid L-Carnitine PRO - 3300mg",
     brand: "MB",
     category: "Weight Loss",
     ...PRICING.MB_LC_PRO_3300MG,
@@ -4788,7 +4788,7 @@ export const products: Product[] = [
   },
   {
     id: "199",
-    name: "MuscleBlaze Liquid L-Carnitine PRO - 3300mg | 450ML",
+    name: "MuscleBlaze Liquid L-Carnitine PRO - 3300mg",
     brand: "MB",
     category: "Weight Loss",
     ...PRICING.MB_LC_PRO_3300MG,
@@ -4811,7 +4811,7 @@ export const products: Product[] = [
   
   {
     id: "203",
-    name: "MuscleBlaze MB Fat Burner PRO | 60N",
+    name: "MuscleBlaze MB Fat Burner PRO",
     brand: "MuscleBlaze",
     category: "Weight Loss",
     ...PRICING.MB_BURNER_PRO_60N,
@@ -4833,7 +4833,7 @@ export const products: Product[] = [
 
   {
     id: "200",
-    name: "GNC Triple Strength L-Carnitine Liquid 3000mg | 450ML",
+    name: "GNC Triple Strength L-Carnitine Liquid 3000mg",
     brand: "GNC",
     category: "Weight Loss",
     ...PRICING.GNC_TRI_LC,
@@ -4855,7 +4855,7 @@ export const products: Product[] = [
 
   {
     id: "509",
-    name: "GNC L-Carnitine 3000mg for Weight Loss | 30N",
+    name: "GNC L-Carnitine 3000mg for Weight Loss",
     brand: "GNC",
     category: "Weight Loss",
     ...PRICING.GNC_LC_3000MG,
@@ -4924,7 +4924,7 @@ export const products: Product[] = [
   
   {
     id: "204",
-    name: "WELLBEINGS Apple Cider Vinegar | 500ml",
+    name: "WELLBEINGS Apple Cider Vinegar",
     brand: "WELLBEINGS",
     category: "Weight Loss",
     ...PRICING.WB_ACV_500ML,
@@ -4947,7 +4947,7 @@ export const products: Product[] = [
   // ==================== RECOVERY ====================
   {
     id: "205",
-    name: "MuscleBlaze L-Glutamine | 250GM",
+    name: "MuscleBlaze L-Glutamine",
     brand: "MuscleBlaze",
     category: "Recovery",
     ...PRICING.MB_L_GLUT,
@@ -4968,7 +4968,7 @@ export const products: Product[] = [
   },
   {
     id: "206",
-    name: "GNC Pro Performance L-GLUTAMINE | 250GM",
+    name: "GNC Pro Performance L-GLUTAMINE",
     brand: "GNC",
     category: "Recovery",
     ...PRICING.GNC_PRO_L_GLUT,
@@ -4991,7 +4991,7 @@ export const products: Product[] = [
   // ==================== INTRA WORKOUT ====================
   {
     id: "207",
-    name: "MuscleBlaze BCAA Pro Essential Amino Acids | 450G",
+    name: "MuscleBlaze BCAA Pro Essential Amino Acids",
     brand: "MuscleBlaze",
     category: "Intra Workout",
     ...PRICING.MB_BCAA_PRO_450,
@@ -5012,7 +5012,7 @@ export const products: Product[] = [
   },
   {
     id: "208",
-    name: "MuscleBlaze BCAA Pro Essential Amino Acids | 450G",
+    name: "MuscleBlaze BCAA Pro Essential Amino Acids",
     brand: "MuscleBlaze",
     category: "Intra Workout",
     ...PRICING.MB_BCAA_PRO_450,
@@ -5033,7 +5033,7 @@ export const products: Product[] = [
   },
   {
     id: "209",
-    name: "MuscleBlaze BCAA Pro Essential Amino Acids | 240GM",
+    name: "MuscleBlaze BCAA Pro Essential Amino Acids",
     brand: "MB",
     category: "Intra Workout",
     ...PRICING.MB_BCAA_PRO_240,
@@ -5054,7 +5054,7 @@ export const products: Product[] = [
   },
   {
     id: "210",
-    name: "MuscleBlaze BCAA Pro Essential Amino Acids | 240GM",
+    name: "MuscleBlaze BCAA Pro Essential Amino Acids",
     brand: "MB",
     category: "Intra Workout",
     ...PRICING.MB_BCAA_PRO_240,
@@ -5077,7 +5077,7 @@ export const products: Product[] = [
   //ON
   {
     id: "510",
-    name: "ON BCAA 5000 POWDER | 250GM",
+    name: "ON BCAA 5000 POWDER",
     brand: "Optimum Nutrition(ON)",
     category: "Intra Workout",
     ...PRICING.ON_BCCA_5000,
@@ -5100,7 +5100,7 @@ export const products: Product[] = [
   //--------------------minarels===============
   {
     id: "211",
-    name: "Calcium Plus 1000mg with Magnesium and Vitamin D3 | 60N",
+    name: "Calcium Plus 1000mg with Magnesium and Vitamin D3",
     brand: "GNC",
     category: "Minerals & Health",
     ...PRICING.GNC_CAL_1000MG,
@@ -5121,7 +5121,7 @@ export const products: Product[] = [
   },
   {
     id: "212",
-    name: "GNC Zinc Magnesium Amino (ZMA) Complex | 60N",
+    name: "GNC Zinc Magnesium Amino (ZMA) Complex",
     brand: "GNC",
     category: "Minerals & Health",
     ...PRICING.GNC_ZINC,
@@ -5143,7 +5143,7 @@ export const products: Product[] = [
   
   {
     id: "213",
-    name: "GNC Marine Collagen Powder | 200G",
+    name: "GNC Marine Collagen Powder",
     brand: "GNC",
     category: "Beauty",
     ...PRICING.GNC_MAR_COLL_POW,
@@ -5164,7 +5164,7 @@ export const products: Product[] = [
   },
   {
     id: "214",
-    name: "GNC Marine Collagen Powder | 200G",
+    name: "GNC Marine Collagen Powder",
     brand: "GNC",
     category: "Beauty",
     ...PRICING.GNC_MAR_COLL_POW,
@@ -5187,7 +5187,7 @@ export const products: Product[] = [
   //WELLBEINGS
   {
     id: "511",
-    name: "WELLBEINGS VITAMIN C & ZINC 1100MG |16N",
+    name: "WELLBEINGS VITAMIN C & ZINC 1100MG",
     brand: "WELLBEINGS",
     category: "Beauty",
     ...PRICING.WB_VC_ZINC_1100MG,
@@ -5314,7 +5314,7 @@ export const products: Product[] = [
   // ==================== PEANUT BUTTER ====================
   {
     id: "215",
-    name: "MyFitness Peanut Butter Smooth | 1.25KG",
+    name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
     ...PRICING.MF_S_1_25,
@@ -5335,7 +5335,7 @@ export const products: Product[] = [
   },
   {
     id: "216",
-    name: "MyFitness Peanut Butter Smooth | 510G",
+    name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
     ...PRICING.MF_S_510,
@@ -5356,7 +5356,7 @@ export const products: Product[] = [
   },
   {
     id: "217",
-    name: "MyFitness Peanut Butter Smooth | 227G",
+    name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
     ...PRICING.MF_S_227,
@@ -5378,7 +5378,7 @@ export const products: Product[] = [
 
   {
     id: "219",
-    name: "MyFitness Peanut Butter Crunchy | 1KG",
+    name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
     ...PRICING.MF_CRU_1000,
@@ -5400,7 +5400,7 @@ export const products: Product[] = [
 
   {
     id: "218",
-    name: "MyFitness Peanut Butter Crunchy | 510G",
+    name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
     ...PRICING.MF_CRU_510,
@@ -5444,7 +5444,7 @@ export const products: Product[] = [
 
   {
     id: "221",
-    name: "MyFitness Peanut Butter Crispy | 227G",
+    name: "MyFitness Peanut Butter Crispy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
     ...PRICING.MF_CRU_227,
@@ -5466,7 +5466,7 @@ export const products: Product[] = [
 
   {
     id: "222",
-    name: "Pintola Peanut Butter Creamy | 1KG",
+    name: "Pintola Peanut Butter Creamy",
     brand: "Pintola",
     category: "Peanut Butter & Oats",
     ...PRICING.PIN_C_1KG,
@@ -5553,7 +5553,7 @@ export const products: Product[] = [
   // ==================== AYURVEDIC ====================
   {
     id: "226",
-    name: "Kapiva Shilajit | 20G",
+    name: "Kapiva Shilajit",
     brand: "Kapiva",
     category: "Ayurvedic Products",
     ...PRICING.KAP_SHIL,
@@ -5574,7 +5574,7 @@ export const products: Product[] = [
   },
   {
     id: "227",
-    name: "Kapiva Shilajit Gold | 20G",
+    name: "Kapiva Shilajit Gold",
     brand: "Kapiva",
     category: "Ayurvedic Products",
     ...PRICING.KAP_GOLD,
@@ -5595,7 +5595,7 @@ export const products: Product[] = [
   },
   {
     id: "228",
-    name: "Kapiva Ashwagandha Gold | 60N",
+    name: "Kapiva Ashwagandha Gold",
     brand: "Kapiva",
     category: "Ayurvedic Products",
     ...PRICING.KAP_ASHW,
@@ -5616,7 +5616,7 @@ export const products: Product[] = [
   },
   {
     id: "229",
-    name: "Kapiva Shilajit Gold Capsul | 60N",
+    name: "Kapiva Shilajit Gold Capsul",
     brand: "Kapiva",
     category: "Ayurvedic",
     ...PRICING.KAP_CAPS,
