@@ -134,24 +134,40 @@ const PRICING = {
   //*********MASS GAINER************
   
   //MB
-  MB_MASS_1KG: getPrice(1799, 2069),
-  MB_MASS_3KG: getPrice(4299, 4944),
-  MB_MASS_5KG: getPrice(6799, 7819),
+  MB_MASS_1KG: getPrice(1099, 1539),
+  MB_MASS_3KG: getPrice(2999, 4399),
+  MB_MASS_5KG: getPrice(4499, 5919),
+
+  MB_SUPER_MASS_1KG: getPrice(950, 1719),
+  MB_SUPER_MASS_3KG: getPrice(2499, 3829),
+  MB_SUPER_MASS_5KG: getPrice(4099, 6449),
 
   //GNC
-  GNC_MASS: getPrice(2499, 2874),
-  LAB_MASS_1KG: getPrice(1899, 2184),
-  LAB_MASS_3KG: getPrice(4699, 5404),
-  MT_MASS: getPrice(2999, 3448),
+  GNC_AMP_MASS: getPrice(2599, 4499),
+  GNC_PRO_PER_MASS: getPrice(1799, 2669),
+
+  //LABRADA
+  LAB_MASS_1KG: getPrice(1199, 1799),
+  LAB_MASS_3KG: getPrice(2899, 4499),
+
+  //MUSCLE TECH
+  MT_EXTREME_MASS: getPrice(2799, 4439),
 
   //ON
-  ON_MASS_1KG: getPrice(2199, 2528),
-  ON_MASS_3KG: getPrice(5299, 6091),
-  MOR_MASS: getPrice(1699, 1953),
-  ABS_MASS_1KG: getPrice(1599, 1838),
-  ABS_MASS_3KG: getPrice(3999, 4597),
-  AVV_MASS_2KG: getPrice(2399, 2757),
-  AVV_MASS_4KG: getPrice(4299, 4941),
+  ON_S_MASS_1KG: getPrice(1090, 1239),
+  ON_S_MASS_3KG: getPrice(2979, 3379),
+
+
+  //DR. MOREPEN
+  MOR_MASS: getPrice(2599, 3558),
+
+  //ABSOLUTE
+  ABS_MASS_1KG: getPrice(949, 1319),
+  ABS_MASS_3KG: getPrice(2599, 3899),
+
+  //AVVTAR
+  AVV_MUSCLE_GAINER_2KG: getPrice(3099, 3559),
+  AVV_MASS_GAINER_2KG: getPrice(2099, 2309),
 
   // ******Vitamins & Health**********
   MB_VITE_60: getPrice(599, 689),
@@ -3224,7 +3240,7 @@ export const products: Product[] = [
   // MASS GAINER
   {
     id: "137",
-    name: "MB Mass Gainer",
+    name: "MuscleBlaze Mass Gainer XXL",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
     ...PRICING.MB_MASS_1KG,
@@ -3245,7 +3261,7 @@ export const products: Product[] = [
   },
   {
     id: "138",
-    name: "MB Mass Gainer",
+    name: "MuscleBlaze Mass Gainer XXL",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
     ...PRICING.MB_MASS_3KG,
@@ -3266,7 +3282,7 @@ export const products: Product[] = [
   },
   {
     id: "139",
-    name: "MB Mass Gainer",
+    name: "MuscleBlaze Mass Gainer XXL",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
     ...PRICING.MB_MASS_5KG,
@@ -3285,12 +3301,80 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 560 Calories, 30g Protein",
     inStock: true,
   },
+
+
+  {
+    id: "503",
+    name: "MuscleBlaze Super Gainer XXL Weight Gainer",
+    brand: "MuscleBlaze",
+    category: "Mass Gainer",
+    ...PRICING.MB_SUPER_MASS_1KG,
+    rating: 4.5,
+    reviews: 6200,
+    image: "/image/Mass_Gainner/MB/mass_gainner_1kg.jpg",
+    image1: "",
+    image2: "",
+    image3: "",
+    images: [],
+    flavors: [{ name: "Chocolate", price: PRICING.MB_SUPER_MASS_1KG.price }],
+    weight: "1KG",
+    weights: ["1KG", "3KG", "5KG"],
+    description: "High calorie mass gainer for muscle building",
+    keyBenefits: ["High calories", "30g protein", "Complex carbs"],
+    nutritionalInfo: "Per Serving: 560 Calories, 30g Protein",
+    inStock: true,
+  },
+  {
+    id: "504",
+    name: "MuscleBlaze Super Gainer XXL Weight Gainer",
+    brand: "MuscleBlaze",
+    category: "Mass Gainer",
+    ...PRICING.MB_SUPER_MASS_3KG,
+    rating: 4.6,
+    reviews: 7800,
+    image: "/image/Mass_Gainner/MB/mass_gainner_2kg.jpg",
+    image1: "",
+    image2: "",
+    image3: "",
+    images: [],
+    flavors: [{ name: "Chocolate", price: PRICING.MB_SUPER_MASS_3KG.price }],
+    weight: "3KG",
+    weights: ["1KG", "3KG", "5KG"],
+    description: "High calorie mass gainer for muscle building",
+    keyBenefits: ["High calories", "30g protein", "Complex carbs"],
+    nutritionalInfo: "Per Serving: 560 Calories, 30g Protein",
+    inStock: true,
+  },
+  {
+    id: "505",
+    name: "MuscleBlaze Super Gainer XXL Weight Gainer",
+    brand: "MuscleBlaze",
+    category: "Mass Gainer",
+    ...PRICING.MB_SUPER_MASS_5KG,
+    rating: 4.7,
+    reviews: 9200,
+    image: "",
+    image1: "",
+    image2: "",
+    image3: "",
+    images: [],
+    flavors: [{ name: "Chocolate", price: PRICING.MB_SUPER_MASS_5KG.price }],
+    weight: "5KG",
+    weights: ["1KG", "3KG", "5KG"],
+    description: "High calorie mass gainer for muscle building",
+    keyBenefits: ["High calories", "30g protein", "Complex carbs"],
+    nutritionalInfo: "Per Serving: 560 Calories, 30g Protein",
+    inStock: true,
+  },
+
+
+  //GNC
   {
     id: "140",
-    name: "GNC Mass Gainer",
+    name: "GNC AMP Mass XXX",
     brand: "GNC",
     category: "Mass Gainer",
-    ...PRICING.GNC_MASS,
+    ...PRICING.GNC_AMP_MASS,
     rating: 4.4,
     reviews: 4500,
     image: "/image/Mass_Gainner/GNC/mass_2kg.webp",
@@ -3298,7 +3382,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/GNC/mass_2kg.webp",
     image3: "/image/Mass_Gainner/GNC/mass_2kg.webp",
     images: [],
-    flavors: [{ name: "Chocolate", price: PRICING.GNC_MASS.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.GNC_AMP_MASS.price }],
     weight: "2KG",
     weights: ["2KG"],
     description: "GNC mass gainer for weight gain",
@@ -3306,9 +3390,77 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 500 Calories, 28g Protein",
     inStock: true,
   },
+
+  {
+    id: "506",
+    name: "GNC AMP Mass XXX",
+    brand: "GNC",
+    category: "Mass Gainer",
+    ...PRICING.GNC_AMP_MASS,
+    rating: 4.4,
+    reviews: 4500,
+    image: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image1: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image2: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image3: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    images: [],
+    flavors: [{ name: "Vanila", price: PRICING.GNC_AMP_MASS.price }],
+    weight: "2KG",
+    weights: ["2KG"],
+    description: "GNC mass gainer for weight gain",
+    keyBenefits: ["500+ calories", "28g protein", "Complex carbs"],
+    nutritionalInfo: "Per Serving: 500 Calories, 28g Protein",
+    inStock: true,
+  },
+
+  {
+    id: "507",
+    name: "GNC Pro Performance Weight Gainer",
+    brand: "GNC",
+    category: "Mass Gainer",
+    ...PRICING.GNC_PRO_PER_MASS,
+    rating: 4.4,
+    reviews: 4500,
+    image: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image1: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image2: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image3: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    images: [],
+    flavors: [{ name: "Double Chocolate", price: PRICING.GNC_PRO_PER_MASS.price }],
+    weight: "3KG",
+    weights: ["3KG"],
+    description: "GNC mass gainer for weight gain",
+    keyBenefits: ["500+ calories", "28g protein", "Complex carbs"],
+    nutritionalInfo: "Per Serving: 500 Calories, 28g Protein",
+    inStock: true,
+  },
+
+  {
+    id: "508",
+    name: "GNC Pro Performance Weight Gainer",
+    brand: "GNC",
+    category: "Mass Gainer",
+    ...PRICING.GNC_PRO_PER_MASS,
+    rating: 4.4,
+    reviews: 4500,
+    image: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image1: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image2: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    image3: "/image/Mass_Gainner/GNC/mass_2kg.webp",
+    images: [],
+    flavors: [{ name: "Vanila Ice Cream", price: PRICING.GNC_PRO_PER_MASS.price }],
+    weight: "3KG",
+    weights: ["3KG"],
+    description: "GNC mass gainer for weight gain",
+    keyBenefits: ["500+ calories", "28g protein", "Complex carbs"],
+    nutritionalInfo: "Per Serving: 500 Calories, 28g Protein",
+    inStock: true,
+  },
+
+  //LABRADA
   {
     id: "141",
-    name: "Labrada Mass Gainer",
+    name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
     ...PRICING.LAB_MASS_1KG,
@@ -3329,7 +3481,7 @@ export const products: Product[] = [
   },
   {
     id: "142",
-    name: "Labrada Mass Gainer",
+    name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
     ...PRICING.LAB_MASS_3KG,
@@ -3350,7 +3502,7 @@ export const products: Product[] = [
   },
   {
     id: "143",
-    name: "Labrada Mass Gainer",
+    name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
     ...PRICING.LAB_MASS_1KG,
@@ -3371,7 +3523,7 @@ export const products: Product[] = [
   },
   {
     id: "144",
-    name: "Labrada Mass Gainer",
+    name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
     ...PRICING.LAB_MASS_3KG,
@@ -3390,12 +3542,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 480 Calories, 26g Protein",
     inStock: true
   },
+
+  //MUSCLE TECH
   {
     id: "145",
-    name: "MuscleTech Mass",
+    name: "MUSCLETECH MASSTECH EXTREME 2000",
     brand: "MuscleTech",
     category: "Mass Gainer",
-    ...PRICING.MT_MASS,
+    ...PRICING.MT_EXTREME_MASS,
     rating: 4.5,
     reviews: 5200,
     image: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_choc_3kg.jpg",
@@ -3403,7 +3557,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_choc_3kg.jpg",
     image3: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_choc_3kg.jpg",
     images: [],
-    flavors: [{ name: "Chocolate", price: PRICING.MT_MASS.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MT_EXTREME_MASS.price }],
     weight: "3KG",
     weights: ["3KG"],
     description: "MuscleTech mass gainer for muscle building",
@@ -3413,10 +3567,10 @@ export const products: Product[] = [
   },
   {
     id: "146",
-    name: "MuscleTech Mass",
+    name: "MUSCLETECH masstech extreme 2000",
     brand: "MuscleTech",
     category: "Mass Gainer",
-    ...PRICING.MT_MASS,
+    ...PRICING.MT_EXTREME_MASS,
     rating: 4.5,
     reviews: 5200,
     image: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_vanilla_3kg.jpg",
@@ -3424,7 +3578,7 @@ export const products: Product[] = [
     image2: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_vanilla_3kg.jpg",
     image3: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_vanilla_3kg.jpg",
     images: [],
-    flavors: [{ name: "Vanilla", price: PRICING.MT_MASS.price }],
+    flavors: [{ name: "Vanilla", price: PRICING.MT_EXTREME_MASS.price }],
     weight: "3KG",
     weights: ["3KG"],
     description: "MuscleTech mass gainer for muscle building",
@@ -3432,12 +3586,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 500 Calories, 30g Protein",
     inStock: true
   },
+
+  //ON
   {
     id: "147",
-    name: "On Mass Gainer",
+    name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition",
     category: "Mass Gainer",
-    ...PRICING.ON_MASS_1KG,
+    ...PRICING.ON_S_MASS_1KG,
     rating: 4.7,
     reviews: 8500,
     image: "",
@@ -3445,7 +3601,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Dutch Chocolate", price: PRICING.ON_MASS_1KG.price }],
+    flavors: [{ name: "Dutch Chocolate", price: PRICING.ON_S_MASS_1KG.price }],
     weight: "1KG",
     weights: ["1KG", "3KG"],
     description: "Optimum Nutrition mass gainer for serious gains",
@@ -3455,10 +3611,10 @@ export const products: Product[] = [
   },
   {
     id: "148",
-    name: "On Mass Gainer",
+    name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition",
     category: "Mass Gainer",
-    ...PRICING.ON_MASS_3KG,
+    ...PRICING. ON_S_MASS_3KG,
     rating: 4.7,
     reviews: 8500,
     image: "",
@@ -3466,7 +3622,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Dutch Chocolate", price: PRICING.ON_MASS_3KG.price }],
+    flavors: [{ name: "Dutch Chocolate", price: PRICING. ON_S_MASS_3KG.price }],
     weight: "3KG",
     weights: ["1KG", "3KG"],
     description: "Optimum Nutrition mass gainer for serious gains",
@@ -3476,10 +3632,10 @@ export const products: Product[] = [
   },
   {
     id: "149",
-    name: "On Mass Gainer",
+    name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition",
     category: "Mass Gainer",
-    ...PRICING.ON_MASS_1KG,
+    ...PRICING.ON_S_MASS_1KG,
     rating: 4.7,
     reviews: 8500,
     image: "",
@@ -3487,7 +3643,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Vanilla", price: PRICING.ON_MASS_1KG.price }],
+    flavors: [{ name: "Vanilla", price: PRICING.ON_S_MASS_1KG.price }],
     weight: "1KG",
     weights: ["1KG", "3KG"],
     description: "Optimum Nutrition mass gainer for serious gains",
@@ -3497,10 +3653,10 @@ export const products: Product[] = [
   },
   {
     id: "150",
-    name: "On Mass Gainer",
+    name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition",
     category: "Mass Gainer",
-    ...PRICING.ON_MASS_3KG,
+    ...PRICING. ON_S_MASS_3KG,
     rating: 4.7,
     reviews: 8500,
     image: "",
@@ -3508,7 +3664,7 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Vanilla", price: PRICING.ON_MASS_3KG.price }],
+    flavors: [{ name: "Vanilla", price: PRICING. ON_S_MASS_3KG.price }],
     weight: "3KG",
     weights: ["1KG", "3KG"],
     description: "Optimum Nutrition mass gainer for serious gains",
@@ -3516,9 +3672,11 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 520 Calories, 32g Protein",
     inStock: true
   },
+
+  //DR. MOREPEN
   {
     id: "151",
-    name: "Morphen Mass Gainer",
+    name: "Dr. Morepen  Mass Gainer",
     brand: "Morphen",
     category: "Mass Gainer",
     ...PRICING.MOR_MASS,
@@ -3539,7 +3697,7 @@ export const products: Product[] = [
   },
   {
     id: "152",
-    name: "Morphen Mass Gainer",
+    name: "Dr. Morepen  Mass Gainer",
     brand: "Morphen",
     category: "Mass Gainer",
     ...PRICING.MOR_MASS,
@@ -3558,9 +3716,11 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 450 Calories, 25g Protein",
     inStock: true
   },
+
+  //ABSOLUTE
   {
     id: "153",
-    name: "Absolute Mass Gainer",
+    name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
     ...PRICING.ABS_MASS_1KG,
@@ -3581,7 +3741,7 @@ export const products: Product[] = [
   },
   {
     id: "154",
-    name: "Absolute Mass Gainer",
+    name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
     ...PRICING.ABS_MASS_3KG,
@@ -3602,7 +3762,7 @@ export const products: Product[] = [
   },
   {
     id: "155",
-    name: "Absolute Mass Gainer",
+    name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
     ...PRICING.ABS_MASS_1KG,
@@ -3623,7 +3783,7 @@ export const products: Product[] = [
   },
   {
     id: "156",
-    name: "Absolute Mass Gainer",
+    name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
     ...PRICING.ABS_MASS_3KG,
@@ -3642,12 +3802,14 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 470 Calories, 27g Protein",
     inStock: true
   },
+
+  //AVVATAR
   {
     id: "157",
-    name: "Avvatar Mass Gainer",
+    name: "Avvatar Muscle Gainer",
     brand: "Avvatar",
     category: "Mass Gainer",
-    ...PRICING.AVV_MASS_2KG,
+    ...PRICING.AVV_MUSCLE_GAINER_2KG,
     rating: 4.5,
     reviews: 3800,
     image: "",
@@ -3655,9 +3817,9 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Belgian Chocolate", price: PRICING.AVV_MASS_2KG.price }],
+    flavors: [{ name: "Belgian Chocolate", price: PRICING.AVV_MUSCLE_GAINER_2KG.price }],
     weight: "2KG",
-    weights: ["2KG", "4KG"],
+    weights: ["2KG"],
     description: "Avvatar mass gainer for lean muscle",
     keyBenefits: ["Premium quality", "Rich taste", "Fast results"],
     nutritionalInfo: "Per Serving: 490 Calories, 28g Protein",
@@ -3668,7 +3830,7 @@ export const products: Product[] = [
     name: "Avvatar Mass Gainer",
     brand: "Avvatar",
     category: "Mass Gainer",
-    ...PRICING.AVV_MASS_4KG,
+    ...PRICING.AVV_MASS_GAINER_2KG,
     rating: 4.5,
     reviews: 3800,
     image: "",
@@ -3676,9 +3838,9 @@ export const products: Product[] = [
     image2: "",
     image3: "",
     images: [],
-    flavors: [{ name: "Belgian Chocolate", price: PRICING.AVV_MASS_4KG.price }],
-    weight: "4KG",
-    weights: ["2KG", "4KG"],
+    flavors: [{ name: "Belgian Chocolate", price: PRICING.AVV_MASS_GAINER_2KG.price }],
+    weight: "2KG",
+    weights: ["2KG"],
     description: "Avvatar mass gainer for lean muscle",
     keyBenefits: ["Premium quality", "Rich taste", "Fast results"],
     nutritionalInfo: "Per Serving: 490 Calories, 28g Protein",
