@@ -3377,7 +3377,7 @@ export const products: Product[] = [
     rating: 4.5,
     reviews: 6200,
     image: "/image/Mass_Gainner/MB/mass_gainner_1kg.jpg",
-    image1: "",
+    image1: "/image/Mass_Gainner/MB/mass_gainner_1kg.jpg",
     image2: "",
     image3: "",
     images: [],
