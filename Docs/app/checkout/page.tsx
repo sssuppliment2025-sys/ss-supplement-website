@@ -28,7 +28,7 @@ export default function CheckoutPage() {
   const { isAuthenticated } = useAuth()
   const { toast } = useToast()
 
-  // ✅ FIXED COINS STATE
+  // ✅ COINS STATE - User Choice
   const [points, setPoints] = useState<number>(0)
   const [loadingPoints, setLoadingPoints] = useState(true)
   const [useCoins, setUseCoins] = useState(false)
@@ -85,25 +85,18 @@ export default function CheckoutPage() {
       .finally(() => setLoadingPoints(false))
   }, [isAuthenticated, toast])
 
-  /* ================= ✅ FIXED PRICE CALCULATIONS - 20% MIN PAYMENT ================= */
+  /* ================= PRICE CALCULATIONS - 20% MIN PAYMENT ================= */
   const subtotal = getCartTotal()
-  
-  // ✅ RULE 1: Max 80% coins usage (20% minimum cash payment)
-  const maxCoinsAllowed = Math.floor(subtotal * 0.8)  // 80% max coins
+  const maxCoinsAllowed = Math.floor(subtotal * 0.8)  // Max 80%
   const availableCoinsForDiscount = Math.min(points, maxCoinsAllowed)
-  const coinsUsed = useCoins ? availableCoinsForDiscount : 0
-  
-  // ✅ RULE 2: Never go below 20% cash payment (minimum ₹50)
+  const coinsUsed = useCoins ? availableCoinsForDiscount : 0  // ✅ User choice
   const minimumCashPayment = Math.max(subtotal * 0.2, 50)
   const finalTotal = Math.max(subtotal - coinsUsed, minimumCashPayment)
 
   console.log("🪙 COINS CALC:", {
-    subtotal,
-    points,
-    maxCoinsAllowed,
-    coinsUsed,
-    minimumCashPayment,
-    finalTotal
+    subtotal, points, useCoins,
+    maxCoinsAllowed, coinsUsed,
+    minimumCashPayment, finalTotal
   })
 
   /* ================= WHATSAPP MESSAGE ================= */
@@ -116,10 +109,10 @@ export default function CheckoutPage() {
             : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
         return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${price * item.quantity}`
       })
-      .join("\n")
+      .join("\\n")
 
     const paymentInfo = paymentMethod === "upi" 
-      ? `💳 *Payment:* UPI\n📱 UTR: ${utrNumber}\n👛 UPI ID: ${ADMIN_UPI_ID}`
+      ? `💳 *Payment:* UPI\\n📱 UTR: ${utrNumber}\\n👛 UPI ID: ${ADMIN_UPI_ID}`
       : "💰 *Payment:* Cash on Delivery"
 
     const message = `
@@ -130,7 +123,7 @@ ${orderItems}
 
 💰 *Billing:*
 Subtotal: ₹${subtotal}
-${coinsUsed > 0 ? `🎁 Coins Used: ${coinsUsed}` : ""}
+${coinsUsed > 0 ? `🎁 Coins Used: ₹${coinsUsed}` : ""}
 Total: *₹${finalTotal}*
 
 👛 *COINS BALANCE:* ${backendCoins} (Earned: +${backendEarned})
@@ -190,7 +183,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     }
   }
 
-  /* ================= ✅ ORDER SUBMIT ================= */
+  /* ================= ✅ FIXED: NO MORE STREAM ERROR ================= */
   const handleSubmit = async () => {
     if (paymentMethod === "upi" && !utrNumber.trim()) {
       toast({
@@ -223,19 +216,19 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             selectedFlavor: item.selectedFlavor,
             selectedWeight: item.selectedWeight,
           })),
-          total: finalTotal,  // ✅ FIXED: Send finalTotal (NOT 0)
-          coins_used: coinsUsed,
+          total: finalTotal,
+          coins_used: coinsUsed,  // ✅ User choice (0 or max 80%)
           payment_method: paymentMethod,
           utr_number: paymentMethod === "upi" ? utrNumber : null,
           address: formData,
         }),
       })
 
+      // ✅ FIXED: Read JSON FIRST, then check status
       const orderData = await orderRes.json()
       
       if (!orderRes.ok) {
-        const errorText = await orderRes.text()
-        console.error("Order error response:", errorText)
+        console.error("🚫 Order error:", orderData)
         throw new Error(orderData.error || orderData.detail || "Failed to create order")
       }
 
@@ -258,14 +251,14 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
       toast({
         title: "✅ Order Placed Successfully! 🎉",
-        description: `Order #${orderId}. New balance: ${profileData.points || 0} coins. Pay ₹${finalTotal.toLocaleString()}`,
+        description: `Order #${orderId}. New balance: ${profileData.points?.toLocaleString() || 0} coins`,
       })
 
       clearCart()
       setOrderPlaced(true)
 
     } catch (err: any) {
-      console.error("Order error:", err)
+      console.error("❌ Order error:", err)
       toast({
         title: "❌ Order Failed",
         description: err.message || "Something went wrong. Please try again.",
@@ -433,7 +426,6 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Form fields - SAME AS BEFORE */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
@@ -610,7 +602,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   })}
                 </div>
 
-                {/* ✅ FIXED Coins Section - 80% MAX */}
+                {/* ✅ Coins Section - User Choice */}
                 <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -676,7 +668,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   )}
                 </div>
 
-                {/* Place Order Button - REMOVED finalTotal === 0 check */}
+                {/* Place Order Button */}
                 <Button
                   onClick={handleProceedToPayment}
                   className="w-full h-12 text-lg"
