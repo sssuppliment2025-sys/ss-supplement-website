@@ -1,4 +1,3 @@
-# mongo/collections.py - YOUR STYLE, FIXED
 from pymongo import MongoClient
 from django.conf import settings
 

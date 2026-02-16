@@ -213,4 +213,3 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='sssuppliment2025@gmail.com')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='komp phxt crhh ermr')
 DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER', default='sssuppliment2025@gmail.com')
-
