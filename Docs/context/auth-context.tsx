@@ -205,100 +205,126 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   // ================= FORGOT PASSWORD - SEND OTP =================
-  const forgotPassword = async (email: string, phone: string) => {
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/forgot-password/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, phone }),
-      })
+const forgotPassword = async (email, phone) => {
+  console.log("🔥 forgotPassword called:", { email, phone })
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/forgot-password/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        phone,  
+        email 
+      }),
+    })
 
-      const data = await res.json()
+    const data = await res.json()
+    console.log("🔥 forgotPassword response:", data)
 
-      if (!res.ok) {
-        return { 
-          success: false, 
-          message: data.error || data.detail || "Failed to send OTP",
-          error: data.error || data.detail
-        }
-      }
-
-      return { 
-        success: true, 
-        message: data.message || "OTP sent successfully"
-      }
-    } catch (error) {
+    if (!res.ok) {
       return { 
         success: false, 
-        message: "Network error. Please try again.",
-        error: "Network error"
+        message: data.error || data.detail || "Failed to send OTP",
+        error: data.error || data.detail
       }
     }
+
+    return { 
+      success: true, 
+      message: data.message || "OTP sent successfully"
+    }
+  } catch (error) {
+    console.error("🔥 forgotPassword error:", error)
+    return { 
+      success: false, 
+      message: "Network error. Please try again.",
+      error: "Network error"
+    }
   }
+}
 
-  // ================= VERIFY OTP =================
-  const verifyOTP = async (email: string, phone: string, otp: string) => {
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/verify-otp/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, phone, otp }),
-      })
 
-      const data = await res.json()
+const verifyOTP = async (email, phone, otp) => {
+  console.log("🔥 verifyOTP called:", { email, phone, otp })
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/verify-otp/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        phone,
+        email,
+        otp 
+      }),
+    })
 
-      if (!res.ok) {
-        return { 
-          success: false, 
-          message: data.error || "Invalid or expired OTP",
-          error: data.error
-        }
-      }
+    const data = await res.json()
+    console.log("🔥 verifyOTP response:", data)
 
-      return { 
-        success: true, 
-        message: data.message || "OTP verified successfully"
-      }
-    } catch (error) {
+    if (!res.ok) {
       return { 
         success: false, 
-        message: "Verification failed. Please try again.",
-        error: "Network error"
+        message: data.error || "Invalid or expired OTP",
+        error: data.error
       }
     }
+
+    return { 
+      success: true, 
+      message: data.message || "OTP verified successfully"
+    }
+  } catch (error) {
+    console.error("🔥 verifyOTP error:", error)
+    return { 
+      success: false, 
+      message: "Verification failed. Please try again.",
+      error: "Network error"
+    }
   }
+}
 
-  // ================= RESET PASSWORD =================
-  const resetPassword = async (email: string, phone: string, otp: string, newPassword: string) => {
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/reset-password/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, phone, otp, newPassword }),
-      })
 
-      const data = await res.json()
+const resetPassword = async (email, phone, otp, newPassword) => {
+  console.log("🔥 resetPassword called:", { email, phone, otp, newPassword })
+  
 
-      if (!res.ok) {
-        return { 
-          success: false, 
-          message: data.error || "Password reset failed",
-          error: data.error
-        }
-      }
+  const safePassword = newPassword || ''
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/reset-password/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        phone,
+        email,
+        otp,
+        new_password: safePassword  
+      }),
+    })
 
-      return { 
-        success: true, 
-        message: data.message || "Password reset successfully"
-      }
-    } catch (error) {
+    const data = await res.json()
+    console.log("🔥 resetPassword response:", data)
+
+    if (!res.ok) {
       return { 
         success: false, 
-        message: "Password reset failed. Please try again.",
-        error: "Network error"
+        message: data.error || "Password reset failed",
+        error: data.error
       }
     }
+
+    return { 
+      success: true, 
+      message: data.message || "Password reset successfully"
+    }
+  } catch (error) {
+    console.error("🔥 resetPassword error:", error)
+    return { 
+      success: false, 
+      message: "Password reset failed. Please try again.",
+      error: "Network error"
+    }
   }
+}
+
 
   return (
     <AuthContext.Provider

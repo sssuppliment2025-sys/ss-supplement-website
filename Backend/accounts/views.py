@@ -9,9 +9,17 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from mongo.collections import users_col, referrals_col
+from Mail.mail import MailFunction
 from utils.password import hash_password, verify_password
 from utils.jwt import generate_tokens_for_user
 from utils.jwt_helper import decode_token
+
+
+
+
+
+
+
 
 
 # ================== HEALTH CHECK ==================
@@ -406,193 +414,207 @@ def profile_view(request):
 
 
 
-# ================================================== Mail =============================================
-# your_app/views.py
+
+
+################################################################################################################
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
 from django.conf import settings
-from django.utils import timezone  # ✅ FIXED: Import added
-from .models import User, OTP
-from .serializers import ForgotPasswordSerializer, VerifyOTPSerializer, ResetPasswordSerializer
-import re
+from datetime import datetime, timedelta
+import secrets
+
+
+try:
+    from utils.password import hash_password
+except ImportError:
+    def hash_password(password):
+        import hashlib
+        return hashlib.sha256(password.encode()).hexdigest()
+
+from mongo.collections import users_col, otps_col
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
-    """Send OTP to user's email for password reset."""
-    serializer = ForgotPasswordSerializer(data=request.data)
+    print("🔥 FORGOT_PASSWORD START")
+    print("🔥 DATA:", request.data)
     
-    
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    phone = serializer.validated_data['phone']
-    email = serializer.validated_data['email']
-    
-    # Validate Indian phone format (+91 followed by 10 digits)
-    if not re.match(r'^\+?91[6-9]\d{9}$', phone.replace(" ", "")):
-        return Response({"error": "Invalid phone number format (+91XXXXXXXXXX)"}, 
-                       status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        # Find exact user match (security - don't reveal if user exists)
-        user = User.objects.filter(phone=phone, email=email).first()
-        if not user:
-            # Don't reveal if user doesn't exist (security)
-            return Response({
-                "success": True,
-                "message": "If account exists, OTP sent to your email"
-            }, status=status.HTTP_200_OK)
-        
-        # Delete old OTPs for this user
-        OTP.objects.filter(phone=phone, email=email).delete()
-        
-        # Create new OTP
-        otp = OTP.objects.create(user=user, phone=phone, email=email)
-        
-        # Send email with OTP
-        subject = 'Password Reset OTP - Your App Name'
-        message = f'''
-Your password reset OTP is: {otp.otp}
+    phone = request.data.get('phone', '').strip()
+    email = request.data.get('email', '').strip()
 
-This OTP is valid for only 10 minutes.
-
-If you did not request this password reset, please ignore this email.
-
----
-Your App Team
-        '''
-        
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
-        )
-        
-        return Response({
-            "success": True,
-            "message": "OTP sent successfully! Check your inbox (and spam folder)."
-        }, status=status.HTTP_200_OK)
-        
-    except Exception as e:
+    if not phone or not email:
         return Response({
             "success": False, 
-            "error": "Failed to send OTP. Please try again."
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            "error": "Phone and email required"
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    user_data = users_col.find_one({
+        '$or': [
+            {'phone': phone},
+            {'email': email}
+        ]
+    })
+    
+    print(f"USER FOUND: {user_data is not None}")
+
+    if not user_data:
+        return Response({
+            "success": True,
+            "message": "If account exists, OTP sent to your email"
+        }, status=status.HTTP_200_OK)
+
+    otps_col.delete_many({
+        '$or': [{'phone': phone}, {'email': email}]
+    })
+
+    otp_code = str(secrets.randbelow(900000) + 100000)
+    expires_at = datetime.now() + timedelta(minutes=10)
+    otp_doc = {
+        'user_id': str(user_data['_id']),
+        'phone': phone,
+        'email': email,
+        'name': user_data.get('name', 'User'),
+        'otp': otp_code,
+        'is_used': False,
+        'expires_at': expires_at,
+        'created_at': datetime.now()
+    }
+    
+    otps_col.insert_one(otp_doc)
+    print(f"✅ OTP SAVED: {otp_code}")
+    if otp_code :
+        MailFunction(settings, email, otp_code)
+    else :
+        print('Mail error...')
+    
+    return Response({
+        "success": True,
+        "message": "OTP sent successfully! Check inbox/spam.",
+        "debug_otp": otp_code  
+    })
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):
-    """Verify OTP sent to user's email."""
-    serializer = VerifyOTPSerializer(data=request.data)
+    """Verify OTP - Step 2"""
+    print("🔥 VERIFY_OTP")
+    print("🔥 DATA:", request.data)
     
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    phone = request.data.get('phone', '').strip()
+    email = request.data.get('email', '').strip()
+    otp_code = request.data.get('otp', '').strip()
     
-    phone = serializer.validated_data['phone']
-    email = serializer.validated_data['email']
-    otp_code = serializer.validated_data['otp']
-    
-    try:
-        # Find valid OTP record
-        otp_record = OTP.objects.filter(
-            phone=phone, 
-            email=email, 
-            otp=otp_code,
-            is_used=False,
-            expires_at__gt=timezone.now()  # ✅ Now works with import
-        ).first()
-        
-        if not otp_record:
-            return Response({
-                "success": False,
-                "error": "Invalid or expired OTP. Please request a new one."
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Mark OTP as used
-        otp_record.is_used = True
-        otp_record.save(update_fields=['is_used'])
-        
+
+    if not phone or not email or not otp_code:
         return Response({
-            "success": True,
-            "message": "OTP verified successfully! You can now reset your password.",
-            "data": {
-                "phone": phone,
-                "email": email
-            }
-        }, status=status.HTTP_200_OK)
-        
-    except Exception as e:
+            "success": False, 
+            "error": "Phone, email, OTP required"
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    otp_doc = otps_col.find_one({
+        '$or': [
+            {'phone': phone, 'email': email},
+            {'phone': phone},
+            {'email': email}
+        ],
+        'otp': otp_code,
+        'is_used': False,
+        'expires_at': {'$gt': datetime.now()}
+    })
+    
+    if not otp_doc:
         return Response({
-            "success": False,
-            "error": "OTP verification failed. Please try again."
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            "success": False, 
+            "error": "Invalid or expired OTP"
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    otps_col.update_one(
+        {'_id': otp_doc['_id']},
+        {'$set': {'is_used': True}}
+    )
+    
+    print("✅ OTP VERIFIED!")
+    return Response({
+        "success": True,
+        "message": "OTP verified! Reset your password."
+    })
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def reset_password(request):
-    """Reset user password after OTP verification."""
-    serializer = ResetPasswordSerializer(data=request.data)
+    """🔥 ULTRA-SIMPLE - Shows EXACT frontend data"""
+    print("🔥 RESET_PASSWORD - FULL DEBUG")
+    print("🔥 RAW request.data:", request.data)
+    print("🔥 request.data.keys():", list(request.data.keys()))
     
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    phone_raw = request.data.get('phone')
+    email_raw = request.data.get('email') 
+    otp_raw = request.data.get('otp')
+    password_raw = request.data.get('new_password')
     
-    phone = serializer.validated_data['phone']
-    email = serializer.validated_data['email']
-    otp_code = serializer.validated_data['otp']
-    new_password = serializer.validated_data['new_password']
+    print(f"📱 PHONE RAW: '{phone_raw}' (type: {type(phone_raw)})")
+    print(f"📧 EMAIL RAW: '{email_raw}' (type: {type(email_raw)})")
+    print(f"🔑   OTP RAW: '{otp_raw}' (type: {type(otp_raw)})")
+    print(f"🔑 PASS RAW: '{password_raw}' (type: {type(password_raw)})")
+    
+
+    phone = str(phone_raw or '').strip() if phone_raw else ''
+    email = str(email_raw or '').strip() if email_raw else ''
+    otp_code = str(otp_raw or '').strip() if otp_raw else ''
+    new_password = str(password_raw or '').strip() if password_raw else ''
+    
+    print(f"📱 PHONE CLEAN: '{phone}' (len: {len(phone)})")
+    print(f"📧 EMAIL CLEAN: '{email}' (len: {len(email)})")
+    print(f"🔑   OTP CLEAN: '{otp_code}' (len: {len(otp_code)})")
+    print(f"🔑 PASS CLEAN: '{new_password}' (len: {len(new_password)})")
+    
+
+    if len(phone) == 0:
+        return Response({"success": False, "error": f"Phone empty. Got: '{phone_raw}'"}, status=400)
+    if len(email) == 0:
+        return Response({"success": False, "error": f"Email empty. Got: '{email_raw}'"}, status=400)
+    if len(otp_code) == 0:
+        return Response({"success": False, "error": f"OTP empty. Got: '{otp_raw}'"}, status=400)
+    if len(new_password) == 0:
+        return Response({"success": False, "error": f"NEW_PASSWORD EMPTY. Got: '{password_raw}' (type: {type(password_raw)})"}, status=400)
+    if len(new_password) < 6:
+        return Response({"success": False, "error": "Password too short"}, status=400)
+    
+    print("ALL FIELDS VALID!")
+    
+    otp_doc = otps_col.find_one({
+        '$or': [
+            {'phone': phone, 'email': email},
+            {'phone': phone},
+            {'email': email}
+        ],
+        'otp': otp_code,
+        'is_used': True,
+        'expires_at': {'$gt': datetime.now()}
+    })
+    
+    if not otp_doc:
+        return Response({"success": False, "error": "Verify OTP first"}, status=400)
     
     try:
-        # Check if OTP was verified (is_used=True) and not expired
-        otp_record = OTP.objects.filter(
-            phone=phone, 
-            email=email, 
-            otp=otp_code,
-            is_used=True,  # ✅ Must be verified first
-            expires_at__gt=timezone.now()  # ✅ Not expired
-        ).first()
-        # In forgot_password view, before send_mail()
-        print("=== EMAIL DEBUG ===")
-        print(f"EMAIL_HOST: {settings.EMAIL_HOST}")
-        print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
-        print(f"DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")
-        print("===================")
-
-        if not otp_record:
-            return Response({
-                "success": False,
-                "error": "Please verify OTP first or request a new one."
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Get user and reset password
-        user = User.objects.get(phone=phone, email=email)
-        user.set_password(new_password)
-        user.save(update_fields=['password'])
-        
-        # Clean up used OTP
-        otp_record.delete()
-        
-        return Response({
-            "success": True,
-            "message": "Password reset successfully! Please login with your new password.",
-            "data": {
-                "phone": phone,
-                "email": email
-            }
-        }, status=status.HTTP_200_OK)
-        
-    except User.DoesNotExist:
-        return Response({
-            "success": False,
-            "error": "User not found with this phone and email combination."
-        }, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response({
-            "success": False,
-            "error": "Password reset failed. Please try again."
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        from utils.password import hash_password
+        hashed_password = hash_password(new_password)
+    except:
+        import hashlib
+        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+    
+    result = users_col.update_one(
+        {'$or': [{'phone': phone}, {'email': email}]},
+        {'$set': {'password': hashed_password}}
+    )
+    
+    otps_col.delete_one({'_id': otp_doc['_id']})
+    
+    print("✅ PASSWORD RESET SUCCESS!")
+    return Response({"success": True, "message": "Password reset successful!"})
