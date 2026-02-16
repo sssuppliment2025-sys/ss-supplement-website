@@ -403,3 +403,196 @@ def profile_view(request):
         })
     except Exception as e:
         return Response({'error': 'Invalid token'}, status=401)
+
+
+
+# ================================================== Mail =============================================
+# your_app/views.py
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone  # ✅ FIXED: Import added
+from .models import User, OTP
+from .serializers import ForgotPasswordSerializer, VerifyOTPSerializer, ResetPasswordSerializer
+import re
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password(request):
+    """Send OTP to user's email for password reset."""
+    serializer = ForgotPasswordSerializer(data=request.data)
+    
+    
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    phone = serializer.validated_data['phone']
+    email = serializer.validated_data['email']
+    
+    # Validate Indian phone format (+91 followed by 10 digits)
+    if not re.match(r'^\+?91[6-9]\d{9}$', phone.replace(" ", "")):
+        return Response({"error": "Invalid phone number format (+91XXXXXXXXXX)"}, 
+                       status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Find exact user match (security - don't reveal if user exists)
+        user = User.objects.filter(phone=phone, email=email).first()
+        if not user:
+            # Don't reveal if user doesn't exist (security)
+            return Response({
+                "success": True,
+                "message": "If account exists, OTP sent to your email"
+            }, status=status.HTTP_200_OK)
+        
+        # Delete old OTPs for this user
+        OTP.objects.filter(phone=phone, email=email).delete()
+        
+        # Create new OTP
+        otp = OTP.objects.create(user=user, phone=phone, email=email)
+        
+        # Send email with OTP
+        subject = 'Password Reset OTP - Your App Name'
+        message = f'''
+Your password reset OTP is: {otp.otp}
+
+This OTP is valid for only 10 minutes.
+
+If you did not request this password reset, please ignore this email.
+
+---
+Your App Team
+        '''
+        
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
+        
+        return Response({
+            "success": True,
+            "message": "OTP sent successfully! Check your inbox (and spam folder)."
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            "success": False, 
+            "error": "Failed to send OTP. Please try again."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_otp(request):
+    """Verify OTP sent to user's email."""
+    serializer = VerifyOTPSerializer(data=request.data)
+    
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    phone = serializer.validated_data['phone']
+    email = serializer.validated_data['email']
+    otp_code = serializer.validated_data['otp']
+    
+    try:
+        # Find valid OTP record
+        otp_record = OTP.objects.filter(
+            phone=phone, 
+            email=email, 
+            otp=otp_code,
+            is_used=False,
+            expires_at__gt=timezone.now()  # ✅ Now works with import
+        ).first()
+        
+        if not otp_record:
+            return Response({
+                "success": False,
+                "error": "Invalid or expired OTP. Please request a new one."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Mark OTP as used
+        otp_record.is_used = True
+        otp_record.save(update_fields=['is_used'])
+        
+        return Response({
+            "success": True,
+            "message": "OTP verified successfully! You can now reset your password.",
+            "data": {
+                "phone": phone,
+                "email": email
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            "success": False,
+            "error": "OTP verification failed. Please try again."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password(request):
+    """Reset user password after OTP verification."""
+    serializer = ResetPasswordSerializer(data=request.data)
+    
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    phone = serializer.validated_data['phone']
+    email = serializer.validated_data['email']
+    otp_code = serializer.validated_data['otp']
+    new_password = serializer.validated_data['new_password']
+    
+    try:
+        # Check if OTP was verified (is_used=True) and not expired
+        otp_record = OTP.objects.filter(
+            phone=phone, 
+            email=email, 
+            otp=otp_code,
+            is_used=True,  # ✅ Must be verified first
+            expires_at__gt=timezone.now()  # ✅ Not expired
+        ).first()
+        # In forgot_password view, before send_mail()
+        print("=== EMAIL DEBUG ===")
+        print(f"EMAIL_HOST: {settings.EMAIL_HOST}")
+        print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
+        print(f"DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")
+        print("===================")
+
+        if not otp_record:
+            return Response({
+                "success": False,
+                "error": "Please verify OTP first or request a new one."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get user and reset password
+        user = User.objects.get(phone=phone, email=email)
+        user.set_password(new_password)
+        user.save(update_fields=['password'])
+        
+        # Clean up used OTP
+        otp_record.delete()
+        
+        return Response({
+            "success": True,
+            "message": "Password reset successfully! Please login with your new password.",
+            "data": {
+                "phone": phone,
+                "email": email
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except User.DoesNotExist:
+        return Response({
+            "success": False,
+            "error": "User not found with this phone and email combination."
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            "success": False,
+            "error": "Password reset failed. Please try again."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
