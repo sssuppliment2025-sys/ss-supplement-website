@@ -39,20 +39,23 @@ export default function ProductPage() {
 
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedFlavor, setSelectedFlavor] = useState("")
-  const [selectedWeight, setSelectedWeight] = useState("")
+  const [selectedWeight, setSelectedWeight] = useState("") // ✅ User's selection
   const [quantity, setQuantity] = useState(1)
   const [showMagnifier, setShowMagnifier] = useState(false)
 
+  // ✅ FIXED: Initialize with CURRENT product weight
   useEffect(() => {
     if (product) {
-      // Handle flavors whether it's a string or array
+      // Flavors
       if (Array.isArray(product.flavors) && product.flavors.length > 0) {
         const firstFlavor = product.flavors[0]
         setSelectedFlavor(typeof firstFlavor === "string" ? firstFlavor : firstFlavor.name)
       } else if (typeof product.flavors === "string") {
         setSelectedFlavor(product.flavors)
       }
-      setSelectedWeight(product.weights?.[0] || product.weight || "")
+      
+      // ✅ FIXED: Use product.weight (not weights[0])
+      setSelectedWeight(product.weight || "")
     }
   }, [product])
 
@@ -63,43 +66,32 @@ export default function ProductPage() {
   const availableFlavors = [...new Set(productVariants.map((v) => v.flavor).filter(Boolean))]
   const availableWeights = [...new Set(productVariants.map((v) => v.weight).filter(Boolean))]
 
-  // Handle flavor selection - navigate to matching product
+  // ✅ FIXED: Flavor change - Update state FIRST
   const handleFlavorChange = (flavor: string) => {
     if (!product) return
-    setSelectedFlavor(flavor)
+    setSelectedFlavor(flavor) // ✅ Update immediately
     
-    // Find product with same weight but new flavor
-    const currentWeight = product.weight || ""
+    // Find matching product
+    const currentWeight = selectedWeight || product.weight || ""
     const matchingProduct = findProductByVariant(product.name, product.brand, flavor, currentWeight)
     
     if (matchingProduct && matchingProduct.id !== product.id) {
       router.push(`/product/${matchingProduct.id}`)
-    } else {
-      // If no exact match, find any product with this flavor
-      const anyFlavorMatch = productVariants.find((v) => v.flavor === flavor)
-      if (anyFlavorMatch && anyFlavorMatch.id !== product.id) {
-        router.push(`/product/${anyFlavorMatch.id}`)
-      }
     }
   }
 
-  // Handle weight selection - navigate to matching product
+  // ✅ FIXED: Weight change - Update state FIRST
   const handleWeightChange = (weight: string) => {
-    if (!product) return
-    setSelectedWeight(weight)
+    setSelectedWeight(weight) // ✅ CRITICAL: Update IMMEDIATELY
     
-    // Find product with same flavor but new weight
-    const currentFlavor = product.flavors?.[0]?.name || ""
+    if (!product) return
+    
+    // Find matching product
+    const currentFlavor = selectedFlavor || (product.flavors?.[0]?.name || "")
     const matchingProduct = findProductByVariant(product.name, product.brand, currentFlavor, weight)
     
     if (matchingProduct && matchingProduct.id !== product.id) {
       router.push(`/product/${matchingProduct.id}`)
-    } else {
-      // If no exact match, find any product with this weight
-      const anyWeightMatch = productVariants.find((v) => v.weight === weight)
-      if (anyWeightMatch && anyWeightMatch.id !== product.id) {
-        router.push(`/product/${anyWeightMatch.id}`)
-      }
     }
   }
 
@@ -118,15 +110,28 @@ export default function ProductPage() {
     )
   }
 
-  // Get current price based on flavor
+  // ✅ FIXED: Price considers BOTH flavor AND weight
   const getCurrentPrice = () => {
+    let price = product.price // base fallback
+    
+    // 1. Flavor price
     if (Array.isArray(product.flavors)) {
       const flavor = product.flavors.find((f) => (typeof f === "string" ? f : f.name) === selectedFlavor)
       if (flavor && typeof flavor !== "string") {
-        return flavor.price
+        price = flavor.price
       }
     }
-    return product.price
+    
+    // 2. Weight override (most important!)
+    if (selectedWeight && (product.weights || product.weightVariants)) {
+      const weights = product.weights || product.weightVariants || []
+      const weightVariant = weights.find((w: any) => w.weight === selectedWeight)
+      if (weightVariant?.price) {
+        price = weightVariant.price
+      }
+    }
+    
+    return price
   }
 
   const currentPrice = getCurrentPrice()
@@ -134,11 +139,12 @@ export default function ProductPage() {
   // Get all product images
   const productImages = product.images?.length > 0 ? product.images : [product.image]
 
+  // ✅ FIXED: Uses selectedWeight (user's choice)
   const handleAddToCart = () => {
     addToCart(product, selectedFlavor, selectedWeight, quantity)
     toast({
       title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name} (${selectedFlavor}, ${selectedWeight}) added!`,
     })
   }
 
@@ -148,12 +154,10 @@ export default function ProductPage() {
   }
 
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
-
   const otherCategoryProducts = products
     .filter((p) => p.category !== product.category)
     .sort(() => Math.random() - 0.5)
     .slice(0, 8)
-
   const bestSellingProducts = products
     .filter((p) => p.id !== product.id)
     .sort((a, b) => b.rating - a.rating)
@@ -165,9 +169,7 @@ export default function ProductPage() {
       <main className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <a href="/" className="hover:text-primary">
-            Home
-          </a>
+          <a href="/" className="hover:text-primary">Home</a>
           <ChevronRight className="h-4 w-4" />
           <a href={`/category/${product.category}`} className="hover:text-primary">
             {product.category}
@@ -177,7 +179,7 @@ export default function ProductPage() {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Product Images with Magnification */}
+          {/* Product Images */}
           <div className="space-y-4">
             <div
               className="relative aspect-square bg-card rounded-xl overflow-hidden border border-border cursor-zoom-in"
@@ -255,7 +257,7 @@ export default function ProductPage() {
             </div>
             <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
 
-            {/* Flavor Selection */}
+            {/* ✅ FIXED: Flavor Selection - Uses selectedFlavor state */}
             {availableFlavors.length > 0 && (
               <div>
                 <h3 className="font-semibold text-foreground mb-3">
@@ -265,28 +267,24 @@ export default function ProductPage() {
                   </span>
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {availableFlavors.map((flavor) => {
-                    const currentFlavor = product.flavors?.[0]?.name || ""
-                    const isSelected = currentFlavor === flavor
-                    return (
-                      <button
-                        key={flavor}
-                        onClick={() => handleFlavorChange(flavor)}
-                        className={`px-4 py-2 rounded-lg border text-sm transition-all ${
-                          isSelected
-                            ? "border-primary bg-primary/10 text-primary font-medium"
-                            : "border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
-                        }`}
-                      >
-                        {flavor}
-                      </button>
-                    )
-                  })}
+                  {availableFlavors.map((flavor) => (
+                    <button
+                      key={flavor}
+                      onClick={() => handleFlavorChange(flavor)}
+                      className={`px-4 py-2 rounded-lg border text-sm transition-all ${
+                        selectedFlavor === flavor
+                          ? "border-primary bg-primary/10 text-primary font-medium"
+                          : "border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
+                      }`}
+                    >
+                      {flavor}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Weight Selection */}
+            {/* ✅ FIXED: Weight Selection - Uses selectedWeight state */}
             {availableWeights.length > 0 && (
               <div>
                 <h3 className="font-semibold text-foreground mb-3">
@@ -297,11 +295,9 @@ export default function ProductPage() {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {availableWeights.map((weight) => {
-                    const currentWeight = product.weight || ""
-                    const isSelected = currentWeight === weight
-                    // Find the variant with this weight to show price difference
+                    const isSelected = selectedWeight === weight // ✅ Uses state!
                     const variantWithWeight = productVariants.find((v) => v.weight === weight)
-                    const priceDiff = variantWithWeight ? variantWithWeight.price - product.price : 0
+                    const priceDiff = variantWithWeight ? variantWithWeight.price - currentPrice : 0
                     
                     return (
                       <button
@@ -314,6 +310,7 @@ export default function ProductPage() {
                         }`}
                       >
                         <span>{weight}</span>
+                        {isSelected && <span className="ml-1 text-xs bg-primary/20 text-primary px-1 py-0.5 rounded">✓</span>}
                         {priceDiff !== 0 && !isSelected && (
                           <span className={`ml-1 text-xs ${priceDiff > 0 ? "text-orange-500" : "text-green-500"}`}>
                             {priceDiff > 0 ? `+₹${priceDiff}` : `-₹${Math.abs(priceDiff)}`}
@@ -342,7 +339,7 @@ export default function ProductPage() {
 
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <Button size="lg" variant="outline" className="flex-1 bg-transparent" onClick={handleAddToCart}>
+              <Button size="lg" className="flex-1" variant="outline" onClick={handleAddToCart}>
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
               </Button>
@@ -420,7 +417,6 @@ export default function ProductPage() {
             subtitle={`More from ${product.category}`}
           />
         )}
-
         {otherCategoryProducts.length > 0 && (
           <RelatedProducts
             products={otherCategoryProducts}
@@ -428,7 +424,6 @@ export default function ProductPage() {
             subtitle="Products from other categories"
           />
         )}
-
         {bestSellingProducts.length > 0 && (
           <RelatedProducts
             products={bestSellingProducts}
