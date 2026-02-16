@@ -14,8 +14,4 @@ urlpatterns = [
     path("leaderboard/", views.LeaderboardView.as_view(), name="leaderboard"),
     path('profileForOrderPlaced/', views.profile_view, name='profile'),
     path('orders/', views.create_order, name='create_order'),
-
-    path('auth/forgot-password/', views.forgot_password, name='forgot_password'),
-    path('auth/verify-otp/', views.verify_otp, name='verify_otp'),
-    path('auth/reset-password/', views.reset_password, name='reset_password'),
 ]

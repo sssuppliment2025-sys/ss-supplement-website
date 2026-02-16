@@ -6,30 +6,20 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
-# ---------------------------------------------------------------------------
-# Base
-# ---------------------------------------------------------------------------
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# ---------------------------------------------------------------------------
-# Core
-# ---------------------------------------------------------------------------
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-this-in-production"
+    "django-insecure-change-this-in-production-to-a-real-secret-key"
 )
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS",
-    "localhost,127.0.0.1"
-).split(",")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
 
 # ---------------------------------------------------------------------------
-# Applications
+# Application definition
 # ---------------------------------------------------------------------------
 
 INSTALLED_APPS = [
@@ -39,19 +29,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Third-party
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-
     # Local
     "accounts",
 ]
-
-# ---------------------------------------------------------------------------
-# Middleware
-# ---------------------------------------------------------------------------
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -64,16 +48,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ---------------------------------------------------------------------------
-# URLs / WSGI
-# ---------------------------------------------------------------------------
-
 ROOT_URLCONF = "config.urls"
-WSGI_APPLICATION = "config.wsgi.application"
-
-# ---------------------------------------------------------------------------
-# Templates
-# ---------------------------------------------------------------------------
 
 TEMPLATES = [
     {
@@ -91,8 +66,11 @@ TEMPLATES = [
     },
 ]
 
+WSGI_APPLICATION = "config.wsgi.application"
+
+
 # ---------------------------------------------------------------------------
-# Database
+# Database – SQLite by default (swap for PostgreSQL in production)
 # ---------------------------------------------------------------------------
 
 DATABASES = {
@@ -102,8 +80,9 @@ DATABASES = {
     }
 }
 
+
 # ---------------------------------------------------------------------------
-# Authentication
+# Auth
 # ---------------------------------------------------------------------------
 
 AUTH_USER_MODEL = "accounts.User"
@@ -115,8 +94,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+
 # ---------------------------------------------------------------------------
-# Django REST Framework & JWT
+# REST Framework & JWT
 # ---------------------------------------------------------------------------
 
 REST_FRAMEWORK = {
@@ -135,26 +115,29 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
+
 # ---------------------------------------------------------------------------
-# CORS
+# CORS – allow your React frontend
 # ---------------------------------------------------------------------------
 
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,https://supliment-project.vercel.app"
+    "http://localhost:3000,http://192.168.1.102:3000,https://supliment-project.vercel.app"
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 
-# ---------------------------------------------------------------------------
-# Referral Points
-# ---------------------------------------------------------------------------
-
-REFERRAL_POINTS_FOR_REFERRER = 4
-REFERRAL_POINTS_FOR_REFERRED = 2
 
 # ---------------------------------------------------------------------------
-# Internationalization / Static
+# Referral Points Configuration
+# ---------------------------------------------------------------------------
+
+REFERRAL_POINTS_FOR_REFERRER = 4   # Points the person who shares the link gets
+REFERRAL_POINTS_FOR_REFERRED = 2   # Points the new user who signs up gets
+
+
+# ---------------------------------------------------------------------------
+# Internationalisation & Static
 # ---------------------------------------------------------------------------
 
 LANGUAGE_CODE = "en-us"
@@ -162,31 +145,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# ---------------------------------------------------------------------------
-# EMAIL (WORKS ON LOCAL + CLOUD)
-# ---------------------------------------------------------------------------
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "sssuppliment2025@gmail.com")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "komp phxt crhh ermr")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-
-# ---------------------------------------------------------------------------
-# MongoDB Configuration
-# ---------------------------------------------------------------------------
-
-MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "sssuppliment_db")
-MONGO_URI = os.environ.get(
-    "MONGO_URI",
-    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
-)
