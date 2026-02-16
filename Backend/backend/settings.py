@@ -1,10 +1,14 @@
 """
-Django settings for the Referral Coin Backend.
+Django settings for the Referral Coin Backend
 """
 
 import os
 from pathlib import Path
 from datetime import timedelta
+
+# ---------------------------------------------------------------------------
+# Base
+# ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,7 +28,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
 ]
-DATABASES = {}
+
 # ---------------------------------------------------------------------------
 # Applications
 # ---------------------------------------------------------------------------
@@ -55,17 +59,14 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-
-    # ❌ CSRF stays enabled globally (safe)
     "django.middleware.csrf.CsrfViewMiddleware",
-
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # ---------------------------------------------------------------------------
-# CORS (REACT → DJANGO)
+# CORS
 # ---------------------------------------------------------------------------
 
 CORS_ALLOWED_ORIGINS = [
@@ -77,8 +78,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 # ---------------------------------------------------------------------------
-# CSRF (ONLY FOR DJANGO ADMIN / TEMPLATES)
-# React + JWT APIs DO NOT USE CSRF
+# CSRF
 # ---------------------------------------------------------------------------
 
 CSRF_TRUSTED_ORIGINS = [
@@ -87,8 +87,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://ss-supplement-website.onrender.com",
 ]
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
 
@@ -138,7 +138,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Django REST Framework (JWT ONLY — NO CSRF)
+# Django REST Framework
 # ---------------------------------------------------------------------------
 
 REST_FRAMEWORK = {
@@ -155,8 +155,8 @@ REST_FRAMEWORK = {
 # ---------------------------------------------------------------------------
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),    
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
@@ -177,39 +177,34 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
-
+STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ---------------------------------------------------------------------------
+# Mongo (optional)
+# ---------------------------------------------------------------------------
 
+MONGO_URI = os.environ.get("MONGO_URI")
+MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME")
 
-
-
-
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
-
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [],
-}
-
-
-
-from decouple import config
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+# ---------------------------------------------------------------------------
+# EMAIL CONFIG (WORKS ON LOCAL + RENDER)
+# ---------------------------------------------------------------------------
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='sssuppliment2025@gmail.com')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='komp phxt crhh ermr')
-DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER', default='sssuppliment2025@gmail.com')
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "sssuppliment2025@gmail.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "komp phxt crhh ermr")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# ---------------------------------------------------------------------------
+# MongoDB Configuration
+# ---------------------------------------------------------------------------
+
+MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "sssuppliment_db")
+MONGO_URI = os.environ.get(
+    "MONGO_URI",
+    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
+)
