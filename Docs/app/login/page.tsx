@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Eye, EyeOff, User, Shield, Gift } from "lucide-react"
+import { Eye, EyeOff, User, Shield, Gift, Mail } from "lucide-react"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -27,7 +27,7 @@ export default function LoginPage() {
   const redirect = searchParams.get("redirect") || "/"
   const refFromUrl = searchParams.get("ref")
 
-  const { login, signup, adminLogin, isAuthenticated } = useAuth()
+  const { login, signup, adminLogin, isAuthenticated, forgotPassword } = useAuth()
   const { toast } = useToast()
 
   const [activeTab, setActiveTab] =
@@ -38,9 +38,11 @@ export default function LoginPage() {
   const [loginLoading, setLoginLoading] = useState(false)
   const [signupLoading, setSignupLoading] = useState(false)
   const [adminLoading, setAdminLoading] = useState(false)
+  const [forgotLoading, setForgotLoading] = useState(false)
 
   const [loginData, setLoginData] = useState({ phone: "", password: "" })
   const [adminData, setAdminData] = useState({ phone: "", password: "" })
+  const [forgotEmail, setForgotEmail] = useState("")
 
   const [signupData, setSignupData] = useState({
     name: "",
@@ -76,6 +78,37 @@ export default function LoginPage() {
       router.replace(redirect)
     }
   }, [isAuthenticated, router, redirect])
+
+  /* ================= FORGOT PASSWORD ================= */
+  const handleForgotPassword = async () => {
+    setForgotLoading(true)
+
+    try {
+      const result = await forgotPassword(forgotEmail.trim())
+      
+      if (result.success) {
+        toast({ 
+          title: "Success!", 
+          description: result.message || "Password reset email sent!" 
+        })
+        setForgotEmail("")
+      } else {
+        toast({
+          title: "Error",
+          description: result.message,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send reset email",
+        variant: "destructive",
+      })
+    } finally {
+      setForgotLoading(false)
+    }
+  }
 
   /* ================= LOGIN ================= */
   const handleLogin = async (e: React.FormEvent) => {
@@ -226,6 +259,20 @@ export default function LoginPage() {
                     <Button className="w-full" disabled={loginLoading}>
                       {loginLoading ? "Logging in..." : "Login"}
                     </Button>
+
+                    {/* ✅ FIXED: Navigate to Forgot Password Page */}
+                    <div className="pt-2">
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="w-full justify-start p-0 h-auto text-sm text-muted-foreground hover:text-foreground no-underline"
+                        onClick={() => router.push('/forgot-password')}
+                        disabled={forgotLoading}
+                      >
+                        <Mail className="w-4 h-4 mr-1" />
+                        Forgot Password?
+                      </Button>
+                    </div>
                   </form>
                 </CardContent>
               </Card>

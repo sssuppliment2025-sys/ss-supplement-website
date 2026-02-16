@@ -210,6 +210,7 @@ export default function ReferralPage() {
         </Card>
 
         {/* LEADERBOARD */}
+        {/*
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -225,7 +226,7 @@ export default function ReferralPage() {
               </div>
             ))}
           </CardContent>
-        </Card>
+        </Card> */}
 
       </main>
 

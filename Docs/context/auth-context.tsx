@@ -8,8 +8,7 @@ import {
   type ReactNode,
 } from "react"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 // ================= TYPES =================
 interface User {
@@ -33,6 +32,11 @@ interface AuthContextType {
     referralCode?: string
   ) => Promise<{ success: boolean; message: string }>
   logout: () => void
+  // ✅ NEW OTP FUNCTIONS
+  forgotPassword: (email: string, phone: string) => Promise<{ success: boolean; message: string; error?: string }>
+  verifyOTP: (email: string, phone: string, otp: string) => Promise<{ success: boolean; message: string; error?: string }>
+  resetPassword: (email: string, phone: string, otp: string, newPassword: string) => Promise<{ success: boolean; message: string; error?: string }>
+  adminLogin: (phone: string, password: string) => Promise<{ success: boolean; message: string }>
 }
 
 // ================= CONTEXT =================
@@ -113,6 +117,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // ================= ADMIN LOGIN =================
+  const adminLogin = async (phone: string, password: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        return { success: false, message: data.detail || "Admin login failed" }
+      }
+
+      // Save JWT tokens
+      localStorage.setItem("access", data.tokens.access)
+      localStorage.setItem("refresh", data.tokens.refresh)
+
+      setUser({
+        id: data.user.id,
+        username: data.user.name || data.user.phone,
+        email: data.user.email,
+        isAdmin: data.user.is_staff || true,
+      })
+
+      return { success: true, message: "Admin login successful" }
+    } catch {
+      return { success: false, message: "Server error" }
+    }
+  }
+
   // ================= SIGNUP =================
   const signup = async (
     name: string,
@@ -168,6 +204,128 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }
 
+  // ================= FORGOT PASSWORD - SEND OTP =================
+const forgotPassword = async (email, phone) => {
+  console.log("🔥 forgotPassword called:", { email, phone })
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/forgot-password/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        phone,  
+        email 
+      }),
+    })
+
+    const data = await res.json()
+    console.log("🔥 forgotPassword response:", data)
+
+    if (!res.ok) {
+      return { 
+        success: false, 
+        message: data.error || data.detail || "Failed to send OTP",
+        error: data.error || data.detail
+      }
+    }
+
+    return { 
+      success: true, 
+      message: data.message || "OTP sent successfully"
+    }
+  } catch (error) {
+    console.error("🔥 forgotPassword error:", error)
+    return { 
+      success: false, 
+      message: "Network error. Please try again.",
+      error: "Network error"
+    }
+  }
+}
+
+
+const verifyOTP = async (email, phone, otp) => {
+  console.log("🔥 verifyOTP called:", { email, phone, otp })
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/verify-otp/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        phone,
+        email,
+        otp 
+      }),
+    })
+
+    const data = await res.json()
+    console.log("🔥 verifyOTP response:", data)
+
+    if (!res.ok) {
+      return { 
+        success: false, 
+        message: data.error || "Invalid or expired OTP",
+        error: data.error
+      }
+    }
+
+    return { 
+      success: true, 
+      message: data.message || "OTP verified successfully"
+    }
+  } catch (error) {
+    console.error("🔥 verifyOTP error:", error)
+    return { 
+      success: false, 
+      message: "Verification failed. Please try again.",
+      error: "Network error"
+    }
+  }
+}
+
+
+const resetPassword = async (email, phone, otp, newPassword) => {
+  console.log("🔥 resetPassword called:", { email, phone, otp, newPassword })
+  
+
+  const safePassword = newPassword || ''
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/reset-password/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        phone,
+        email,
+        otp,
+        new_password: safePassword  
+      }),
+    })
+
+    const data = await res.json()
+    console.log("🔥 resetPassword response:", data)
+
+    if (!res.ok) {
+      return { 
+        success: false, 
+        message: data.error || "Password reset failed",
+        error: data.error
+      }
+    }
+
+    return { 
+      success: true, 
+      message: data.message || "Password reset successfully"
+    }
+  } catch (error) {
+    console.error("🔥 resetPassword error:", error)
+    return { 
+      success: false, 
+      message: "Password reset failed. Please try again.",
+      error: "Network error"
+    }
+  }
+}
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -178,6 +336,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         signup,
         logout,
+        forgotPassword,
+        verifyOTP,
+        resetPassword,
+        adminLogin,
       }}
     >
       {!loading && children}
