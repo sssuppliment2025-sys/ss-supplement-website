@@ -19,14 +19,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 export default function CartPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { items, updateQuantity, removeFromCart, getCartTotal } = useCart()
+  const { items, updateQuantity, removeFromCart, getCartTotal, getCartItemPrice } = useCart()
   const { isAuthenticated } = useAuth()
 
   const [points, setPoints] = useState<number>(0)
   const [loadingPoints, setLoadingPoints] = useState(true)
 
   /* ================= FETCH USER POINTS ================= */
-
   useEffect(() => {
     if (!isAuthenticated) {
       setLoadingPoints(false)
@@ -58,7 +57,6 @@ export default function CartPage() {
   }, [isAuthenticated, toast])
 
   /* ================= CHECKOUT ================= */
-
   const handleCheckout = () => {
     if (!isAuthenticated) {
       router.push("/login?redirect=/checkout")
@@ -68,7 +66,6 @@ export default function CartPage() {
   }
 
   /* ================= EMPTY CART ================= */
-
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
@@ -96,7 +93,6 @@ export default function CartPage() {
   }
 
   /* ================= MAIN UI ================= */
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -110,10 +106,13 @@ export default function CartPage() {
           {/* CART ITEMS */}
           <div className="lg:col-span-2 space-y-4">
             {items.map(item => {
-              const flavorPrice =
-                item.product.flavors?.find(
-                  (f: any) => f.name === item.selectedFlavor
-                )?.price || item.product.price
+              // ✅ FIXED: Use cart context's proper price calculation
+              const itemPrice = getCartItemPrice(
+                item.product.id, 
+                item.selectedFlavor, 
+                item.selectedWeight
+              )
+              const totalPrice = itemPrice * item.quantity
 
               return (
                 <Card
@@ -136,10 +135,15 @@ export default function CartPage() {
                         </h3>
                       </Link>
                       <p className="text-sm text-muted-foreground">
-                        {item.selectedFlavor} • {item.selectedWeight}
+                        {item.selectedFlavor} • <strong>{item.selectedWeight}</strong>
+                      </p>
+                      
+                      {/* ✅ Show single item price */}
+                      <p className="text-sm text-muted-foreground mb-3">
+                        ₹{itemPrice} / {item.selectedWeight}
                       </p>
 
-                      <div className="flex justify-between items-center mt-3">
+                      <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <Button
                             size="icon"
@@ -176,8 +180,9 @@ export default function CartPage() {
                           </Button>
                         </div>
 
-                        <p className="font-bold">
-                          ₹{flavorPrice * item.quantity}
+                        {/* ✅ FIXED: Correct total price */}
+                        <p className="font-bold text-lg">
+                          ₹{totalPrice.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -185,7 +190,7 @@ export default function CartPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="text-destructive"
+                      className="text-destructive hover:text-destructive/80"
                       onClick={() =>
                         removeFromCart(
                           item.product.id,
@@ -209,8 +214,8 @@ export default function CartPage() {
                 <h2 className="text-lg font-bold">Order Summary</h2>
 
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal</span>
-                  <span>₹{getCartTotal()}</span>
+                  <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                  <span>₹{getCartTotal().toLocaleString()}</span>
                 </div>
 
                 <div className="flex justify-between text-sm">
@@ -229,13 +234,13 @@ export default function CartPage() {
                   </span>
                 </div>
 
-                <div className="border-t pt-3 flex justify-between font-bold text-lg">
+                <div className="border-t pt-3 flex justify-between font-bold text-xl">
                   <span>Total</span>
-                  <span>₹{getCartTotal()}</span>
+                  <span>₹{getCartTotal().toLocaleString()}</span>
                 </div>
 
                 <Button
-                  className="w-full bg-primary"
+                  className="w-full bg-primary hover:bg-primary/90"
                   size="lg"
                   onClick={handleCheckout}
                 >
@@ -258,3 +263,4 @@ export default function CartPage() {
     </div>
   )
 }
+  

@@ -18,6 +18,7 @@ interface CartContextType {
   clearCart: () => void
   getCartTotal: () => number
   getCartCount: () => number
+  getCartItemPrice: (productId: string, flavor: string, weight: string) => number
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -28,7 +29,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const storedCart = localStorage.getItem("ss_cart")
     if (storedCart) {
-      setItems(JSON.parse(storedCart))
+      try {
+        setItems(JSON.parse(storedCart))
+      } catch (error) {
+        console.error("Failed to parse cart from localStorage:", error)
+        setItems([])
+      }
     }
   }, [])
 
@@ -39,7 +45,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = (product: Product, flavor: string, weight: string, quantity = 1) => {
     setItems((prev) => {
       const existingIndex = prev.findIndex(
-        (item) => item.product.id === product.id && item.selectedFlavor === flavor && item.selectedWeight === weight,
+        (item) => 
+          item.product.id === product.id && 
+          item.selectedFlavor === flavor && 
+          item.selectedWeight === weight
       )
 
       if (existingIndex > -1) {
@@ -55,8 +64,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeFromCart = (productId: string, flavor: string, weight: string) => {
     setItems((prev) =>
       prev.filter(
-        (item) => !(item.product.id === productId && item.selectedFlavor === flavor && item.selectedWeight === weight),
-      ),
+        (item) => !(item.product.id === productId && item.selectedFlavor === flavor && item.selectedWeight === weight)
+      )
     )
   }
 
@@ -68,10 +77,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems((prev) =>
       prev.map((item) =>
-        item.product.id === productId && item.selectedFlavor === flavor && item.selectedWeight === weight
+        item.product.id === productId && 
+        item.selectedFlavor === flavor && 
+        item.selectedWeight === weight
           ? { ...item, quantity }
-          : item,
-      ),
+          : item
+      )
     )
   }
 
@@ -79,15 +90,58 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([])
   }
 
+  // ✅ FIXED: Proper price calculation for BOTH flavor AND weight
+  const getItemPrice = (product: Product, flavor: string, weight: string): number => {
+    let price = product.price // fallback to base price
+
+    // 1. Check flavor price first (handles both array and string flavors)
+    if (Array.isArray(product.flavors) && product.flavors.length > 0) {
+      const flavorObj = product.flavors.find((f) => {
+        if (typeof f === "string") {
+          return f === flavor
+        }
+        return f.name === flavor
+      })
+      if (flavorObj && typeof flavorObj !== "string" && flavorObj.price) {
+        price = flavorObj.price
+      }
+    } else if (typeof product.flavors === "string" && product.flavors === flavor) {
+      // String flavor - use base price
+      price = product.price
+    }
+
+    // 2. Override with weight-specific price if available
+    if (weight && (product.weights || product.weightVariants)) {
+      const weightsArray = product.weights || product.weightVariants || []
+      const weightVariant = weightsArray.find((w: any) => 
+        (typeof w === "string" ? w : w.weight || w.name) === weight
+      )
+      if (weightVariant && typeof weightVariant !== "string" && weightVariant.price) {
+        price = weightVariant.price
+      }
+    }
+
+    // 3. Final fallback to original price
+    return price || product.originalPrice || 0
+  }
+
   const getCartTotal = () => {
     return items.reduce((total, item) => {
-      const flavorPrice = item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
-      return total + flavorPrice * item.quantity
+      const itemPrice = getItemPrice(item.product, item.selectedFlavor, item.selectedWeight)
+      return total + (itemPrice * item.quantity)
     }, 0)
   }
 
   const getCartCount = () => {
     return items.reduce((count, item) => count + item.quantity, 0)
+  }
+
+  const getCartItemPrice = (productId: string, flavor: string, weight: string) => {
+    const item = items.find(
+      (i) => i.product.id === productId && i.selectedFlavor === flavor && i.selectedWeight === weight
+    )
+    if (!item) return 0
+    return getItemPrice(item.product, flavor, weight)
   }
 
   return (
@@ -100,6 +154,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         getCartTotal,
         getCartCount,
+        getCartItemPrice,
       }}
     >
       {children}
