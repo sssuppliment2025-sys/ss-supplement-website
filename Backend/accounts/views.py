@@ -417,6 +417,7 @@ def profile_view(request):
 
 
 ################################################################################################################
+################################################################################################################
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -426,7 +427,7 @@ from django.conf import settings
 from datetime import datetime, timedelta
 import secrets
 import threading
-import requests  # pip install requests
+import requests
 
 try:
     from utils.password import hash_password
@@ -437,11 +438,15 @@ except ImportError:
 
 from mongo.collections import users_col, otps_col
 
-# 🔥 ASYNC MAIL FUNCTION (0.1s instead of 30s)
-def send_email_async(email, otp_code, phone):
-    def mail_thread():
+# 🔥 DUAL EMAIL SYSTEM - Gmail → SendGrid Auto-Failover
+class DualEmailSender:
+    def __init__(self):
+        self.primary_success = False
+        self.backup_success = False
+    
+    def send_gmail(self, email, otp_code, phone):
+        """PRIMARY: Gmail SMTP"""
         try:
-            # ✅ EMAIL (Gmail)
             send_mail(
                 'SS Supplement - Your OTP Code',
                 f'Your OTP is: {otp_code}\nValid for 10 minutes.\n\nSS Supplement Team',
@@ -449,23 +454,80 @@ def send_email_async(email, otp_code, phone):
                 [email],
                 fail_silently=False,
             )
-            print(f"✅ EMAIL SENT to {email}")
-            
-            # ✅ SMS (Fast2SMS - India)
-            sms_data = {
-                'authorization': settings.FAST2SMS_KEY,  # Add to settings.py
-                'sender_id': 'FSTSMS',
-                'message': f'SS Supplement OTP: {otp_code}. Valid 10min.',
-                'numbers': phone,
-                'language': 'unicode'
-            }
-            sms_response = requests.post('https://www.fast2sms.in/sms', data=sms_data, timeout=10)
-            print(f"✅ SMS SENT to {phone}: {sms_response.status_code}")
-            
+            print(f"✅ PRIMARY Gmail SENT to {email}")
+            self.primary_success = True
+            return True
         except Exception as e:
-            print(f"⚠️ Mail/SMS failed: {e}")
+            print(f"❌ PRIMARY Gmail FAILED: {e}")
+            return False
     
-    # 🔥 RUN ASYNC - Frontend gets instant response!
+    def send_sendgrid(self, email, otp_code, phone):
+        """BACKUP: SendGrid API (Render-friendly)"""
+        try:
+            if hasattr(settings, 'SENDGRID_API_KEY'):
+                response = requests.post(
+                    'https://api.sendgrid.com/v3/mail/send',
+                    auth=('api', settings.SENDGRID_API_KEY),
+                    json={
+                        "personalizations": [{"to": [{"email": email}]}],
+                        "from": {"email": "noreply@yourapp.com"},
+                        "subject": "SS Supplement - Your OTP Code",
+                        "content": [{"type": "text/plain", "value": f"Your OTP: {otp_code}\nValid 10 mins."}]
+                    },
+                    timeout=10
+                )
+                if response.status_code in [202, 250]:
+                    print(f"✅ BACKUP SendGrid SENT to {email}")
+                    self.backup_success = True
+                    return True
+            print("❌ BACKUP SendGrid FAILED - No API key")
+            return False
+        except Exception as e:
+            print(f"❌ BACKUP SendGrid ERROR: {e}")
+            return False
+    
+    def send_sms(self, phone, otp_code):
+        """SMS Backup"""
+        try:
+            if hasattr(settings, 'FAST2SMS_KEY'):
+                sms_data = {
+                    'authorization': settings.FAST2SMS_KEY,
+                    'sender_id': 'FSTSMS',
+                    'message': f'SS Supplement OTP: {otp_code}. Valid 10min.',
+                    'numbers': phone,
+                    'language': 'unicode'
+                }
+                sms_response = requests.post('https://www.fast2sms.in/sms', data=sms_data, timeout=10)
+                print(f"✅ SMS SENT to {phone}: {sms_response.status_code}")
+                return True
+        except Exception as e:
+            print(f"❌ SMS FAILED: {e}")
+        return False
+
+# 🔥 ULTIMATE ASYNC DUAL-SENDER (0.1s response)
+def send_email_async(email, otp_code, phone):
+    sender = DualEmailSender()
+    
+    def mail_thread():
+        print(f"🚀 SENDING OTP {otp_code} to {email} (+{phone})")
+        
+        # 1️⃣ TRY PRIMARY (Gmail)
+        gmail_sent = sender.send_gmail(email, otp_code, phone)
+        
+        # 2️⃣ IF PRIMARY FAILS → BACKUP (SendGrid)
+        if not gmail_sent:
+            print("🔄 PRIMARY FAILED → SWITCHING TO BACKUP")
+            sendgrid_sent = sender.send_sendgrid(email, otp_code, phone)
+        
+        # 3️⃣ ALWAYS TRY SMS
+        sender.send_sms(phone, otp_code)
+        
+        # 4️⃣ FINAL STATUS
+        if sender.primary_success or sender.backup_success:
+            print(f"✅ EMAIL SUCCESS ({'Primary' if sender.primary_success else 'Backup'})")
+        else:
+            print("⚠️ ALL EMAILS FAILED - SMS sent")
+    
     thread = threading.Thread(target=mail_thread)
     thread.start()
 
@@ -484,26 +546,24 @@ def forgot_password(request):
             "error": "Phone and email required"
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # 🔥 FAST USER CHECK (MongoDB index needed)
     user_data = users_col.find_one({
         '$or': [{'phone': phone}, {'email': email}]
     })
     
     print(f"USER FOUND: {user_data is not None}")
 
-    # 🔥 SECURITY: Don't reveal if user exists
     if not user_data:
         return Response({
             "success": True,
             "message": "If account exists, OTP sent to your email"
         }, status=status.HTTP_200_OK)
 
-    # 🔥 CLEAN OLD OTPs (Fast)
+    # Clean old OTPs
     otps_col.delete_many({
         '$or': [{'phone': phone}, {'email': email}]
     })
 
-    # 🔥 GENERATE & SAVE OTP (0.01s)
+    # Generate & save OTP
     otp_code = str(secrets.randbelow(900000) + 100000)
     expires_at = datetime.now() + timedelta(minutes=10)
     otp_doc = {
@@ -520,7 +580,7 @@ def forgot_password(request):
     otps_col.insert_one(otp_doc)
     print(f"✅ OTP SAVED: {otp_code}")
     
-    # 🔥 SEND ASYNC - INSTANT RESPONSE!
+    # 🔥 DUAL FAILOVER - INSTANT RESPONSE!
     send_email_async(email, otp_code, phone)
     
     return Response({
@@ -544,7 +604,6 @@ def verify_otp(request):
             "error": "Phone, email, OTP required"
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # 🔥 FAST OTP LOOKUP
     otp_doc = otps_col.find_one({
         '$or': [{'phone': phone, 'email': email}, {'phone': phone}, {'email': email}],
         'otp': otp_code,
@@ -558,7 +617,6 @@ def verify_otp(request):
             "error": "Invalid or expired OTP"
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # 🔥 MARK AS USED
     otps_col.update_one({'_id': otp_doc['_id']}, {'$set': {'is_used': True}})
     print("✅ OTP VERIFIED!")
     
@@ -573,7 +631,6 @@ def reset_password(request):
     print("🔥 RESET_PASSWORD")
     print("🔥 DATA:", request.data)
 
-    # 🔥 EXTRACT & VALIDATE
     phone = str(request.data.get('phone', '')).strip()
     email = str(request.data.get('email', '')).strip()
     otp_code = str(request.data.get('otp', '')).strip()
@@ -585,7 +642,6 @@ def reset_password(request):
     if len(new_password) < 6:
         return Response({"success": False, "error": "Password must be 6+ characters"}, status=400)
 
-    # 🔥 VERIFY OTP WAS USED
     otp_doc = otps_col.find_one({
         '$or': [{'phone': phone, 'email': email}, {'phone': phone}, {'email': email}],
         'otp': otp_code,
@@ -596,7 +652,6 @@ def reset_password(request):
     if not otp_doc:
         return Response({"success": False, "error": "Verify OTP first"}, status=400)
 
-    # 🔥 UPDATE PASSWORD (Atomic)
     hashed_password = hash_password(new_password)
     result = users_col.update_one(
         {'$or': [{'phone': phone}, {'email': email}]},
@@ -606,7 +661,6 @@ def reset_password(request):
     if result.modified_count == 0:
         return Response({"success": False, "error": "User not found"}, status=404)
 
-    # 🔥 CLEANUP
     otps_col.delete_one({'_id': otp_doc['_id']})
     
     print("✅ PASSWORD RESET SUCCESS!")
