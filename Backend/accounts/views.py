@@ -425,7 +425,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from datetime import datetime, timedelta
 import secrets
-
+import threading
+import requests  # pip install requests
 
 try:
     from utils.password import hash_password
@@ -435,6 +436,38 @@ except ImportError:
         return hashlib.sha256(password.encode()).hexdigest()
 
 from mongo.collections import users_col, otps_col
+
+# 🔥 ASYNC MAIL FUNCTION (0.1s instead of 30s)
+def send_email_async(email, otp_code, phone):
+    def mail_thread():
+        try:
+            # ✅ EMAIL (Gmail)
+            send_mail(
+                'SS Supplement - Your OTP Code',
+                f'Your OTP is: {otp_code}\nValid for 10 minutes.\n\nSS Supplement Team',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
+            print(f"✅ EMAIL SENT to {email}")
+            
+            # ✅ SMS (Fast2SMS - India)
+            sms_data = {
+                'authorization': settings.FAST2SMS_KEY,  # Add to settings.py
+                'sender_id': 'FSTSMS',
+                'message': f'SS Supplement OTP: {otp_code}. Valid 10min.',
+                'numbers': phone,
+                'language': 'unicode'
+            }
+            sms_response = requests.post('https://www.fast2sms.in/sms', data=sms_data, timeout=10)
+            print(f"✅ SMS SENT to {phone}: {sms_response.status_code}")
+            
+        except Exception as e:
+            print(f"⚠️ Mail/SMS failed: {e}")
+    
+    # 🔥 RUN ASYNC - Frontend gets instant response!
+    thread = threading.Thread(target=mail_thread)
+    thread.start()
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -451,25 +484,26 @@ def forgot_password(request):
             "error": "Phone and email required"
         }, status=status.HTTP_400_BAD_REQUEST)
 
+    # 🔥 FAST USER CHECK (MongoDB index needed)
     user_data = users_col.find_one({
-        '$or': [
-            {'phone': phone},
-            {'email': email}
-        ]
+        '$or': [{'phone': phone}, {'email': email}]
     })
     
     print(f"USER FOUND: {user_data is not None}")
 
+    # 🔥 SECURITY: Don't reveal if user exists
     if not user_data:
         return Response({
             "success": True,
             "message": "If account exists, OTP sent to your email"
         }, status=status.HTTP_200_OK)
 
+    # 🔥 CLEAN OLD OTPs (Fast)
     otps_col.delete_many({
         '$or': [{'phone': phone}, {'email': email}]
     })
 
+    # 🔥 GENERATE & SAVE OTP (0.01s)
     otp_code = str(secrets.randbelow(900000) + 100000)
     expires_at = datetime.now() + timedelta(minutes=10)
     otp_doc = {
@@ -485,42 +519,34 @@ def forgot_password(request):
     
     otps_col.insert_one(otp_doc)
     print(f"✅ OTP SAVED: {otp_code}")
-    if otp_code :
-        MailFunction(settings, email, otp_code)
-    else :
-        print('Mail error...')
+    
+    # 🔥 SEND ASYNC - INSTANT RESPONSE!
+    send_email_async(email, otp_code, phone)
     
     return Response({
         "success": True,
         "message": "OTP sent successfully! Check inbox/spam.",
-        "debug_otp": otp_code  
     })
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):
-    """Verify OTP - Step 2"""
     print("🔥 VERIFY_OTP")
     print("🔥 DATA:", request.data)
     
     phone = request.data.get('phone', '').strip()
     email = request.data.get('email', '').strip()
     otp_code = request.data.get('otp', '').strip()
-    
 
-    if not phone or not email or not otp_code:
+    if not all([phone, email, otp_code]):
         return Response({
             "success": False, 
             "error": "Phone, email, OTP required"
         }, status=status.HTTP_400_BAD_REQUEST)
-    
 
+    # 🔥 FAST OTP LOOKUP
     otp_doc = otps_col.find_one({
-        '$or': [
-            {'phone': phone, 'email': email},
-            {'phone': phone},
-            {'email': email}
-        ],
+        '$or': [{'phone': phone, 'email': email}, {'phone': phone}, {'email': email}],
         'otp': otp_code,
         'is_used': False,
         'expires_at': {'$gt': datetime.now()}
@@ -531,14 +557,11 @@ def verify_otp(request):
             "success": False, 
             "error": "Invalid or expired OTP"
         }, status=status.HTTP_400_BAD_REQUEST)
-    
 
-    otps_col.update_one(
-        {'_id': otp_doc['_id']},
-        {'$set': {'is_used': True}}
-    )
-    
+    # 🔥 MARK AS USED
+    otps_col.update_one({'_id': otp_doc['_id']}, {'$set': {'is_used': True}})
     print("✅ OTP VERIFIED!")
+    
     return Response({
         "success": True,
         "message": "OTP verified! Reset your password."
@@ -547,53 +570,24 @@ def verify_otp(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def reset_password(request):
-    """🔥 ULTRA-SIMPLE - Shows EXACT frontend data"""
-    print("🔥 RESET_PASSWORD - FULL DEBUG")
-    print("🔥 RAW request.data:", request.data)
-    print("🔥 request.data.keys():", list(request.data.keys()))
-    
+    print("🔥 RESET_PASSWORD")
+    print("🔥 DATA:", request.data)
 
-    phone_raw = request.data.get('phone')
-    email_raw = request.data.get('email') 
-    otp_raw = request.data.get('otp')
-    password_raw = request.data.get('new_password')
+    # 🔥 EXTRACT & VALIDATE
+    phone = str(request.data.get('phone', '')).strip()
+    email = str(request.data.get('email', '')).strip()
+    otp_code = str(request.data.get('otp', '')).strip()
+    new_password = str(request.data.get('new_password', '')).strip()
     
-    print(f"📱 PHONE RAW: '{phone_raw}' (type: {type(phone_raw)})")
-    print(f"📧 EMAIL RAW: '{email_raw}' (type: {type(email_raw)})")
-    print(f"🔑   OTP RAW: '{otp_raw}' (type: {type(otp_raw)})")
-    print(f"🔑 PASS RAW: '{password_raw}' (type: {type(password_raw)})")
+    if not all([phone, email, otp_code, new_password]):
+        return Response({"success": False, "error": "All fields required"}, status=400)
     
-
-    phone = str(phone_raw or '').strip() if phone_raw else ''
-    email = str(email_raw or '').strip() if email_raw else ''
-    otp_code = str(otp_raw or '').strip() if otp_raw else ''
-    new_password = str(password_raw or '').strip() if password_raw else ''
-    
-    print(f"📱 PHONE CLEAN: '{phone}' (len: {len(phone)})")
-    print(f"📧 EMAIL CLEAN: '{email}' (len: {len(email)})")
-    print(f"🔑   OTP CLEAN: '{otp_code}' (len: {len(otp_code)})")
-    print(f"🔑 PASS CLEAN: '{new_password}' (len: {len(new_password)})")
-    
-
-    if len(phone) == 0:
-        return Response({"success": False, "error": f"Phone empty. Got: '{phone_raw}'"}, status=400)
-    if len(email) == 0:
-        return Response({"success": False, "error": f"Email empty. Got: '{email_raw}'"}, status=400)
-    if len(otp_code) == 0:
-        return Response({"success": False, "error": f"OTP empty. Got: '{otp_raw}'"}, status=400)
-    if len(new_password) == 0:
-        return Response({"success": False, "error": f"NEW_PASSWORD EMPTY. Got: '{password_raw}' (type: {type(password_raw)})"}, status=400)
     if len(new_password) < 6:
-        return Response({"success": False, "error": "Password too short"}, status=400)
-    
-    print("ALL FIELDS VALID!")
-    
+        return Response({"success": False, "error": "Password must be 6+ characters"}, status=400)
+
+    # 🔥 VERIFY OTP WAS USED
     otp_doc = otps_col.find_one({
-        '$or': [
-            {'phone': phone, 'email': email},
-            {'phone': phone},
-            {'email': email}
-        ],
+        '$or': [{'phone': phone, 'email': email}, {'phone': phone}, {'email': email}],
         'otp': otp_code,
         'is_used': True,
         'expires_at': {'$gt': datetime.now()}
@@ -601,20 +595,22 @@ def reset_password(request):
     
     if not otp_doc:
         return Response({"success": False, "error": "Verify OTP first"}, status=400)
-    
-    try:
-        from utils.password import hash_password
-        hashed_password = hash_password(new_password)
-    except:
-        import hashlib
-        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
-    
+
+    # 🔥 UPDATE PASSWORD (Atomic)
+    hashed_password = hash_password(new_password)
     result = users_col.update_one(
         {'$or': [{'phone': phone}, {'email': email}]},
         {'$set': {'password': hashed_password}}
     )
     
+    if result.modified_count == 0:
+        return Response({"success": False, "error": "User not found"}, status=404)
+
+    # 🔥 CLEANUP
     otps_col.delete_one({'_id': otp_doc['_id']})
     
     print("✅ PASSWORD RESET SUCCESS!")
-    return Response({"success": True, "message": "Password reset successful!"})
+    return Response({
+        "success": True, 
+        "message": "Password reset successful! Login now."
+    })
