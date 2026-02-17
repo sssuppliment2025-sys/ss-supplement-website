@@ -23,6 +23,7 @@ import { RelatedProducts } from "@/components/related-products"
 import { ImageMagnifier } from "@/components/image-magnifier"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useProducts } from "@/context/product-context"
 import { useCart } from "@/context/cart-context"
@@ -42,6 +43,7 @@ export default function ProductPage() {
   const [selectedWeight, setSelectedWeight] = useState("") // ✅ User's selection
   const [quantity, setQuantity] = useState(1)
   const [showMagnifier, setShowMagnifier] = useState(false)
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>()
 
   // ✅ FIXED: Initialize with CURRENT product weight
   useEffect(() => {
@@ -58,6 +60,34 @@ export default function ProductPage() {
       setSelectedWeight(product.weight || "")
     }
   }, [product])
+
+  useEffect(() => {
+    setSelectedImage(0)
+  }, [product?.id])
+
+  useEffect(() => {
+    if (!carouselApi) return
+
+    const onSelect = () => {
+      setSelectedImage(carouselApi.selectedScrollSnap())
+    }
+
+    onSelect()
+    carouselApi.on("select", onSelect)
+    carouselApi.on("reInit", onSelect)
+
+    return () => {
+      carouselApi.off("select", onSelect)
+      carouselApi.off("reInit", onSelect)
+    }
+  }, [carouselApi])
+
+  useEffect(() => {
+    if (!carouselApi) return
+    if (carouselApi.selectedScrollSnap() !== selectedImage) {
+      carouselApi.scrollTo(selectedImage)
+    }
+  }, [carouselApi, selectedImage])
 
   // Get all variants of this product
   const productVariants = product ? getProductVariants(product.name, product.brand) : []
@@ -122,22 +152,18 @@ export default function ProductPage() {
       }
     }
     
-    // 2. Weight override (most important!)
-    if (selectedWeight && (product.weights || product.weightVariants)) {
-      const weights = product.weights || product.weightVariants || []
-      const weightVariant = weights.find((w: any) => w.weight === selectedWeight)
-      if (weightVariant?.price) {
-        price = weightVariant.price
-      }
-    }
-    
     return price
   }
 
   const currentPrice = getCurrentPrice()
 
   // Get all product images
-  const productImages = product.images?.length > 0 ? product.images : [product.image]
+  const baseImages = [product.image, product.image1, product.image2, product.image3].filter(
+    (img): img is string => Boolean(img),
+  )
+  const dataImages = product.images?.filter((img): img is string => Boolean(img)) ?? []
+  const productImages = [...new Set(dataImages.length > 0 ? dataImages : baseImages)]
+  const galleryImages = productImages.length > 0 ? productImages : ["/placeholder.svg"]
 
   // ✅ FIXED: Uses selectedWeight (user's choice)
   const handleAddToCart = () => {
@@ -181,14 +207,54 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Images */}
           <div className="space-y-4">
+            <div className="md:hidden">
+              <div className="relative rounded-xl overflow-hidden border border-border bg-card">
+                <Carousel setApi={setCarouselApi} opts={{ loop: galleryImages.length > 1 }}>
+                  <CarouselContent className="ml-0">
+                    {galleryImages.map((img, index) => (
+                      <CarouselItem key={`${img}-${index}`} className="pl-0">
+                        <div className="relative aspect-square">
+                          <Image
+                            src={img || "/placeholder.svg"}
+                            alt={`${product.name} ${index + 1}`}
+                            fill
+                            className="object-contain p-6"
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
+                {product.discount > 0 && (
+                  <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground text-sm px-2.5 py-1">
+                    {product.discount}% OFF
+                  </Badge>
+                )}
+                {galleryImages.length > 1 && (
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-background/75 px-2 py-1 rounded-full">
+                    {galleryImages.map((_, index) => (
+                      <button
+                        key={`dot-${index}`}
+                        type="button"
+                        onClick={() => setSelectedImage(index)}
+                        className={`h-1.5 w-1.5 rounded-full transition-all ${
+                          selectedImage === index ? "bg-primary w-4" : "bg-muted-foreground/50"
+                        }`}
+                        aria-label={`Go to image ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
             <div
-              className="relative aspect-square bg-card rounded-xl overflow-hidden border border-border cursor-zoom-in"
+              className="relative aspect-square bg-card rounded-xl overflow-hidden border border-border cursor-zoom-in hidden md:block"
               onMouseEnter={() => setShowMagnifier(true)}
               onMouseLeave={() => setShowMagnifier(false)}
             >
               {showMagnifier ? (
                 <ImageMagnifier
-                  src={productImages[selectedImage] || "/placeholder.svg"}
+                  src={galleryImages[selectedImage] || "/placeholder.svg"}
                   alt={product.name}
                   width={600}
                   height={600}
@@ -198,7 +264,7 @@ export default function ProductPage() {
                 />
               ) : (
                 <Image
-                  src={productImages[selectedImage] || "/placeholder.svg"}
+                  src={galleryImages[selectedImage] || "/placeholder.svg"}
                   alt={product.name}
                   fill
                   className="object-contain p-8"
@@ -214,8 +280,8 @@ export default function ProductPage() {
                 Hover to zoom
               </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {productImages.map((img, index) => (
+            <div className="hidden md:flex gap-2 overflow-x-auto pb-2">
+              {galleryImages.map((img, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
