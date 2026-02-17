@@ -13,8 +13,22 @@ from Mail.mail import MailFunction
 from utils.password import hash_password, verify_password
 from utils.jwt import generate_tokens_for_user
 from utils.jwt_helper import decode_token
+from django.core.mail import EmailMultiAlternatives
 
 
+
+######### ================== Mail Function ===================
+def MailFunction(userMail, userName, password):
+    subject = 'Testing mail'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = userMail
+    text_content = 'This is a fallback plain text message.'
+    html_content = f'<p><pre>Hi {userName}, thank you for signing up on UPOLABDHI!......... 🎉</pre> <pre>Your username: {userName}Y \our password: {password}....🔑</pre>  <pre>Please keep your credentials safe and do not share them with others........</pre>   <pre>Your registration was successful.....😊😊 — Welcome to UPOLABDHI!..... 😀😀</pre></p>'
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+######### ================== Mail Function ===================
 
 
 
@@ -422,7 +436,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from datetime import datetime, timedelta
 import secrets
@@ -438,95 +452,47 @@ except ImportError:
 
 from mongo.collections import users_col, otps_col
 
-# 🔥 DUAL EMAIL SYSTEM - Gmail → SendGrid Auto-Failover
-class DualEmailSender:
-    def __init__(self):
-        self.primary_success = False
-        self.backup_success = False
+# 🔥 YOUR MailFunction - MODIFIED FOR OTP
+def MailFunction(userMail, userName, otp_code, phone=""):
+    """Enhanced MailFunction for OTP emails"""
+    subject = 'SS Supplement - Your OTP Code'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = userMail
+    text_content = f'Hi {userName},\n\nYour OTP is: {otp_code}\nValid for 10 minutes.\n\nSS Supplement Team'
     
-    def send_gmail(self, email, otp_code, phone):
-        """PRIMARY: Gmail SMTP"""
-        try:
-            send_mail(
-                'SS Supplement - Your OTP Code',
-                f'Your OTP is: {otp_code}\nValid for 10 minutes.\n\nSS Supplement Team',
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False,
-            )
-            print(f"✅ PRIMARY Gmail SENT to {email}")
-            self.primary_success = True
-            return True
-        except Exception as e:
-            print(f"❌ PRIMARY Gmail FAILED: {e}")
-            return False
+    html_content = f'''
+    <p><pre>Hi <strong>{userName}</strong>,</pre></p>
+    <p><pre>Your OTP: <strong style="font-size: 24px; color: #007bff;">{otp_code}</strong></pre></p>
+    <p><pre>Valid for 10 minutes only.</pre></p>
+    <hr>
+    <p><pre>Phone: {phone}</pre></p>
+    <p><pre>SS Supplement Team 😊</pre></p>
+    '''
     
-    def send_sendgrid(self, email, otp_code, phone):
-        """BACKUP: SendGrid API (Render-friendly)"""
-        try:
-            if hasattr(settings, 'SENDGRID_API_KEY'):
-                response = requests.post(
-                    'https://api.sendgrid.com/v3/mail/send',
-                    auth=('api', settings.SENDGRID_API_KEY),
-                    json={
-                        "personalizations": [{"to": [{"email": email}]}],
-                        "from": {"email": "noreply@yourapp.com"},
-                        "subject": "SS Supplement - Your OTP Code",
-                        "content": [{"type": "text/plain", "value": f"Your OTP: {otp_code}\nValid 10 mins."}]
-                    },
-                    timeout=10
-                )
-                if response.status_code in [202, 250]:
-                    print(f"✅ BACKUP SendGrid SENT to {email}")
-                    self.backup_success = True
-                    return True
-            print("❌ BACKUP SendGrid FAILED - No API key")
-            return False
-        except Exception as e:
-            print(f"❌ BACKUP SendGrid ERROR: {e}")
-            return False
-    
-    def send_sms(self, phone, otp_code):
-        """SMS Backup"""
-        try:
-            if hasattr(settings, 'FAST2SMS_KEY'):
-                sms_data = {
-                    'authorization': settings.FAST2SMS_KEY,
-                    'sender_id': 'FSTSMS',
-                    'message': f'SS Supplement OTP: {otp_code}. Valid 10min.',
-                    'numbers': phone,
-                    'language': 'unicode'
-                }
-                sms_response = requests.post('https://www.fast2sms.in/sms', data=sms_data, timeout=10)
-                print(f"✅ SMS SENT to {phone}: {sms_response.status_code}")
-                return True
-        except Exception as e:
-            print(f"❌ SMS FAILED: {e}")
-        return False
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send(fail_silently=False)
+    print(f"✅ MailFunction SENT to {userMail}")
+    return True
 
-# 🔥 ULTIMATE ASYNC DUAL-SENDER (0.1s response)
-def send_email_async(email, otp_code, phone):
-    sender = DualEmailSender()
+# 🔥 ULTIMATE ASYNC OTP SENDER (0.1s response)
+def send_email_async(email, otp_code, phone, user_name):
+    """Async OTP sender using your MailFunction"""
     
     def mail_thread():
         print(f"🚀 SENDING OTP {otp_code} to {email} (+{phone})")
         
-        # 1️⃣ TRY PRIMARY (Gmail)
-        gmail_sent = sender.send_gmail(email, otp_code, phone)
-        
-        # 2️⃣ IF PRIMARY FAILS → BACKUP (SendGrid)
-        if not gmail_sent:
-            print("🔄 PRIMARY FAILED → SWITCHING TO BACKUP")
-            sendgrid_sent = sender.send_sendgrid(email, otp_code, phone)
-        
-        # 3️⃣ ALWAYS TRY SMS
-        sender.send_sms(phone, otp_code)
-        
-        # 4️⃣ FINAL STATUS
-        if sender.primary_success or sender.backup_success:
-            print(f"✅ EMAIL SUCCESS ({'Primary' if sender.primary_success else 'Backup'})")
-        else:
-            print("⚠️ ALL EMAILS FAILED - SMS sent")
+        try:
+            # ✅ USE YOUR MailFunction
+            success = MailFunction(email, user_name, otp_code, phone)
+            
+            if success:
+                print(f"✅ MailFunction SUCCESS to {email}")
+            else:
+                print(f"❌ MailFunction FAILED to {email}")
+                
+        except Exception as e:
+            print(f"❌ MailFunction ERROR: {e}")
     
     thread = threading.Thread(target=mail_thread)
     thread.start()
@@ -580,8 +546,8 @@ def forgot_password(request):
     otps_col.insert_one(otp_doc)
     print(f"✅ OTP SAVED: {otp_code}")
     
-    # 🔥 DUAL FAILOVER - INSTANT RESPONSE!
-    send_email_async(email, otp_code, phone)
+    # 🔥 USE YOUR MailFunction - INSTANT RESPONSE!
+    send_email_async(email, otp_code, phone, user_data.get('name', 'User'))
     
     return Response({
         "success": True,

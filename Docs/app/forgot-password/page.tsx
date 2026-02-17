@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Mail, Phone, Shield, Key, CheckCircle, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
   const { forgotPassword, verifyOTP, resetPassword } = useAuth()
 
   const [step, setStep] = useState(1)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)  // ✅ ADDED MISSING STATE
   const [showPassword, setShowPassword] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -35,8 +35,8 @@ export default function ForgotPasswordPage() {
     confirm_password: ""
   })
 
-  const handleSendOTP = async (e) => {
-    e.preventDefault()
+  const handleSendOTP = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault() // 🚫 STOP REFRESH
     setLoading(true)
 
     try {
@@ -66,8 +66,8 @@ export default function ForgotPasswordPage() {
     }
   }
 
-  const handleVerifyOTP = async (e) => {
-    e.preventDefault()
+  const handleVerifyOTP = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault() // 🚫 STOP REFRESH
     setLoading(true)
 
     try {
@@ -97,8 +97,8 @@ export default function ForgotPasswordPage() {
     }
   }
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault()
+  const handleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault() // 🚫 STOP REFRESH
     
     if (formData.new_password !== formData.confirm_password) {
       toast({
@@ -176,19 +176,20 @@ export default function ForgotPasswordPage() {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
           
-          {/* Back Button - Login Style */}
+          {/* Back Button */}
           <div className="mb-8">
             <Button 
               variant="ghost" 
               className="w-full justify-start h-12 px-4 border border-input rounded-xl hover:bg-accent hover:border-border"
               onClick={goBack}
+              disabled={loading}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {step === 1 ? "Back to Login" : "Back"}
             </Button>
           </div>
 
-          {/* Main Card - Clean Login Style */}
+          {/* Main Card */}
           <Card>
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -233,12 +234,14 @@ export default function ForgotPasswordPage() {
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="phone"
+                        name="phone"
                         type="tel"
                         placeholder="7047283086"
                         className="pl-10 h-12"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -251,17 +254,23 @@ export default function ForgotPasswordPage() {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="email"
+                        name="email"
                         type="email"
                         placeholder="your@email.com"
                         className="pl-10 h-12"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
 
-                  <Button className="w-full h-12" disabled={loading || !formData.phone || !formData.email}>
+                  <Button 
+                    type="submit"
+                    className="w-full h-12" 
+                    disabled={loading || !formData.phone || !formData.email}
+                  >
                     {loading ? "Sending..." : "Send OTP"}
                   </Button>
                 </form>
@@ -294,6 +303,7 @@ export default function ForgotPasswordPage() {
                       <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="otp"
+                        name="otp"
                         type="text"
                         maxLength={6}
                         placeholder="123456"
@@ -304,11 +314,16 @@ export default function ForgotPasswordPage() {
                           setFormData({...formData, otp: value})
                         }}
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
 
-                  <Button className="w-full h-12" disabled={loading || formData.otp.length !== 6}>
+                  <Button 
+                    type="submit"
+                    className="w-full h-12" 
+                    disabled={loading || formData.otp.length !== 6}
+                  >
                     {loading ? "Verifying..." : "Verify OTP"}
                   </Button>
                 </form>
@@ -341,6 +356,7 @@ export default function ForgotPasswordPage() {
                       <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="newPassword"
+                        name="newPassword"
                         type={showPassword ? "text" : "password"}
                         placeholder="At least 6 characters"
                         className="pl-10 pr-12 h-12"
@@ -348,6 +364,7 @@ export default function ForgotPasswordPage() {
                         onChange={(e) => setFormData({...formData, new_password: e.target.value})}
                         minLength={6}
                         required
+                        disabled={loading}
                       />
                       <button
                         type="button"
@@ -365,17 +382,20 @@ export default function ForgotPasswordPage() {
                       <CheckCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="confirmPassword"
+                        name="confirmPassword"
                         type={showPassword ? "text" : "password"}
                         placeholder="Repeat new password"
                         className="pl-10 pr-12 h-12"
                         value={formData.confirm_password}
                         onChange={(e) => setFormData({...formData, confirm_password: e.target.value})}
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
 
                   <Button 
+                    type="submit"
                     className="w-full h-12" 
                     disabled={loading || 
                       formData.new_password !== formData.confirm_password || 
@@ -393,6 +413,7 @@ export default function ForgotPasswordPage() {
                   variant="link"
                   className="w-full justify-start p-0 h-auto text-sm text-muted-foreground hover:text-foreground no-underline"
                   onClick={() => router.push("/login")}
+                  disabled={loading}
                 >
                   👤 Remember password? Login
                 </Button>
