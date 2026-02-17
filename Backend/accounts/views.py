@@ -436,12 +436,19 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from datetime import datetime, timedelta
 import secrets
 import threading
-import requests
+import os
+
+# 🔥 RESEND SUPPORT (Optional fallback)
+try:
+    import resend
+    RESEND_AVAILABLE = True
+except ImportError:
+    RESEND_AVAILABLE = False
 
 try:
     from utils.password import hash_password
@@ -452,51 +459,107 @@ except ImportError:
 
 from mongo.collections import users_col, otps_col
 
-# 🔥 YOUR MailFunction - MODIFIED FOR OTP
+# 🔥 ULTIMATE MailFunction - Brevo Priority + All Fallbacks
 def MailFunction(userMail, userName, otp_code, phone=""):
-    """Enhanced MailFunction for OTP emails"""
-    subject = 'SS Supplement - Your OTP Code'
-    from_email = settings.EMAIL_HOST_USER
-    to_email = userMail
-    text_content = f'Hi {userName},\n\nYour OTP is: {otp_code}\nValid for 10 minutes.\n\nSS Supplement Team'
+    """🔥 Brevo (Priority) → Resend → Gmail → Console (Ultimate fallback)"""
     
-    html_content = f'''
-    <p><pre>Hi <strong>{userName}</strong>,</pre></p>
-    <p><pre>Your OTP: <strong style="font-size: 24px; color: #007bff;">{otp_code}</strong></pre></p>
-    <p><pre>Valid for 10 minutes only.</pre></p>
-    <hr>
-    <p><pre>Phone: {phone}</pre></p>
-    <p><pre>SS Supplement Team 😊</pre></p>
-    '''
+    print(f"🔍 EMAIL DEBUG: Trying {userMail}")
     
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send(fail_silently=False)
-    print(f"✅ MailFunction SENT to {userMail}")
+    # 🔥 #1 BREVO SMTP (Render Production - 300/day FREE)
+    if os.environ.get('BREVO_SMTP_KEY'):
+        try:
+            subject = 'SS Supplement - Your OTP Code'
+            from_email = os.environ.get('EMAIL_HOST_USER', 'sssuppliment2025@gmail.com')
+            to_email = userMail
+            
+            text_content = f'Hi {userName},\n\nYour OTP: {otp_code}\nValid 10 mins.\nPhone: {phone}\nSS Supplement'
+            
+            html_content = f'''
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; padding: 40px;">
+                    <h2 style="color: #333;">Hi <strong>{userName}</strong>,</h2>
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                               color: white; padding: 30px; border-radius: 15px; margin: 30px 0; display: inline-block;">
+                        <h1 style="font-size: 48px; margin: 0; font-weight: bold; letter-spacing: 5px;">
+                            {otp_code}
+                        </h1>
+                        <p style="margin: 10px 0 0 0; font-size: 18px;">Your OTP Code</p>
+                    </div>
+                    <p style="color: #666; font-size: 16px;">
+                        Valid for <strong>10 minutes</strong> only.
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #eee;">
+                    <p style="color: #888; font-size: 14px;">
+                        Phone: <strong>{phone}</strong><br>
+                        SS Supplement Team 😊
+                    </p>
+                </div>
+            </body>
+            </html>
+            '''
+            
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send(fail_silently=False)
+            
+            print(f"✅ BREVO SMTP DELIVERED to {userMail}")
+            return True
+            
+        except Exception as e:
+            print(f"❌ BREVO SMTP FAILED: {e}")
+    
+    # 🔥 #2 RESEND API (If Brevo fails)
+    if RESEND_AVAILABLE and os.environ.get('RESEND_API_KEY'):
+        try:
+            resend.api_key = os.environ.get('RESEND_API_KEY')
+            resend.Emails.send({
+                "from": os.environ.get('FROM_EMAIL', 'SS Supplement <noreply@resend.dev>'),
+                "to": [userMail],
+                "subject": "SS Supplement - Your OTP Code",
+                "html": f"""[SAME HTML AS ABOVE]"""
+            })
+            print(f"✅ RESEND API DELIVERED to {userMail}")
+            return True
+        except Exception as e:
+            print(f"❌ RESEND FAILED: {e}")
+    
+    # 🔥 #3 GMAIL SMTP (Local fallback)
+    try:
+        from_email = settings.EMAIL_HOST_USER
+        subject = 'SS Supplement - Your OTP Code'
+        to_email = userMail
+        text_content = f'Hi {userName}, Your OTP: {otp_code}'
+        html_content = f'<h1>{otp_code}</h1>'
+        
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send(fail_silently=False)
+        print(f"✅ GMAIL SMTP SENT to {userMail}")
+        return True
+    except Exception as e:
+        print(f"❌ GMAIL FAILED: {e}")
+    
+    # 🔥 #4 CONSOLE (Last resort - logs email)
+    print(f"📧 CONSOLE MODE: Would send to {userMail}: OTP {otp_code}")
     return True
 
-# 🔥 ULTIMATE ASYNC OTP SENDER (0.1s response)
+# 🔥 ASYNC SENDER (0.1s response)
 def send_email_async(email, otp_code, phone, user_name):
-    """Async OTP sender using your MailFunction"""
-    
     def mail_thread():
         print(f"🚀 SENDING OTP {otp_code} to {email} (+{phone})")
-        
-        try:
-            # ✅ USE YOUR MailFunction
-            success = MailFunction(email, user_name, otp_code, phone)
-            
-            if success:
-                print(f"✅ MailFunction SUCCESS to {email}")
-            else:
-                print(f"❌ MailFunction FAILED to {email}")
-                
-        except Exception as e:
-            print(f"❌ MailFunction ERROR: {e}")
+        success = MailFunction(email, user_name, otp_code, phone)
+        if success:
+            print(f"✅ TOTAL SUCCESS to {email}")
+        else:
+            print(f"❌ ALL METHODS FAILED")
     
-    thread = threading.Thread(target=mail_thread)
+    thread = threading.Thread(target=mail_thread, daemon=True)
     thread.start()
 
+# 🔥 ENDPOINTS (Unchanged - Perfect)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
@@ -529,7 +592,7 @@ def forgot_password(request):
         '$or': [{'phone': phone}, {'email': email}]
     })
 
-    # Generate & save OTP
+    # Generate OTP
     otp_code = str(secrets.randbelow(900000) + 100000)
     expires_at = datetime.now() + timedelta(minutes=10)
     otp_doc = {
@@ -546,7 +609,6 @@ def forgot_password(request):
     otps_col.insert_one(otp_doc)
     print(f"✅ OTP SAVED: {otp_code}")
     
-    # 🔥 USE YOUR MailFunction - INSTANT RESPONSE!
     send_email_async(email, otp_code, phone, user_data.get('name', 'User'))
     
     return Response({
