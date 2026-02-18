@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, User, Menu, X, ChevronDown, Phone, MessageCircle, Gift } from "lucide-react"
+import { ShoppingCart, User, Menu, X, ChevronDown, Phone, MessageCircle, Gift, Coins } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SearchResults } from "@/components/search-results"
 import { useCart } from "@/context/cart-context"
@@ -33,25 +33,72 @@ const stores = ["Delhi NCR", "Mumbai", "Bangalore", "Pune", "Chennai"]
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [referralCoins, setReferralCoins] = useState(0)
   const { getCartCount } = useCart()
   const { user, isAuthenticated, logout } = useAuth()
+  const apiBase = process.env.NEXT_PUBLIC_API_URL
+
+  useEffect(() => {
+    let active = true
+
+    const loadCoins = async () => {
+      if (!apiBase || !isAuthenticated) {
+        if (active) setReferralCoins(0)
+        return
+      }
+
+      const token = localStorage.getItem("access")
+      if (!token) {
+        if (active) setReferralCoins(0)
+        return
+      }
+
+      try {
+        const res = await fetch(`${apiBase}/api/profile/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!res.ok) throw new Error("Failed to fetch profile")
+
+        const data = await res.json()
+        if (active) {
+          setReferralCoins(typeof data.points === "number" ? data.points : 0)
+        }
+      } catch {
+        if (active) setReferralCoins(0)
+      }
+    }
+
+    loadCoins()
+
+    return () => {
+      active = false
+    }
+  }, [apiBase, isAuthenticated])
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground py-2">
-        <div className="container mx-auto px-4 flex items-center justify-between text-sm">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 sm:gap-4">
             <span className="flex items-center gap-1">
               <Phone className="h-3 w-3" />
               +91 95478 99170
             </span>
             <span className="hidden md:block">Free Shipping on orders above ₹999</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/referral" className="flex items-center gap-1 hover:underline">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link href="/referral" className="flex items-center gap-1.5 hover:underline">
               <Gift className="h-3 w-3" />
               Refer & Earn
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary-foreground/15 px-2 py-0.5 text-xs sm:text-sm font-bold leading-none tabular-nums">
+                <Coins className="h-3 w-3" />
+                {referralCoins.toLocaleString()}
+              </span>
             </Link>
             <span className="hidden sm:block">100% Authentic Products</span>
           </div>
@@ -83,12 +130,25 @@ export function Header() {
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              aria-label="Open search"
+              onClick={() => {
+                setMobileSearchOpen((prev) => !prev)
+                setMobileMenuOpen(false)
+              }}
+            >
+              <i className="bi bi-search text-primary text-base" />
+            </Button>
+
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
                     <User className="h-5 w-5" />
-                    <span className="hidden sm:inline">{user?.name}</span>
+                    <span className="hidden sm:inline">{user?.username}</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -130,12 +190,29 @@ export function Header() {
               </Button>
             </Link>
 
-            <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen)
+                setMobileSearchOpen(false)
+              }}
+            >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Mobile search from navbar */}
+      {mobileSearchOpen && (
+        <div className="md:hidden border-t border-border bg-card">
+          <div className="container mx-auto px-4 py-3">
+            <SearchResults onClose={() => setMobileSearchOpen(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="border-t border-border hidden md:block">
@@ -239,6 +316,10 @@ export function Header() {
                 <Link href="/referral" className="block py-2 text-foreground flex items-center gap-2">
                   <Gift className="h-4 w-4" />
                   REFER & EARN
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary tabular-nums">
+                    <Coins className="h-3 w-3" />
+                    {referralCoins.toLocaleString()}
+                  </span>
                 </Link>
               </li>
               <li>

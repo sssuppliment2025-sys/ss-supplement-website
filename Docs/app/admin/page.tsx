@@ -272,7 +272,7 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
+              <span className="text-sm text-muted-foreground">Welcome, {user?.username}</span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
