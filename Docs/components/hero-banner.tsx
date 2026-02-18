@@ -55,7 +55,7 @@ export function HeroBanner() {
         <div
           key={banner.id}
           className={`absolute inset-0 transition-opacity duration-500 ${
-            index === currentSlide ? "opacity-100" : "opacity-0"
+            index === currentSlide ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
         >
           <Image
@@ -69,11 +69,17 @@ export function HeroBanner() {
           <div className="absolute inset-0 flex items-center">
             <div className="container mx-auto px-4">
               <div className="max-w-lg">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 text-balance">{banner.title}</h2>
-                <p className="text-lg md:text-xl text-white/90 mb-6">{banner.subtitle}</p>
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 text-balance drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
+                  {banner.title}
+                </h2>
+                <p className="text-lg md:text-xl text-white mb-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">{banner.subtitle}</p>
                 <Link href={banner.link}>
-                  <Button size="lg" className="bg-white text-background hover:bg-white/90">
-                    {banner.cta}
+                  <Button
+                    size="lg"
+                    className="group relative overflow-hidden border border-white/80 bg-gradient-to-r from-amber-100 via-white to-orange-100 text-zinc-900 shadow-[0_6px_18px_rgba(0,0,0,0.28)] font-semibold transition-all duration-500 hover:-translate-y-0.5 hover:from-orange-100 hover:via-amber-100 hover:to-white hover:shadow-[0_12px_26px_rgba(0,0,0,0.34)]"
+                  >
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                    <span className="relative z-10">{banner.cta}</span>
                   </Button>
                 </Link>
               </div>
