@@ -51,11 +51,11 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
             <Button
               size="icon"
-              variant="secondary"
-              className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              variant="ghost"
+              className="absolute bottom-2 right-2 h-10 w-10 rounded-full border border-white/50 bg-white/35 text-zinc-900 hover:text-zinc-900 dark:text-zinc-100 dark:hover:text-zinc-100 backdrop-blur-md shadow-sm hover:bg-white/55 hover:scale-105 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all"
               onClick={handleAddToCart}
             >
-              <ShoppingCart className="h-4 w-4" />
+              <ShoppingCart className="h-4 w-4 text-zinc-900 dark:text-zinc-100" />
             </Button>
           </div>
           <div className="p-4">
