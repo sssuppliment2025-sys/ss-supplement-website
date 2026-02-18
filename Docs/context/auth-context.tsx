@@ -18,11 +18,37 @@ interface User {
   isAdmin: boolean
 }
 
+interface OTPData {
+  name: string
+  phone: string
+  email: string
+  otp: string
+}
+
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isAdmin: boolean
   loading: boolean
+  // 🔥 OTP FLOW (Frontend handles email)
+  otpData: OTPData | null
+  setOtpData: (data: OTPData | null) => void
+  forgotPassword: (email: string, phone: string) => Promise<{ 
+    success: boolean; 
+    message: string; 
+    error?: string;
+    data?: OTPData;
+  }>
+  verifyOTP: (email: string, phone: string, otp: string) => Promise<{ 
+    success: boolean; 
+    message: string; 
+    error?: string 
+  }>
+  resetPassword: (email: string, phone: string, otp: string, newPassword: string) => Promise<{ 
+    success: boolean; 
+    message: string; 
+    error?: string 
+  }>
   login: (phone: string, password: string) => Promise<{ success: boolean; message: string }>
   signup: (
     name: string,
@@ -32,10 +58,6 @@ interface AuthContextType {
     referralCode?: string
   ) => Promise<{ success: boolean; message: string }>
   logout: () => void
-  // ✅ NEW OTP FUNCTIONS
-  forgotPassword: (email: string, phone: string) => Promise<{ success: boolean; message: string; error?: string }>
-  verifyOTP: (email: string, phone: string, otp: string) => Promise<{ success: boolean; message: string; error?: string }>
-  resetPassword: (email: string, phone: string, otp: string, newPassword: string) => Promise<{ success: boolean; message: string; error?: string }>
   adminLogin: (phone: string, password: string) => Promise<{ success: boolean; message: string }>
 }
 
@@ -46,6 +68,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [otpData, setOtpData] = useState<OTPData | null>(null)
 
   // ================= FETCH CURRENT USER =================
   const fetchCurrentUser = async () => {
@@ -100,7 +123,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, message: data.detail || "Login failed" }
       }
 
-      // Save JWT tokens
       localStorage.setItem("access", data.tokens.access)
       localStorage.setItem("refresh", data.tokens.refresh)
 
@@ -132,7 +154,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, message: data.detail || "Admin login failed" }
       }
 
-      // Save JWT tokens
       localStorage.setItem("access", data.tokens.access)
       localStorage.setItem("refresh", data.tokens.refresh)
 
@@ -163,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         phone,
         password,
-        confirmPassword: password, // REQUIRED BY BACKEND
+        confirmPassword: password,
       }
 
       if (referralCode) body.referralCode = referralCode
@@ -180,7 +201,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, message: JSON.stringify(data) }
       }
 
-      // Save tokens
       localStorage.setItem("access", data.tokens.access)
       localStorage.setItem("refresh", data.tokens.refresh)
 
@@ -202,129 +222,131 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("access")
     localStorage.removeItem("refresh")
     setUser(null)
+    setOtpData(null) // Clear OTP data
   }
 
-  // ================= FORGOT PASSWORD - SEND OTP =================
-const forgotPassword = async (email, phone) => {
-  console.log("🔥 forgotPassword called:", { email, phone })
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/forgot-password/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        phone,  
-        email 
-      }),
-    })
+  // 🔥 ================= FORGOT PASSWORD - GET OTP DATA =================
+  const forgotPassword = async (email: string, phone: string) => {
+    console.log("🔥 forgotPassword called:", { email, phone })
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/forgot-password/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, email }),
+      })
 
-    const data = await res.json()
-    console.log("🔥 forgotPassword response:", data)
+      const data = await res.json()
+      console.log("🔥 forgotPassword response:", data)
 
-    if (!res.ok) {
+      if (!res.ok) {
+        return { 
+          success: false, 
+          message: data.error || data.detail || "Failed to generate OTP",
+          error: data.error || data.detail
+        }
+      }
+
+      // 🔥 STORE OTP DATA FOR FRONTEND EMAIL SENDING
+      if (data.success && data.data) {
+        setOtpData(data.data)
+        console.log("🔥 OTP Data stored for email:", data.data)
+      }
+
+      return { 
+        success: true, 
+        message: data.message || "OTP ready - email will be sent from frontend",
+        data: data.data
+      }
+    } catch (error) {
+      console.error("🔥 forgotPassword error:", error)
       return { 
         success: false, 
-        message: data.error || data.detail || "Failed to send OTP",
-        error: data.error || data.detail
+        message: "Network error. Please try again.",
+        error: "Network error"
       }
     }
-
-    return { 
-      success: true, 
-      message: data.message || "OTP sent successfully"
-    }
-  } catch (error) {
-    console.error("🔥 forgotPassword error:", error)
-    return { 
-      success: false, 
-      message: "Network error. Please try again.",
-      error: "Network error"
-    }
   }
-}
 
+  // 🔥 ================= VERIFY OTP =================
+  const verifyOTP = async (email: string, phone: string, otp: string) => {
+    console.log("🔥 verifyOTP called:", { email, phone, otp })
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/verify-otp/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, email, otp }),
+      })
 
-const verifyOTP = async (email, phone, otp) => {
-  console.log("🔥 verifyOTP called:", { email, phone, otp })
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/verify-otp/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        phone,
-        email,
-        otp 
-      }),
-    })
+      const data = await res.json()
+      console.log("🔥 verifyOTP response:", data)
 
-    const data = await res.json()
-    console.log("🔥 verifyOTP response:", data)
+      if (!res.ok) {
+        return { 
+          success: false, 
+          message: data.error || "Invalid or expired OTP",
+          error: data.error
+        }
+      }
 
-    if (!res.ok) {
+      return { 
+        success: true, 
+        message: data.message || "OTP verified successfully"
+      }
+    } catch (error) {
+      console.error("🔥 verifyOTP error:", error)
       return { 
         success: false, 
-        message: data.error || "Invalid or expired OTP",
-        error: data.error
+        message: "Verification failed. Please try again.",
+        error: "Network error"
       }
     }
-
-    return { 
-      success: true, 
-      message: data.message || "OTP verified successfully"
-    }
-  } catch (error) {
-    console.error("🔥 verifyOTP error:", error)
-    return { 
-      success: false, 
-      message: "Verification failed. Please try again.",
-      error: "Network error"
-    }
   }
-}
 
+  // 🔥 ================= RESET PASSWORD =================
+  const resetPassword = async (email: string, phone: string, otp: string, newPassword: string) => {
+    console.log("🔥 resetPassword called:", { email, phone, otp, newPassword })
+    
+    const safePassword = newPassword || ''
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/reset-password/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          phone,
+          email,
+          otp,
+          new_password: safePassword 
+        }),
+      })
 
-const resetPassword = async (email, phone, otp, newPassword) => {
-  console.log("🔥 resetPassword called:", { email, phone, otp, newPassword })
-  
+      const data = await res.json()
+      console.log("🔥 resetPassword response:", data)
 
-  const safePassword = newPassword || ''
-  
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/reset-password/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        phone,
-        email,
-        otp,
-        new_password: safePassword  
-      }),
-    })
+      if (!res.ok) {
+        return { 
+          success: false, 
+          message: data.error || "Password reset failed",
+          error: data.error
+        }
+      }
 
-    const data = await res.json()
-    console.log("🔥 resetPassword response:", data)
+      // Clear OTP data after success
+      setOtpData(null)
 
-    if (!res.ok) {
+      return { 
+        success: true, 
+        message: data.message || "Password reset successfully"
+      }
+    } catch (error) {
+      console.error("🔥 resetPassword error:", error)
       return { 
         success: false, 
-        message: data.error || "Password reset failed",
-        error: data.error
+        message: "Password reset failed. Please try again.",
+        error: "Network error"
       }
     }
-
-    return { 
-      success: true, 
-      message: data.message || "Password reset successfully"
-    }
-  } catch (error) {
-    console.error("🔥 resetPassword error:", error)
-    return { 
-      success: false, 
-      message: "Password reset failed. Please try again.",
-      error: "Network error"
-    }
   }
-}
-
 
   return (
     <AuthContext.Provider
@@ -333,12 +355,14 @@ const resetPassword = async (email, phone, otp, newPassword) => {
         isAuthenticated: !!user,
         isAdmin: user?.isAdmin || false,
         loading,
+        otpData,           // 🔥 NEW: OTP data for frontend  email
+        setOtpData,        // 🔥 NEW: Set OTP data manually
         login,
         signup,
         logout,
-        forgotPassword,
+        forgotPassword,    // 🔥 UPDATED: Returns OTP data
         verifyOTP,
-        resetPassword,
+        resetPassword,     // 🔥 UPDATED: Clears OTP data
         adminLogin,
       }}
     >

@@ -436,133 +436,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from datetime import datetime, timedelta
 import secrets
-import threading
-import os
-
-# 🔥 RESEND SUPPORT (Optional fallback)
-try:
-    import resend
-    RESEND_AVAILABLE = True
-except ImportError:
-    RESEND_AVAILABLE = False
-
-try:
-    from utils.password import hash_password
-except ImportError:
-    def hash_password(password):
-        import hashlib
-        return hashlib.sha256(password.encode()).hexdigest()
-
 from mongo.collections import users_col, otps_col
 
-# 🔥 ULTIMATE MailFunction - Brevo Priority + All Fallbacks
-def MailFunction(userMail, userName, otp_code, phone=""):
-    """🔥 Brevo (Priority) → Resend → Gmail → Console (Ultimate fallback)"""
-    
-    print(f"🔍 EMAIL DEBUG: Trying {userMail}")
-    
-    # 🔥 #1 BREVO SMTP (Render Production - 300/day FREE)
-    if os.environ.get('BREVO_SMTP_KEY'):
-        try:
-            subject = 'SS Supplement - Your OTP Code'
-            from_email = os.environ.get('EMAIL_HOST_USER', 'sssuppliment2025@gmail.com')
-            to_email = userMail
-            
-            text_content = f'Hi {userName},\n\nYour OTP: {otp_code}\nValid 10 mins.\nPhone: {phone}\nSS Supplement'
-            
-            html_content = f'''
-            <!DOCTYPE html>
-            <html>
-            <head><meta charset="UTF-8"></head>
-            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="text-align: center; padding: 40px;">
-                    <h2 style="color: #333;">Hi <strong>{userName}</strong>,</h2>
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                               color: white; padding: 30px; border-radius: 15px; margin: 30px 0; display: inline-block;">
-                        <h1 style="font-size: 48px; margin: 0; font-weight: bold; letter-spacing: 5px;">
-                            {otp_code}
-                        </h1>
-                        <p style="margin: 10px 0 0 0; font-size: 18px;">Your OTP Code</p>
-                    </div>
-                    <p style="color: #666; font-size: 16px;">
-                        Valid for <strong>10 minutes</strong> only.
-                    </p>
-                    <hr style="border: none; border-top: 1px solid #eee;">
-                    <p style="color: #888; font-size: 14px;">
-                        Phone: <strong>{phone}</strong><br>
-                        SS Supplement Team 😊
-                    </p>
-                </div>
-            </body>
-            </html>
-            '''
-            
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            msg.attach_alternative(html_content, "text/html")
-            msg.send(fail_silently=False)
-            
-            print(f"✅ BREVO SMTP DELIVERED to {userMail}")
-            return True
-            
-        except Exception as e:
-            print(f"❌ BREVO SMTP FAILED: {e}")
-    
-    # 🔥 #2 RESEND API (If Brevo fails)
-    if RESEND_AVAILABLE and os.environ.get('RESEND_API_KEY'):
-        try:
-            resend.api_key = os.environ.get('RESEND_API_KEY')
-            resend.Emails.send({
-                "from": os.environ.get('FROM_EMAIL', 'SS Supplement <noreply@resend.dev>'),
-                "to": [userMail],
-                "subject": "SS Supplement - Your OTP Code",
-                "html": f"""[SAME HTML AS ABOVE]"""
-            })
-            print(f"✅ RESEND API DELIVERED to {userMail}")
-            return True
-        except Exception as e:
-            print(f"❌ RESEND FAILED: {e}")
-    
-    # 🔥 #3 GMAIL SMTP (Local fallback)
-    try:
-        from_email = settings.EMAIL_HOST_USER
-        subject = 'SS Supplement - Your OTP Code'
-        to_email = userMail
-        text_content = f'Hi {userName}, Your OTP: {otp_code}'
-        html_content = f'<h1>{otp_code}</h1>'
-        
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=False)
-        print(f"✅ GMAIL SMTP SENT to {userMail}")
-        return True
-    except Exception as e:
-        print(f"❌ GMAIL FAILED: {e}")
-    
-    # 🔥 #4 CONSOLE (Last resort - logs email)
-    print(f"📧 CONSOLE MODE: Would send to {userMail}: OTP {otp_code}")
-    return True
-
-# 🔥 ASYNC SENDER (0.1s response)
-def send_email_async(email, otp_code, phone, user_name):
-    def mail_thread():
-        print(f"🚀 SENDING OTP {otp_code} to {email} (+{phone})")
-        success = MailFunction(email, user_name, otp_code, phone)
-        if success:
-            print(f"✅ TOTAL SUCCESS to {email}")
-        else:
-            print(f"❌ ALL METHODS FAILED")
-    
-    thread = threading.Thread(target=mail_thread, daemon=True)
-    thread.start()
-
-# 🔥 ENDPOINTS (Unchanged - Perfect)
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
+    """🔥 Generate OTP and return user info to frontend for email"""
     print("🔥 FORGOT_PASSWORD START")
     print("🔥 DATA:", request.data)
     
@@ -575,6 +457,7 @@ def forgot_password(request):
             "error": "Phone and email required"
         }, status=status.HTTP_400_BAD_REQUEST)
 
+    # Find user
     user_data = users_col.find_one({
         '$or': [{'phone': phone}, {'email': email}]
     })
@@ -584,7 +467,13 @@ def forgot_password(request):
     if not user_data:
         return Response({
             "success": True,
-            "message": "If account exists, OTP sent to your email"
+            "message": "If account exists, OTP sent to your email",
+            "data": {
+                "name": "User",
+                "phone": phone,
+                "email": email,
+                "otp": "XXXXX"  # Dummy OTP for non-existing users
+            }
         }, status=status.HTTP_200_OK)
 
     # Clean old OTPs
@@ -608,17 +497,23 @@ def forgot_password(request):
     
     otps_col.insert_one(otp_doc)
     print(f"✅ OTP SAVED: {otp_code}")
-    
-    send_email_async(email, otp_code, phone, user_data.get('name', 'User'))
-    
+
+    # 🔥 SEND ALL INFO TO FRONTEND (Frontend handles email)
     return Response({
         "success": True,
-        "message": "OTP sent successfully! Check inbox/spam.",
-    })
+        "message": "User info with OTP ready - send email from frontend",
+        "data": {
+            "name": user_data.get('name', 'User'),
+            "phone": phone,
+            "email": email,
+            "otp": otp_code  # Frontend will send this via email
+        }
+    }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):
+    """🔥 Verify OTP from frontend"""
     print("🔥 VERIFY_OTP")
     print("🔥 DATA:", request.data)
     
@@ -656,6 +551,7 @@ def verify_otp(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def reset_password(request):
+    """🔥 Reset password after OTP verification"""
     print("🔥 RESET_PASSWORD")
     print("🔥 DATA:", request.data)
 
@@ -680,6 +576,14 @@ def reset_password(request):
     if not otp_doc:
         return Response({"success": False, "error": "Verify OTP first"}, status=400)
 
+    # Hash password (you need to import your hash_password function)
+    try:
+        from utils.password import hash_password
+    except ImportError:
+        import hashlib
+        def hash_password(password):
+            return hashlib.sha256(password.encode()).hexdigest()
+    
     hashed_password = hash_password(new_password)
     result = users_col.update_one(
         {'$or': [{'phone': phone}, {'email': email}]},

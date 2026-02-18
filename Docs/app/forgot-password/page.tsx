@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, FormEvent } from "react"
+import { useState, FormEvent, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Mail, Phone, Shield, Key, CheckCircle, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -17,15 +17,17 @@ import {
 } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/context/auth-context"
+import emailjs from '@emailjs/browser'
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { forgotPassword, verifyOTP, resetPassword } = useAuth()
+  const { forgotPassword, verifyOTP, resetPassword, otpData } = useAuth()
 
   const [step, setStep] = useState(1)
-  const [loading, setLoading] = useState(false)  // ✅ ADDED MISSING STATE
+  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
   
   const [formData, setFormData] = useState({
     phone: "",
@@ -35,27 +37,69 @@ export default function ForgotPasswordPage() {
     confirm_password: ""
   })
 
+  // 🔥 SEND EMAIL FROM FRONTEND
+  const sendOTPEmail = async (userData: any) => {
+    const templateParams = {
+      to_email: userData.email,
+      to_name: userData.name || 'User',
+      otp: userData.otp,
+      phone: userData.phone,
+    }
+
+    try {
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID', 
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID', 
+        templateParams,
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY'
+      )
+      console.log("✅ EmailJS: Email sent successfully!")
+      toast({
+        title: "Email Sent! 📧",
+        description: "Check your inbox/spam folder for OTP."
+      })
+      setEmailSent(true)
+    } catch (error) {
+      console.error("❌ EmailJS failed:", error)
+      // Fallback: Show OTP in console for testing
+      console.log("🔥 DEVELOPMENT OTP (check console):", userData.otp)
+      toast({
+        title: "OTP Ready! 🔑",
+        description: `Check browser console for OTP: ${userData.otp.slice(0,3)}*** (DEV MODE)`
+      })
+      setEmailSent(true)
+    }
+  }
+
   const handleSendOTP = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault() // 🚫 STOP REFRESH
+    e.preventDefault()
     setLoading(true)
 
     try {
+      console.log("🔥 Calling forgotPassword with:", { email: formData.email, phone: formData.phone })
+      
       const result = await forgotPassword(formData.email, formData.phone)
       
-      if (result.success) {
+      if (result.success && result.data) {
+        console.log("✅ Backend OTP data:", result.data)
+        
+        // 🔥 SEND EMAIL FROM FRONTEND
+        await sendOTPEmail(result.data)
+        
         toast({
-          title: "OTP Sent! ✅",
-          description: "Check your email inbox/spam folder."
+          title: "OTP Generated! ✅",
+          description: "Email sent - check inbox/spam or console (dev)."
         })
         setStep(2)
       } else {
         toast({
           title: "Error",
-          description: result.message || result.error || "Failed to send OTP",
+          description: result.message || result.error || "Failed to generate OTP",
           variant: "destructive"
         })
       }
     } catch (error) {
+      console.error("Forgot password error:", error)
       toast({
         title: "Error",
         description: "Network error. Please try again.",
@@ -67,7 +111,7 @@ export default function ForgotPasswordPage() {
   }
 
   const handleVerifyOTP = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault() // 🚫 STOP REFRESH
+    e.preventDefault()
     setLoading(true)
 
     try {
@@ -98,7 +142,7 @@ export default function ForgotPasswordPage() {
   }
 
   const handleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault() // 🚫 STOP REFRESH
+    e.preventDefault()
     
     if (formData.new_password !== formData.confirm_password) {
       toast({
@@ -120,12 +164,7 @@ export default function ForgotPasswordPage() {
 
     setLoading(true)
     try {
-      console.log("🔥 SENDING RESET DATA:", {
-        phone: formData.phone,
-        email: formData.email,
-        otp: formData.otp,
-        new_password: formData.new_password
-      })
+      console.log("🔥 Resetting password...")
       
       const result = await resetPassword(
         formData.email,
@@ -137,7 +176,7 @@ export default function ForgotPasswordPage() {
       if (result.success) {
         toast({
           title: "Success! 🎉",
-          description: "Password reset successfully!"
+          description: "Password reset successfully! Redirecting..."
         })
         setTimeout(() => {
           router.push("/login")
@@ -217,7 +256,7 @@ export default function ForgotPasswordPage() {
               </CardTitle>
               <CardDescription className="text-center">
                 {step === 1 && "Enter your phone and email to receive OTP."}
-                {step === 2 && "Enter the 6-digit code sent to your email."}
+                {step === 2 && `Enter the 6-digit code sent to ${formData.email || 'your email'}.`}
                 {step === 3 && "Create a new password (min 6 characters)."}
               </CardDescription>
             </CardHeader>
@@ -287,7 +326,7 @@ export default function ForgotPasswordPage() {
                       className="bg-muted/50 pl-10 h-12"
                     />
                   </div>
-                  
+                 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Email</Label>
                     <Input 
@@ -340,7 +379,7 @@ export default function ForgotPasswordPage() {
                       className="bg-muted/50 h-12"
                     />
                   </div>
-                  
+                 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Email</Label>
                     <Input 
