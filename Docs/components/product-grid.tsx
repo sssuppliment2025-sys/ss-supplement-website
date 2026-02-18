@@ -11,6 +11,7 @@ interface ProductGridProps {
   shuffle?: boolean
   title?: string
   selectedBrands?: string[]
+  productIds?: string[]
 }
 
 const EMPTY_BRANDS: string[] = []
@@ -21,6 +22,7 @@ export function ProductGrid({
   shuffle = false,
   title,
   selectedBrands,
+  productIds,
 }: ProductGridProps) {
   const { products, getProductsByCategory } = useProducts()
   const [displayProducts, setDisplayProducts] = useState<Product[]>([])
@@ -30,6 +32,15 @@ export function ProductGrid({
 
   // ✅ Server-safe filtering
   const baseProducts = useMemo(() => {
+    if (productIds && productIds.length > 0) {
+      const selectedMap = new Map(products.map((product) => [product.id, product]))
+      const selectedProducts = productIds
+        .map((id) => selectedMap.get(id))
+        .filter((product): product is Product => Boolean(product))
+
+      return limit ? selectedProducts.slice(0, limit) : selectedProducts
+    }
+
     // Ensure getProductsByCategory exists
     let items: Product[] = category && getProductsByCategory
       ? getProductsByCategory(category)

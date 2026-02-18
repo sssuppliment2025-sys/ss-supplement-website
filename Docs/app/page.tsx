@@ -10,6 +10,8 @@ import { OffersBanner } from "@/components/offers-banner"
 
 export default function HomePage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL
+  const featuredProductIds = ["13", "2", "23", "56", "62", "131", "109", "77", "221", "226"] // Example featured product IDs
+  const bestSellerProductIds = ["41", "2", "10", "102", "222"] // Example best seller product IDs
 
   useEffect(() => {
     if (!apiBase) {
@@ -30,7 +32,7 @@ export default function HomePage() {
         <OffersBanner />
 
         <div className="container mx-auto px-4">
-          <ProductGrid title="Featured Products" shuffle={true} limit={10} />
+          <ProductGrid title="Featured Products" productIds={featuredProductIds} />
 
           <section className="py-8">
             <h2 className="text-2xl font-bold text-foreground mb-6">
@@ -52,7 +54,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <ProductGrid title="Best Sellers" limit={5} />
+          <ProductGrid title="Best Sellers" productIds={bestSellerProductIds} />
         </div>
       </main>
       <Footer />

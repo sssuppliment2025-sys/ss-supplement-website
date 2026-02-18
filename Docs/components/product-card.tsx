@@ -32,7 +32,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/product/${product.id}`}>
-      <Card className="group bg-card border-border hover:border-primary/50 transition-all duration-300 overflow-hidden h-full">
+      <Card
+        id={`product-card-${product.id}`}
+        className="group bg-card border-border hover:border-primary/50 transition-all duration-300 overflow-hidden h-full"
+      >
         <CardContent className="p-0">
           <div className="relative aspect-square bg-secondary/50 overflow-hidden">
             <Image
