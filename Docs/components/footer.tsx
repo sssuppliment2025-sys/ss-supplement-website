@@ -153,7 +153,7 @@ export function Footer() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">FSSAI License:</span>
-              <span className="text-xs text-foreground">10015064000576</span>
+              <span className="text-xs text-foreground">22825162000174</span>
             </div>
           </div>
         </div>

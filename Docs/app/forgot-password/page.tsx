@@ -275,7 +275,7 @@ export default function ForgotPasswordPage() {
                         id="phone"
                         name="phone"
                         type="tel"
-                        placeholder="7047283086"
+                        placeholder="e.g. +1234567890"
                         className="pl-10 h-12"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
