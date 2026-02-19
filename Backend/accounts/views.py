@@ -7,17 +7,54 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from pymongo import MongoClient
+from bson import ObjectId
+from utils.jwt_helper import decode_token
+import uuid
+from datetime import datetime
+import os
+from dotenv import load_dotenv
 from mongo.collections import users_col, referrals_col
 from Mail.mail import MailFunction
 from utils.password import hash_password, verify_password
 from utils.jwt import generate_tokens_for_user
 from utils.jwt_helper import decode_token
 from django.core.mail import EmailMultiAlternatives
+from rest_framework.permissions import AllowAny
+from rest_framework import status
+from django.conf import settings
+from datetime import datetime, timedelta
+from mongo.collections import users_col, otps_col
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes
+
 
 from .RouterFunctions.Signup import signup_logic
 from .RouterFunctions.login import LoginLogic
 from .RouterFunctions.ProfileShowForRefferPoint import ProfileForRefferal
+from .RouterFunctions.Refferal import refferalsLogic
+from .RouterFunctions.CreateUserOrder import CreateOrderUser
+from .RouterFunctions.ForgotPassword import FPassword
+from .RouterFunctions.ResetPassword import RPassword
+from .RouterFunctions.VerifyOTP import VOtp
+from .RouterFunctions.ProfileView import ProfiView
+
+
+
+
+load_dotenv()
+
+MONGO_URI = os.getenv(
+    "MONGO_URI",
+    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
+)
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["sssuppliment_db"]  
+orders_collection = db['orders']
+users_collection = db['users']
 
 
 
@@ -121,18 +158,13 @@ class ProfileView(APIView):
             return Response({"detail": "Invalid token"}, status=401)
 
 
-# ================== MY REFERRALS ==================
+# # .............................................. MY REFERRALS ..................................................
+# Future Test <<<<-----  Target codes.... 
 class MyReferralsView(APIView):
     def get(self, request):
         auth = request.headers.get("Authorization")
-        if not auth or not auth.startswith("Bearer "):
-            return Response([], status=200)
-
-        try:
-            token = auth.replace("Bearer ", "")
-            payload = decode_token(token)
-
-            referrals = referrals_col.find({"referrer_id": payload["user_id"]})
+        try :
+            referrals = refferalsLogic(auth)
 
             return Response([
                 {
@@ -150,13 +182,11 @@ class MyReferralsView(APIView):
             return Response([], status=200)
 
 
-# ================== LEADERBOARD ==================
+# .................................................. LEADERBOARD ...................................................
 class LeaderboardView(APIView):
     permission_classes = [AllowAny]
-
     def get(self, request):
         users = users_col.find().sort("points", -1).limit(50)
-
         return Response([
             {
                 "id": str(u["_id"]),
@@ -173,157 +203,16 @@ class LeaderboardView(APIView):
 
 
 
-# =============================== Order placed with coin =====================
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from pymongo import MongoClient
-from bson import ObjectId
-from utils.jwt_helper import decode_token
-import uuid
-from datetime import datetime
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-MONGO_URI = os.getenv(
-    "MONGO_URI",
-    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
-)
-
-mongo_client = MongoClient(MONGO_URI)
-db = mongo_client["sssuppliment_db"]  
-orders_collection = db['orders']
-users_collection = db['users']
-
+# ................................................ Order placed with coin =.............................................
 @api_view(['POST'])
 def create_order(request):
     try:
         auth_header = request.headers.get('Authorization')
+        data = request.data
         if not auth_header or not auth_header.startswith('Bearer '):
             return Response({'error': 'Token required'}, status=401)
         
-        token = auth_header.split(' ')[1]
-        payload = decode_token(token)
-        user_id = payload['user_id']
-        
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
-        if not user:
-            return Response({'error': 'User not found'}, status=404)
-        
-        data = request.data
-        
-        subtotal = sum(float(item.get('price', 0)) * int(item.get('quantity', 0)) for item in data.get('items', []))
-        coins_used = float(data.get('coins_used', 0))
-        final_total = float(data.get('total', 0))  
-
-       
-        min_cash_payment = max(subtotal * 0.2, 50)  
-        if final_total < min_cash_payment:
-            return Response({
-                'error': f'Minimum 20% cash payment required. Min: ₹{int(min_cash_payment)}, Got: ₹{int(final_total)}'
-            }, status=400)
-        
-        
-        max_coins_allowed = subtotal * 0.8
-        if coins_used > max_coins_allowed:
-            return Response({
-                'error': f'Maximum 80% coins allowed. Max: ₹{int(max_coins_allowed)}, Requested: ₹{int(coins_used)}'
-            }, status=400)
-        
-        
-        current_points = user.get('points', 0)
-        
-       
-        if coins_used > 0:
-            if current_points < coins_used:
-                return Response({
-                    'error': f'Insufficient coins. Available: {int(current_points)}, Required: {int(coins_used)}'
-                }, status=400)
-            
-           
-            users_collection.update_one(
-                {"_id": ObjectId(user_id)},
-                {"$inc": {"points": -coins_used}}
-            )
-        
-   
-        updated_user = users_collection.find_one({"_id": ObjectId(user_id)})
-        new_points = int(updated_user.get('points', 0))
-        
-      
-        order_id = str(uuid.uuid4())[:8].upper()
-        
-    
-        address_data = data.get('address', {})
-        address_array = [
-            {"type": "fullName", "value": address_data.get('fullName', '')},
-            {"type": "phone", "value": address_data.get('phone', '')},
-            {"type": "email", "value": address_data.get('email', '')},
-            {"type": "address", "value": address_data.get('address', '')},
-            {"type": "city", "value": address_data.get('city', '')},
-            {"type": "state", "value": address_data.get('state', '')},
-            {"type": "pincode", "value": address_data.get('pincode', '')},
-            {"type": "landmark", "value": address_data.get('landmark', '')}
-        ]
-        
-        
-        enhanced_items = []
-        for item in data.get('items', []):
-            flavor = (item.get('selectedFlavor') or 
-                     item.get('flavor') or 
-                     item.get('variant') or 
-                     item.get('flavour') or 
-                     'N/A')
-            
-            weight = (item.get('selectedWeight') or 
-                     item.get('weight') or 
-                     item.get('size') or 
-                     item.get('variantWeight') or
-                     'N/A')
-            
-            enhanced_items.append({
-                "product_id": str(item.get('productId', '')),
-                "name": item.get('name', ''),
-                "quantity": int(item.get('quantity', 0)),
-                "price": float(item.get('price', 0)),
-                "total": float(item.get('price', 0)) * int(item.get('quantity', 0)),
-                "flavor": flavor,
-                "weight": weight
-            })
-        
-      
-        earned_points = int(final_total * 0.05)
-        
-        
-        order_data = {
-            '_id': ObjectId(),
-            'order_id': order_id,
-            'user_id': user_id,
-            'user_phone': user.get('phone', ''),
-            'user_name': user.get('name', ''),
-            'user_email': user.get('email', ''),
-            'address_details': address_array,
-            'order_items': enhanced_items,
-            'subtotal': float(subtotal),
-            'coins_used': float(coins_used),
-            'final_total': float(final_total),
-            'payment_method': data.get('payment_method', 'cod'),
-            'utr_number': data.get('utr_number'),
-            'status': 'pending',
-            'earned_points': earned_points,
-            'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow(),
-        }
-        
-       
-        orders_collection.insert_one(order_data)
-        
-        
-        print(f"Order created: {order_id}")
-        print(f"Subtotal: ₹{subtotal}, Coins: ₹{coins_used}, Final: ₹{final_total}")
-        print(f"User coins before: {int(current_points)}, after: {new_points}")
+        order_id, earned_points, new_points = CreateOrderUser(auth_header, data, users_collection, orders_collection)
         
         return Response({
             'success': True,
@@ -338,7 +227,7 @@ def create_order(request):
         
     except Exception as e:
         print(f"Order error: {str(e)}")
-        print(f"Request data: {request.data}")
+        #print(f"Request data: {request.data}")
         return Response({
             'error': str(e),
             'detail': 'Order creation failed'
@@ -346,31 +235,10 @@ def create_order(request):
 
 
 
-
+# ................................................ profile_view .............................................
 @api_view(['GET'])
 def profile_view(request):
-    try:
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
-            return Response({'error': 'Token required'}, status=401)
-        
-        token = auth_header.split(' ')[1]
-        payload = decode_token(token)
-        user_id = payload['user_id']
-        
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
-        if not user:
-            return Response({'error': 'User not found'}, status=404)
-        
-        return Response({
-            'points': int(user.get('points', 0)),
-            'phone': user.get('phone', ''),
-            'name': user.get('name', ''),
-            'email': user.get('email', ''),
-            'referral_code': user.get('referral_code', '')
-        })
-    except Exception as e:
-        return Response({'error': 'Invalid token'}, status=401)
+    return ProfiView(request, users_collection)
 
 
 
@@ -378,171 +246,27 @@ def profile_view(request):
 
 ################################################################################################################
 ################################################################################################################
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework import status
-from django.conf import settings
-from datetime import datetime, timedelta
-import secrets
-from mongo.collections import users_col, otps_col
-
+# ................................................ forgot_password .............................................
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
-    """🔥 Generate OTP and return user info to frontend for email"""
-    print("🔥 FORGOT_PASSWORD START")
-    print("🔥 DATA:", request.data)
+    """Generate OTP and return user info to frontend for email"""
+    #print("FORGOT_PASSWORD START")
+    #print("DATA:", request.data)
+    return FPassword(request)
+
     
-    phone = request.data.get('phone', '').strip()
-    email = request.data.get('email', '').strip()
-
-    if not phone or not email:
-        return Response({
-            "success": False, 
-            "error": "Phone and email required"
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    # Find user
-    user_data = users_col.find_one({
-        '$or': [{'phone': phone}, {'email': email}]
-    })
-    
-    print(f"USER FOUND: {user_data is not None}")
-
-    if not user_data:
-        return Response({
-            "success": True,
-            "message": "If account exists, OTP sent to your email",
-            "data": {
-                "name": "User",
-                "phone": phone,
-                "email": email,
-                "otp": "XXXXX"  # Dummy OTP for non-existing users
-            }
-        }, status=status.HTTP_200_OK)
-
-    # Clean old OTPs
-    otps_col.delete_many({
-        '$or': [{'phone': phone}, {'email': email}]
-    })
-
-    # Generate OTP
-    otp_code = str(secrets.randbelow(900000) + 100000)
-    expires_at = datetime.now() + timedelta(minutes=10)
-    otp_doc = {
-        'user_id': str(user_data['_id']),
-        'phone': phone,
-        'email': email,
-        'name': user_data.get('name', 'User'),
-        'otp': otp_code,
-        'is_used': False,
-        'expires_at': expires_at,
-        'created_at': datetime.now()
-    }
-    
-    otps_col.insert_one(otp_doc)
-    print(f"✅ OTP SAVED: {otp_code}")
-
-    # 🔥 SEND ALL INFO TO FRONTEND (Frontend handles email)
-    return Response({
-        "success": True,
-        "message": "User info with OTP ready - send email from frontend",
-        "data": {
-            "name": user_data.get('name', 'User'),
-            "phone": phone,
-            "email": email,
-            "otp": otp_code  # Frontend will send this via email
-        }
-    }, status=status.HTTP_200_OK)
-
+# ................................................ verify_otp .............................................
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_otp(request):
-    """🔥 Verify OTP from frontend"""
-    print("🔥 VERIFY_OTP")
-    print("🔥 DATA:", request.data)
-    
-    phone = request.data.get('phone', '').strip()
-    email = request.data.get('email', '').strip()
-    otp_code = request.data.get('otp', '').strip()
+    """Verify OTP from frontend"""
+    #print("VERIFY_OTP")
+    #print("DATA:", request.data)
+    return VOtp(request, otps_col)
 
-    if not all([phone, email, otp_code]):
-        return Response({
-            "success": False, 
-            "error": "Phone, email, OTP required"
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    otp_doc = otps_col.find_one({
-        '$or': [{'phone': phone, 'email': email}, {'phone': phone}, {'email': email}],
-        'otp': otp_code,
-        'is_used': False,
-        'expires_at': {'$gt': datetime.now()}
-    })
-    
-    if not otp_doc:
-        return Response({
-            "success": False, 
-            "error": "Invalid or expired OTP"
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    otps_col.update_one({'_id': otp_doc['_id']}, {'$set': {'is_used': True}})
-    print("✅ OTP VERIFIED!")
-    
-    return Response({
-        "success": True,
-        "message": "OTP verified! Reset your password."
-    })
-
+# ................................................ reset_password .............................................
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def reset_password(request):
-    """🔥 Reset password after OTP verification"""
-    print("🔥 RESET_PASSWORD")
-    print("🔥 DATA:", request.data)
-
-    phone = str(request.data.get('phone', '')).strip()
-    email = str(request.data.get('email', '')).strip()
-    otp_code = str(request.data.get('otp', '')).strip()
-    new_password = str(request.data.get('new_password', '')).strip()
-    
-    if not all([phone, email, otp_code, new_password]):
-        return Response({"success": False, "error": "All fields required"}, status=400)
-    
-    if len(new_password) < 6:
-        return Response({"success": False, "error": "Password must be 6+ characters"}, status=400)
-
-    otp_doc = otps_col.find_one({
-        '$or': [{'phone': phone, 'email': email}, {'phone': phone}, {'email': email}],
-        'otp': otp_code,
-        'is_used': True,
-        'expires_at': {'$gt': datetime.now()}
-    })
-    
-    if not otp_doc:
-        return Response({"success": False, "error": "Verify OTP first"}, status=400)
-
-    # Hash password (you need to import your hash_password function)
-    try:
-        from utils.password import hash_password
-    except ImportError:
-        import hashlib
-        def hash_password(password):
-            return hashlib.sha256(password.encode()).hexdigest()
-    
-    hashed_password = hash_password(new_password)
-    result = users_col.update_one(
-        {'$or': [{'phone': phone}, {'email': email}]},
-        {'$set': {'password': hashed_password}}
-    )
-    
-    if result.modified_count == 0:
-        return Response({"success": False, "error": "User not found"}, status=404)
-
-    otps_col.delete_one({'_id': otp_doc['_id']})
-    
-    print("✅ PASSWORD RESET SUCCESS!")
-    return Response({
-        "success": True, 
-        "message": "Password reset successful! Login now."
-    })
+    return RPassword(request, otps_col, users_col, hash_password)
