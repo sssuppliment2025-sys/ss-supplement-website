@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Coins } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Coins, Truck } from "lucide-react"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -19,7 +19,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 export default function CartPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { items, updateQuantity, removeFromCart, getCartTotal, getCartItemPrice } = useCart()
+  // ✅ UPDATED: Added new cart functions
+  const { 
+    items, 
+    updateQuantity, 
+    removeFromCart, 
+    getCartTotal, 
+    getCartSubtotal, 
+    getShippingFee,
+    getCartItemPrice 
+  } = useCart()
   const { isAuthenticated } = useAuth()
 
   const [points, setPoints] = useState<number>(0)
@@ -106,7 +115,6 @@ export default function CartPage() {
           {/* CART ITEMS */}
           <div className="lg:col-span-2 space-y-4">
             {items.map(item => {
-              // ✅ FIXED: Use cart context's proper price calculation
               const itemPrice = getCartItemPrice(
                 item.product.id, 
                 item.selectedFlavor, 
@@ -138,7 +146,6 @@ export default function CartPage() {
                         {item.selectedFlavor} • <strong>{item.selectedWeight}</strong>
                       </p>
                       
-                      {/* ✅ Show single item price */}
                       <p className="text-sm text-muted-foreground mb-3">
                         ₹{itemPrice} / {item.selectedWeight}
                       </p>
@@ -180,7 +187,6 @@ export default function CartPage() {
                           </Button>
                         </div>
 
-                        {/* ✅ FIXED: Correct total price */}
                         <p className="font-bold text-lg">
                           ₹{totalPrice.toLocaleString()}
                         </p>
@@ -207,20 +213,27 @@ export default function CartPage() {
             })}
           </div>
 
-          {/* ORDER SUMMARY */}
+          {/* ORDER SUMMARY - ✅ FULLY UPDATED */}
           <div>
             <Card className="sticky top-24">
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-lg font-bold">Order Summary</h2>
 
+                {/* ✅ SUBTOTAL (without shipping) */}
                 <div className="flex justify-between text-sm">
                   <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
-                  <span>₹{getCartTotal().toLocaleString()}</span>
+                  <span>₹{getCartSubtotal().toLocaleString()}</span>
                 </div>
 
-                <div className="flex justify-between text-sm">
-                  <span>Shipping</span>
-                  <span className="text-success">FREE</span>
+                {/* ✅ DYNAMIC SHIPPING FEE */}
+                <div className="flex justify-between text-sm items-center">
+                  <span className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-muted-foreground" />
+                    Shipping
+                  </span>
+                  <span className={getShippingFee() === 0 ? "text-success font-medium" : "text-foreground"}>
+                    {getShippingFee() === 0 ? "FREE" : `₹${getShippingFee()}`}
+                  </span>
                 </div>
 
                 {/* COINS */}
@@ -234,6 +247,7 @@ export default function CartPage() {
                   </span>
                 </div>
 
+                {/* ✅ FINAL TOTAL (subtotal + shipping) */}
                 <div className="border-t pt-3 flex justify-between font-bold text-xl">
                   <span>Total</span>
                   <span>₹{getCartTotal().toLocaleString()}</span>
@@ -263,4 +277,3 @@ export default function CartPage() {
     </div>
   )
 }
-  
