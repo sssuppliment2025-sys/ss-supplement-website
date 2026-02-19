@@ -29,7 +29,7 @@ const categories = [
   
 ]
 
-const stores = ["Delhi NCR", "Mumbai", "Bangalore", "Pune", "Chennai"]
+const stores = ["Haldia", "Kolkata", "Raipur"]
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
