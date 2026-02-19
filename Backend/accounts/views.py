@@ -15,6 +15,10 @@ from utils.jwt import generate_tokens_for_user
 from utils.jwt_helper import decode_token
 from django.core.mail import EmailMultiAlternatives
 
+from .RouterFunctions.Signup import signup_logic
+from .RouterFunctions.login import LoginLogic
+from .RouterFunctions.ProfileShowForRefferPoint import ProfileForRefferal
+
 
 
 ######### ================== Mail Function ===================
@@ -41,7 +45,8 @@ def wake_up(request):
     return JsonResponse({"status": "backend awake"})
 
 
-# ================== SIGNUP ==================
+# .............................................. SIGNUP ...............................................
+
 class SignupView(APIView):
     permission_classes = [AllowAny]
 
@@ -51,60 +56,10 @@ class SignupView(APIView):
         password = data.get("password")
         name = data.get("name")
         email = data.get("email")
-        referral_code = data.get("referralCode")  # optional
-
-        if not phone or not password or not name:
-            return Response({"detail": "Required fields missing"}, status=400)
-
-        if users_col.find_one({"phone": phone}):
-            return Response({"detail": "Phone already registered"}, status=400)
-
-        # --- Create new user ---
-        user_doc = {
-            "phone": phone,
-            "email": email,
-            "name": name,
-            "password": hash_password(password),
-            "points": 0,  # start with 0 points
-            "created_at": datetime.utcnow(),
-        }
-        result = users_col.insert_one(user_doc)
-        user_id = str(result.inserted_id)
-
-        # --- REFERRAL LOGIC ---
-        if referral_code:
-            try:
-                referrer = users_col.find_one({"_id": ObjectId(referral_code)})
-            except InvalidId:
-                referrer = None
-
-            if referrer and str(referrer["_id"]) != user_id:
-                # Update points
-                users_col.update_one(
-                    {"_id": referrer["_id"]}, {"$inc": {"points": 4}}
-                )
-                users_col.update_one(
-                    {"_id": ObjectId(user_id)}, {"$inc": {"points": 2}}
-                )
-
-                # Save referral record
-                referrals_col.insert_one({
-                    "referrer_id": str(referrer["_id"]),
-                    "referred_user": {
-                        "id": user_id,
-                        "name": name,
-                        "phone": phone,
-                        "email": email,
-                    },
-                    "referrer_points": 4,
-                    "referee_points": 2,
-                    "created_at": datetime.utcnow(),
-                })
-
-        # --- Generate JWT tokens ---
-        tokens = generate_tokens_for_user(user_id)
-        user = users_col.find_one({"_id": ObjectId(user_id)})
-
+        referral_code = data.get("referralCode")  
+        print(data)
+        
+        user_id, user, tokens = signup_logic(data, phone, password, name, email, referral_code)
         return Response({
             "user": {
                 "id": user_id,
@@ -115,9 +70,10 @@ class SignupView(APIView):
             },
             "tokens": tokens,
         }, status=201)
+        
 
 
-# ================== LOGIN ==================
+# ....................................... LOGIN ...................................................
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -125,14 +81,8 @@ class LoginView(APIView):
         phone = request.data.get("phone")
         password = request.data.get("password")
 
-        if not phone or not password:
-            return Response({"detail": "Phone and password required"}, status=400)
+        tokens, user = LoginLogic(phone, password)
 
-        user = users_col.find_one({"phone": phone})
-        if not user or not verify_password(password, user["password"]):
-            return Response({"detail": "Invalid credentials"}, status=401)
-
-        tokens = generate_tokens_for_user(str(user["_id"]))
 
         return Response({
             "user": {
@@ -146,7 +96,7 @@ class LoginView(APIView):
         })
 
 
-# ================== PROFILE ==================
+# .............................................. PROFILE ..................................................
 class ProfileView(APIView):
     permission_classes = [AllowAny]
 
@@ -156,11 +106,7 @@ class ProfileView(APIView):
             return Response({"detail": "Unauthorized"}, status=401)
 
         try:
-            token = auth.replace("Bearer ", "")
-            payload = decode_token(token)
-            user = users_col.find_one({"_id": ObjectId(payload["user_id"])})
-            if not user:
-                return Response({"detail": "User not found"}, status=404)
+            user = ProfileForRefferal(auth)
 
             return Response({
                 "id": str(user["_id"]),
