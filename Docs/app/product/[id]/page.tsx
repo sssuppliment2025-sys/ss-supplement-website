@@ -179,6 +179,41 @@ export default function ProductPage() {
     router.push("/cart")
   }
 
+  const handleShare = async () => {
+    const shareUrl = typeof window !== "undefined" ? window.location.href : `/product/${product.id}`
+    const shareData = {
+      title: `${product.name} | ${product.brand}`,
+      text: `Check out this product: ${product.name}`,
+      url: shareUrl,
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share(shareData)
+        return
+      }
+
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl)
+        toast({
+          title: "Link copied",
+          description: "Product link copied to clipboard.",
+        })
+        return
+      }
+
+      toast({
+        title: "Share unavailable",
+        description: "Your browser does not support sharing on this device.",
+      })
+    } catch {
+      toast({
+        title: "Share canceled",
+        description: "Sharing was canceled or failed.",
+      })
+    }
+  }
+
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
   const otherCategoryProducts = products
     .filter((p) => p.category !== product.category)
@@ -420,7 +455,7 @@ export default function ProductPage() {
                 <Heart className="h-4 w-4 mr-2" />
                 Add to Wishlist
               </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
