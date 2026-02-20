@@ -71,6 +71,20 @@ def MailFunction(userMail, userName, password):
     msg.send()
 ######### ================== Mail Function ===================
 
+# Add to your utils or signup_logic file
+#import random
+#import string
+
+#def generate_referral_code(length=8):
+#    """Generate unique referral code like 'ABCD1234'"""
+#    chars = string.ascii_uppercase + string.digits
+#    code = ''.join(random.choices(chars, k=length))
+#    return code
+
+
+
+
+
 
 
 
@@ -83,30 +97,55 @@ def wake_up(request):
 
 
 # .............................................. SIGNUP ...............................................
-
 class SignupView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        data = request.data
-        phone = data.get("phone")
-        password = data.get("password")
-        name = data.get("name")
-        email = data.get("email")
-        referral_code = data.get("referralCode")  
-        print(data)
-        
-        user_id, user, tokens = signup_logic(data, phone, password, name, email, referral_code)
-        return Response({
-            "user": {
-                "id": user_id,
-                "name": user["name"],
-                "phone": user["phone"],
-                "email": user.get("email"),
-                "points": user.get("points", 0),
-            },
-            "tokens": tokens,
-        }, status=201)
+        try:
+            data = request.data
+            phone = data.get("phone")
+            password = data.get("password")
+            name = data.get("name")
+            email = data.get("email")
+            referral_code = data.get("referralCode")
+            
+            print("📱 Signup request:", {
+                "phone": phone[:4] + "****" if phone else None,
+                "name": name,
+                "has_referral": bool(referral_code)
+            })
+
+            user_id, user, tokens = signup_logic(
+                data, phone, password, name, email, referral_code
+            )
+            
+            return Response({
+                "success": True,
+                "user": {
+                    "id": user_id,
+                    "name": user["name"],
+                    "phone": user["phone"],
+                    "email": user.get("email"),
+                    "points": user.get("points", 0), 
+                    "referral_code": user.get("referral_code"),
+                },
+                "tokens": tokens,
+            }, status=201)
+            
+        except ValueError as ve:
+            print(f"Validation error: {str(ve)}")
+            return Response({
+                "success": False,
+                "error": str(ve)
+            }, status=400)
+            
+        except Exception as e:
+            print(f"Signup error: {str(e)}")
+            return Response({
+                "success": False,
+                "error": "Signup failed. Please try again."
+            }, status=500)
+
         
 
 
