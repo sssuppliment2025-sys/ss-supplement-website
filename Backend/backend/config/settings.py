@@ -132,8 +132,8 @@ CORS_ALLOW_CREDENTIALS = True
 # Referral Points Configuration
 # ---------------------------------------------------------------------------
 
-REFERRAL_POINTS_FOR_REFERRER = 4   # Points the person who shares the link gets
-REFERRAL_POINTS_FOR_REFERRED = 2   # Points the new user who signs up gets
+REFERRAL_POINTS_FOR_REFERRER = 100   # Points the person who shares the link gets
+REFERRAL_POINTS_FOR_REFERRED = 50   # Points the new user who signs up gets
 
 
 # ---------------------------------------------------------------------------

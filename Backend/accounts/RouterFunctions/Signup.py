@@ -36,10 +36,10 @@ def signup_logic(data, phone, password, name, email, referral_code) :
         if referrer and str(referrer["_id"]) != user_id:
                 
             users_col.update_one(
-                {"_id": referrer["_id"]}, {"$inc": {"points": 4}}
+                {"_id": referrer["_id"]}, {"$inc": {"points": 100}}
             )
             users_col.update_one(
-                {"_id": ObjectId(user_id)}, {"$inc": {"points": 2}}
+                {"_id": ObjectId(user_id)}, {"$inc": {"points": 50}}
             )
 
                 
@@ -51,8 +51,8 @@ def signup_logic(data, phone, password, name, email, referral_code) :
                     "phone": phone,
                     "email": email,
                 },
-                "referrer_points": 4,
-                "referee_points": 2,
+                "referrer_points": 100,
+                "referee_points": 50,
                 "created_at": datetime.utcnow(),
             })
 

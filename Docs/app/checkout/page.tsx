@@ -28,8 +28,9 @@ export default function CheckoutPage() {
   const { isAuthenticated } = useAuth()
   const { toast } = useToast()
 
-  // ✅ FIXED COINS STATE
+  // ✅ COINS STATE - INCLUDING EARNED POINTS
   const [points, setPoints] = useState<number>(0)
+  const [earnedPoints, setEarnedPoints] = useState<number>(0) // NEW: Track earned points
   const [loadingPoints, setLoadingPoints] = useState(true)
   const [useCoins, setUseCoins] = useState(false)
 
@@ -85,15 +86,11 @@ export default function CheckoutPage() {
       .finally(() => setLoadingPoints(false))
   }, [isAuthenticated, toast])
 
-  /* ================= ✅ FIXED PRICE CALCULATIONS - 20% MIN PAYMENT ================= */
+  /* ================= PRICE CALCULATIONS - 20% MIN PAYMENT ================= */
   const subtotal = getCartTotal()
-  
-  // ✅ RULE 1: Max 80% coins usage (20% minimum cash payment)
   const maxCoinsAllowed = Math.floor(subtotal * 0.8)  // 80% max coins
   const availableCoinsForDiscount = Math.min(points, maxCoinsAllowed)
   const coinsUsed = useCoins ? availableCoinsForDiscount : 0
-  
-  // ✅ RULE 2: Never go below 20% cash payment (minimum ₹50)
   const minimumCashPayment = Math.max(subtotal * 0.2, 50)
   const finalTotal = Math.max(subtotal - coinsUsed, minimumCashPayment)
 
@@ -106,7 +103,7 @@ export default function CheckoutPage() {
     finalTotal
   })
 
-  /* ================= WHATSAPP MESSAGE ================= */
+  /* ================= WHATSAPP MESSAGE - UPDATED WITH EARNED POINTS ================= */
   const generateWhatsAppMessage = (backendCoins: number, backendEarned: number) => {
     const orderItems = items
       .map((item) => {
@@ -133,7 +130,9 @@ Subtotal: ₹${subtotal}
 ${coinsUsed > 0 ? `🎁 Coins Used: ${coinsUsed}` : ""}
 Total: *₹${finalTotal}*
 
-👛 *COINS BALANCE:* ${backendCoins} (Earned: +${backendEarned})
+👛 *COINS UPDATE:*
+🎉 *Earned:* +${backendEarned} coins
+💰 *New Balance:* ${backendCoins} coins
 
 ${paymentInfo}
 
@@ -190,7 +189,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     }
   }
 
-  /* ================= ✅ ORDER SUBMIT ================= */
+  /* ================= ✅ ORDER SUBMIT - FULLY UPDATED WITH EARNED POINTS ================= */
   const handleSubmit = async () => {
     if (paymentMethod === "upi" && !utrNumber.trim()) {
       toast({
@@ -223,7 +222,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             selectedFlavor: item.selectedFlavor,
             selectedWeight: item.selectedWeight,
           })),
-          total: finalTotal,  // ✅ FIXED: Send finalTotal (NOT 0)
+          total: finalTotal,
           coins_used: coinsUsed,
           payment_method: paymentMethod,
           utr_number: paymentMethod === "upi" ? utrNumber : null,
@@ -239,26 +238,29 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
         throw new Error(orderData.error || orderData.detail || "Failed to create order")
       }
 
-      // ✅ REFRESH COINS FROM BACKEND
+      // ✅ CAPTURE EARNED POINTS FROM BACKEND RESPONSE
+      const earnedPointsFromBackend = orderData.order?.earnedPoints || orderData.earnedPoints || 0
+      setEarnedPoints(earnedPointsFromBackend)
+
+      // ✅ REFRESH COINS FROM BACKEND (new total points)
       const profileRes = await fetch(`${API_URL}/api/profile/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       const profileData = await profileRes.json()
-      setPoints(profileData.points || 0)
+      const newTotalPoints = profileData.points || 0
+      setPoints(newTotalPoints)
 
       setOrderId(orderData.order?.id || orderData.id || "SUCCESS")
 
-      const whatsappUrl = generateWhatsAppMessage(
-        profileData.points || 0,
-        orderData.order?.earnedPoints || orderData.earnedPoints || 0
-      )
+      // ✅ UPDATED WHATSAPP WITH EARNED POINTS
+      const whatsappUrl = generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend)
       window.open(whatsappUrl, '_blank')
 
       toast({
         title: "✅ Order Placed Successfully! 🎉",
-        description: `Order #${orderId}. New balance: ${profileData.points || 0} coins. Pay ₹${finalTotal.toLocaleString()}`,
+        description: `Order #${orderId}. Earned +${earnedPointsFromBackend} coins! New balance: ${newTotalPoints} coins. Pay ₹${finalTotal.toLocaleString()}`,
       })
 
       clearCart()
@@ -287,7 +289,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     return null
   }
 
-  // Success screen
+  // ✅ UPDATED SUCCESS SCREEN WITH EARNED POINTS DISPLAY
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-background">
@@ -300,10 +302,33 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed Successfully!</h1>
             <p className="text-muted-foreground mb-6">
               Order details sent to WhatsApp. Please pay ₹{finalTotal.toLocaleString()}.
-              <span className="block mt-2 bg-success/10 text-success px-3 py-1 rounded-full text-sm">
-                ✅ New coin balance: {points.toLocaleString()} coins
-              </span>
             </p>
+            
+            {/* ✅ EARNED POINTS CELEBRATION */}
+            <div className="bg-gradient-to-r from-yellow-500/10 to-success/10 border border-yellow-200/50 rounded-2xl p-6 mb-8 space-y-4">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Coins className="h-8 w-8 text-yellow-500 animate-bounce" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-amber-600 bg-clip-text text-transparent">
+                  +{earnedPoints.toLocaleString()} Coins Earned!
+                </span>
+              </div>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Previous Balance:</span>
+                  <span>{(points - earnedPoints).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Earned this order:</span>
+                  <span className="font-semibold text-yellow-600">+{earnedPoints.toLocaleString()}</span>
+                </div>
+                <div className="h-px bg-gradient-to-r from-yellow-200 to-transparent my-2" />
+                <div className="flex justify-between text-lg font-bold text-foreground">
+                  <span>New Balance:</span>
+                  <span className="text-2xl text-primary">{points.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-3">
               <Button onClick={() => router.push("/orders")} className="w-full bg-primary">
                 View My Orders
@@ -414,7 +439,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     )
   }
 
-  // Main checkout form
+  // Main checkout form (unchanged - same as before)
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -433,7 +458,6 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Form fields - SAME AS BEFORE */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
@@ -610,7 +634,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   })}
                 </div>
 
-                {/* ✅ FIXED Coins Section - 80% MAX */}
+                {/* Coins Section */}
                 <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -676,7 +700,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   )}
                 </div>
 
-                {/* Place Order Button - REMOVED finalTotal === 0 check */}
+                {/* Place Order Button */}
                 <Button
                   onClick={handleProceedToPayment}
                   className="w-full h-12 text-lg"

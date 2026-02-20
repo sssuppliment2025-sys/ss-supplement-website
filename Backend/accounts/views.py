@@ -209,10 +209,17 @@ def create_order(request):
     try:
         auth_header = request.headers.get('Authorization')
         data = request.data
+        
         if not auth_header or not auth_header.startswith('Bearer '):
             return Response({'error': 'Token required'}, status=401)
         
-        order_id, earned_points, new_points = CreateOrderUser(auth_header, data, users_collection, orders_collection)
+      
+        order_id, earned_points, new_points = CreateOrderUser(
+            auth_header, 
+            data, 
+            users_collection, 
+            orders_collection
+        )
         
         return Response({
             'success': True,
@@ -221,17 +228,22 @@ def create_order(request):
                 'earnedPoints': earned_points  
             },
             'user': {
-                'points': new_points
+                'points': new_points 
             }
         }, status=201)
         
+    except ValueError as ve:
+        print(f"Validation error: {str(ve)}")
+        return Response({'error': str(ve)}, status=400)
+        
     except Exception as e:
         print(f"Order error: {str(e)}")
-        #print(f"Request data: {request.data}")
+        print(f"Request data: {request.data}")
         return Response({
             'error': str(e),
             'detail': 'Order creation failed'
         }, status=500)
+
 
 
 
