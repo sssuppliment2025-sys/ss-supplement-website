@@ -26,76 +26,139 @@ const categories = [
 export function CategoryBar() {
   const pathname = usePathname()
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    setIsReady(true)
+  }, [])
 
   useEffect(() => {
     const node = scrollRef.current
     if (!node) return
 
-    const updateScrollState = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = node
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1)
-    }
+    const activeItem = node.querySelector<HTMLAnchorElement>('a[data-active="true"]')
+    if (!activeItem) return
 
-    updateScrollState()
-    node.addEventListener("scroll", updateScrollState, { passive: true })
-    window.addEventListener("resize", updateScrollState)
-
-    return () => {
-      node.removeEventListener("scroll", updateScrollState)
-      window.removeEventListener("resize", updateScrollState)
-    }
-  }, [])
+    activeItem.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    })
+  }, [pathname])
 
   return (
-    <section className="py-4 bg-secondary/30 border-b border-border">
-      <div className="container mx-auto px-4">
+    <section
+      className="relative overflow-hidden border-b border-border/60 bg-[#faf7f7] py-3 md:py-6"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-35 blur-[1.2px]"
+        style={{ backgroundImage: "url('/category-bg.png')" }}
+      />
+      <div className="relative z-10 container mx-auto max-w-[1600px] px-3 md:px-4">
+        <div className="mb-3 text-center md:mb-5">
+          <h2 className="text-xl font-extrabold tracking-tight text-orange-600 sm:text-2xl md:text-4xl">
+            Explore Our Categories
+          </h2>
+        </div>
         <div className="relative">
-          {canScrollLeft && (
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-secondary/30 to-transparent z-10" />
-          )}
-          {canScrollRight && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-secondary/30 to-transparent z-10" />
-          )}
-          <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory scroll-px-2">
-            {categories.map((cat) => (
-              <Link
-                key={cat.name}
-                href={`/category/${encodeURIComponent(cat.name)}`}
-                className={`flex shrink-0 flex-col items-center gap-1.5 min-w-[102px] group snap-start ${
-                  pathname === `/category/${encodeURIComponent(cat.name)}`
-                    ? "text-foreground"
-                    : ""
-                }`}
-              >
-                <div
-                  className={`relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-card to-secondary/40 shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5 ${
-                    pathname === `/category/${encodeURIComponent(cat.name)}`
-                      ? "border-2 border-primary/70"
-                      : "border border-border/70 group-hover:border-primary/60"
+          <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-0.5 pl-1 pr-3 scrollbar-hide snap-x snap-mandatory scroll-px-2 md:hidden">
+            {categories.map((cat, index) => {
+              const isActive = pathname === `/category/${encodeURIComponent(cat.name)}`
+              const tilt = index % 2 === 0 ? "-rotate-[8deg]" : "rotate-[7deg]"
+
+              return (
+                <Link
+                  key={cat.name}
+                  href={`/category/${encodeURIComponent(cat.name)}`}
+                  aria-label={`Browse ${cat.name}`}
+                  data-active={isActive ? "true" : "false"}
+                  className={`group flex w-[calc((100%-1rem)/3.5)] min-w-[calc((100%-1rem)/3.5)] shrink-0 snap-start flex-col items-center gap-1.5 text-center transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf7f7] ${
+                    isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
                   }`}
+                  style={{ transitionDelay: `${index * 35}ms` }}
                 >
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    sizes="64px"
-                    className="object-contain p-1 transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <span
-                  className={`text-[11px] text-center transition-colors whitespace-nowrap leading-tight ${
-                    pathname === `/category/${encodeURIComponent(cat.name)}`
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground group-hover:text-foreground"
+                  <div
+                    className={`relative h-[72px] w-[72px] overflow-hidden rounded-full border-[2px] border-orange-400 bg-[linear-gradient(155deg,#f97316,#ea580c_55%,#c2410c)] shadow-[0_8px_14px_-12px_rgba(234,88,12,0.6)] transition-all duration-300 ${
+                      isActive ? "ring-2 ring-orange-300/50" : "group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_22px_-14px_rgba(234,88,12,0.68)]"
+                    }`}
+                  >
+                    <div className="absolute inset-[3px] rounded-full bg-[radial-gradient(circle_at_20%_16%,#fb923c,#ea580c_65%,#9a3412)]" />
+                    <div className="absolute inset-[4px] overflow-hidden rounded-full">
+                      <Image
+                        src={cat.image}
+                        alt={cat.name}
+                        fill
+                        sizes="(max-width: 767px) 72px, 62px"
+                        loading="lazy"
+                        className={`object-contain p-1 transition-transform duration-300 ${tilt} ${isActive ? "scale-105" : "group-hover:scale-105"}`}
+                      />
+                    </div>
+                  </div>
+                  <span
+                    className={`max-w-[90px] text-sm font-bold leading-[1.1] tracking-tight ${
+                      isActive ? "text-zinc-900" : "text-zinc-700 group-hover:text-zinc-900"
+                    }`}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {cat.name}
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+          <div className="hidden items-start justify-between gap-1 md:flex">
+            {categories.map((cat, index) => {
+              const isActive = pathname === `/category/${encodeURIComponent(cat.name)}`
+              const tilt = index % 2 === 0 ? "-rotate-[8deg]" : "rotate-[7deg]"
+
+              return (
+                <Link
+                  key={cat.name}
+                  href={`/category/${encodeURIComponent(cat.name)}`}
+                  aria-label={`Browse ${cat.name}`}
+                  className={`group flex min-w-0 flex-col items-center gap-1.5 text-center transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf7f7] ${
+                    isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
                   }`}
+                  style={{ transitionDelay: `${index * 25}ms` }}
                 >
-                  {cat.name}
-                </span>
-              </Link>
-            ))}
+                  <div
+                    className={`relative h-[62px] w-[62px] overflow-hidden rounded-full border-[2px] border-orange-400 bg-[linear-gradient(155deg,#f97316,#ea580c_55%,#c2410c)] shadow-[0_8px_14px_-12px_rgba(234,88,12,0.6)] transition-all duration-300 ${
+                      isActive ? "ring-2 ring-orange-300/50" : "group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_20px_-14px_rgba(234,88,12,0.68)]"
+                    }`}
+                  >
+                    <div className="absolute inset-[3px] rounded-full bg-[radial-gradient(circle_at_20%_16%,#fb923c,#ea580c_65%,#9a3412)]" />
+                    <div className="absolute inset-[4px] overflow-hidden rounded-full">
+                      <Image
+                        src={cat.image}
+                        alt={cat.name}
+                        fill
+                        sizes="62px"
+                        loading="lazy"
+                        className={`object-contain p-1 transition-transform duration-300 ${tilt} ${isActive ? "scale-105" : "group-hover:scale-105"}`}
+                      />
+                    </div>
+                  </div>
+                  <span
+                    className={`max-w-[74px] text-[11px] font-bold leading-[1.15] tracking-tight ${
+                      isActive ? "text-zinc-900" : "text-zinc-700 group-hover:text-zinc-900"
+                    }`}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {cat.name}
+                  </span>
+                </Link>
+              )
+            })}
           </div>
         </div>
       </div>
