@@ -25,15 +25,18 @@ const categories = [
 
 export function CategoryBar() {
   const pathname = usePathname()
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const mobileScrollRef = useRef<HTMLDivElement>(null)
+  const desktopScrollRef = useRef<HTMLDivElement>(null)
   const [isReady, setIsReady] = useState(false)
+  const [canScrollDesktopLeft, setCanScrollDesktopLeft] = useState(false)
+  const [canScrollDesktopRight, setCanScrollDesktopRight] = useState(false)
 
   useEffect(() => {
     setIsReady(true)
   }, [])
 
   useEffect(() => {
-    const node = scrollRef.current
+    const node = mobileScrollRef.current
     if (!node) return
 
     const activeItem = node.querySelector<HTMLAnchorElement>('a[data-active="true"]')
@@ -46,6 +49,53 @@ export function CategoryBar() {
     })
   }, [pathname])
 
+  useEffect(() => {
+    const node = desktopScrollRef.current
+    if (!node) return
+
+    const media = window.matchMedia("(min-width: 768px)")
+    const getScrollStep = () => {
+      const firstItem = node.querySelector<HTMLElement>('a[data-desktop-item="true"]')
+      if (!firstItem) return 100
+      const gap = Number.parseFloat(window.getComputedStyle(node).columnGap || "0")
+      return Math.round(firstItem.getBoundingClientRect().width + gap)
+    }
+
+    const updateDesktopScrollState = () => {
+      if (!media.matches) return
+      const { scrollLeft, scrollWidth, clientWidth } = node
+      setCanScrollDesktopLeft(scrollLeft > 2)
+      setCanScrollDesktopRight(scrollLeft + clientWidth < scrollWidth - 2)
+    }
+
+    const autoScroll = () => {
+      if (!media.matches) return
+      const step = getScrollStep()
+      if (node.scrollLeft + node.clientWidth >= node.scrollWidth - 2) {
+        node.scrollTo({ left: 0, behavior: "auto" })
+        return
+      }
+      node.scrollBy({ left: step, behavior: "smooth" })
+    }
+
+    updateDesktopScrollState()
+    const interval = window.setInterval(autoScroll, 2200)
+    node.addEventListener("scroll", updateDesktopScrollState, { passive: true })
+    window.addEventListener("resize", updateDesktopScrollState)
+
+    return () => {
+      window.clearInterval(interval)
+      node.removeEventListener("scroll", updateDesktopScrollState)
+      window.removeEventListener("resize", updateDesktopScrollState)
+    }
+  }, [])
+
+  const scrollDesktopBy = (delta: number) => {
+    const node = desktopScrollRef.current
+    if (!node) return
+    node.scrollBy({ left: delta, behavior: "smooth" })
+  }
+
   return (
     <section
       className="relative overflow-hidden border-b border-border/60 bg-[#faf7f7] py-3 md:py-6"
@@ -54,14 +104,36 @@ export function CategoryBar() {
         className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-35 blur-[1.2px]"
         style={{ backgroundImage: "url('/category-bg.png')" }}
       />
-      <div className="relative z-10 container mx-auto max-w-[1600px] px-3 md:px-4">
+      <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-30 hidden md:block">
+        {canScrollDesktopLeft && (
+          <button
+            type="button"
+            aria-label="Scroll categories left"
+            onClick={() => scrollDesktopBy(-260)}
+            className="pointer-events-auto absolute left-0 top-1/2 flex h-14 w-12 -translate-y-1/2 items-center justify-center text-orange-600/95"
+          >
+            <span className="text-[36px] leading-none">{`<`}</span>
+          </button>
+        )}
+        {canScrollDesktopRight && (
+          <button
+            type="button"
+            aria-label="Scroll categories right"
+            onClick={() => scrollDesktopBy(260)}
+            className="pointer-events-auto absolute right-0 top-1/2 flex h-14 w-12 -translate-y-1/2 items-center justify-center text-orange-600/95"
+          >
+            <span className="text-[36px] leading-none">{`>`}</span>
+          </button>
+        )}
+      </div>
+      <div className="relative z-10 container mx-auto max-w-[1600px] px-3 md:px-0">
         <div className="mb-3 text-center md:mb-5">
           <h2 className="text-xl font-extrabold tracking-tight text-orange-600 sm:text-2xl md:text-4xl">
             Explore Our Categories
           </h2>
         </div>
         <div className="relative">
-          <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-0.5 pl-1 pr-3 scrollbar-hide snap-x snap-mandatory scroll-px-2 md:hidden">
+          <div ref={mobileScrollRef} className="flex gap-2 overflow-x-auto pb-0.5 pl-1 pr-3 scrollbar-hide snap-x snap-mandatory scroll-px-2 md:hidden">
             {categories.map((cat, index) => {
               const isActive = pathname === `/category/${encodeURIComponent(cat.name)}`
               const tilt = index % 2 === 0 ? "-rotate-[8deg]" : "rotate-[7deg]"
@@ -111,7 +183,15 @@ export function CategoryBar() {
               )
             })}
           </div>
-          <div className="hidden items-start justify-between gap-1 md:flex">
+          <div className="relative hidden md:block">
+            <div
+              className="mx-auto w-full max-w-none overflow-hidden"
+              style={{
+                WebkitMaskImage: "linear-gradient(to right, transparent 0, black 56px, black calc(100% - 56px), transparent 100%)",
+                maskImage: "linear-gradient(to right, transparent 0, black 56px, black calc(100% - 56px), transparent 100%)",
+              }}
+            >
+              <div ref={desktopScrollRef} className="flex items-start gap-10 overflow-x-auto px-14 scrollbar-hide">
             {categories.map((cat, index) => {
               const isActive = pathname === `/category/${encodeURIComponent(cat.name)}`
               const tilt = index % 2 === 0 ? "-rotate-[8deg]" : "rotate-[7deg]"
@@ -121,13 +201,14 @@ export function CategoryBar() {
                   key={cat.name}
                   href={`/category/${encodeURIComponent(cat.name)}`}
                   aria-label={`Browse ${cat.name}`}
-                  className={`group flex min-w-0 flex-col items-center gap-1.5 text-center transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf7f7] ${
+                  data-desktop-item="true"
+                  className={`group flex min-w-[98px] shrink-0 flex-col items-center gap-2.5 text-center transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf7f7] ${
                     isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
                   }`}
                   style={{ transitionDelay: `${index * 25}ms` }}
                 >
                   <div
-                    className={`relative h-[62px] w-[62px] overflow-hidden rounded-full border-[2px] border-orange-400 bg-[linear-gradient(155deg,#f97316,#ea580c_55%,#c2410c)] shadow-[0_8px_14px_-12px_rgba(234,88,12,0.6)] transition-all duration-300 ${
+                    className={`relative h-[82px] w-[82px] overflow-hidden rounded-full border-[2px] border-orange-400 bg-[linear-gradient(155deg,#f97316,#ea580c_55%,#c2410c)] shadow-[0_8px_14px_-12px_rgba(234,88,12,0.6)] transition-all duration-300 ${
                       isActive ? "ring-2 ring-orange-300/50" : "group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_20px_-14px_rgba(234,88,12,0.68)]"
                     }`}
                   >
@@ -137,14 +218,14 @@ export function CategoryBar() {
                         src={cat.image}
                         alt={cat.name}
                         fill
-                        sizes="62px"
+                        sizes="82px"
                         loading="lazy"
                         className={`object-contain p-1 transition-transform duration-300 ${tilt} ${isActive ? "scale-105" : "group-hover:scale-105"}`}
                       />
                     </div>
                   </div>
                   <span
-                    className={`max-w-[74px] text-[11px] font-bold leading-[1.15] tracking-tight ${
+                    className={`max-w-[98px] text-sm font-bold leading-[1.15] tracking-tight ${
                       isActive ? "text-zinc-900" : "text-zinc-700 group-hover:text-zinc-900"
                     }`}
                     style={{
@@ -159,6 +240,8 @@ export function CategoryBar() {
                 </Link>
               )
             })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
