@@ -13,7 +13,7 @@ const PRICING = {
   // Whey
   //ON
   ON_WHEY_100_gold_2LB: getPrice(3287, 3779),
-  ON_WHEY_100_gold_5LB: getPrice(7200, 8269),
+  ON_WHEY_100_gold_5LB: getPrice(7300, 8269),
 
   //Dymatize
   DYMATIZE_Elite_100_5LB: getPrice(8399, 12999),
