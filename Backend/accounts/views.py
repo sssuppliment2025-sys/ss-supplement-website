@@ -113,31 +113,31 @@ class ProfileForAccountView(APIView):
                 "address_fields": address_dict  
             }
             
-            print(f"Returning: {response_data}") 
+            #print(f"Returning: {response_data}") 
             return Response(response_data, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"GET Profile ERROR: {str(e)}")
-            print(traceback.format_exc())
+            #print(f"GET Profile ERROR: {str(e)}")
+            #print(traceback.format_exc())
             return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def put(self, request):
         try:
-            print(f"PUT Profile - request.user: {request.user}")
+            #print(f"PUT Profile - request.user: {request.user}")
             
             if not request.user or 'id' not in request.user:
                 return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
             
             user_id = request.user['id']
             data = request.data
-            print(f"Frontend sent: {data}")
+            #print(f"Frontend sent: {data}")
             
            
             address_fields = data.get('address_fields', {})
             full_address = data.get('address', '')
             
-            print(f"Full address: {full_address}")
-            print(f"Address fields: {address_fields}")
+            #print(f"Full address: {full_address}")
+            #print(f"Address fields: {address_fields}")
             
             
             address_doc = {
@@ -155,7 +155,7 @@ class ProfileForAccountView(APIView):
                 "updated_at": datetime.utcnow()
             }
             
-            print(f"Saving address_doc: {address_doc}")
+            #print(f"Saving address_doc: {address_doc}")
             
            
             result = user_addresses_col.update_one(
@@ -164,7 +164,7 @@ class ProfileForAccountView(APIView):
                 upsert=True
             )
             
-            print(f"Update result: {result.modified_count} modified, {result.upserted_id}") 
+            #print(f"Update result: {result.modified_count} modified, {result.upserted_id}") 
             
             return Response({
                 "message": "Profile updated successfully",
@@ -173,8 +173,8 @@ class ProfileForAccountView(APIView):
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"PUT Profile ERROR: {str(e)}")
-            print(traceback.format_exc())
+            #print(f"PUT Profile ERROR: {str(e)}")
+            #print(traceback.format_exc())
             return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ChangePasswordView(APIView):

@@ -1,4 +1,3 @@
-# accounts/services/referrals.py
 from mongo.collections import users_col, referrals_col
 from bson import ObjectId
 from utils.jwt_helper import decode_token
@@ -16,17 +15,15 @@ def get_my_referrals(auth_header: str):
         
         if not user_id:
             return []
-        
-        # ✅ FIXED: Convert CURSOR to LIST
+ 
         referrals_cursor = referrals_col.find({"referrer_id": user_id})
         referrals = list(referrals_cursor)
         
-        # ✅ SAFE data processing
+      
         referral_list = []
         for r in referrals:
             referred_user_id = r.get("referred_user")
             
-            # ✅ SAFE: Get referred user data
             referee_data = {}
             if referred_user_id and isinstance(referred_user_id, dict):
                 referee_data = {
@@ -34,7 +31,7 @@ def get_my_referrals(auth_header: str):
                     "phone": referred_user_id.get("phone", "") or ""
                 }
             elif referred_user_id and isinstance(referred_user_id, ObjectId):
-                # If ObjectId, fetch from users_col
+            
                 user_doc = users_col.find_one({"_id": referred_user_id})
                 if user_doc:
                     referee_data = {
@@ -54,6 +51,6 @@ def get_my_referrals(auth_header: str):
         return referral_list
         
     except Exception as e:
-        print(f"❌ referralsLogic ERROR: {str(e)}")
+        print(f"referralsLogic ERROR: {str(e)}")
         print(traceback.format_exc())
         return []
