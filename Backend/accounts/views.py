@@ -9,7 +9,6 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
 from pymongo import MongoClient
 from bson import ObjectId
 from utils.jwt_helper import decode_token
@@ -35,26 +34,197 @@ from rest_framework.decorators import api_view, permission_classes
 from .RouterFunctions.Signup import signup_logic
 from .RouterFunctions.login import LoginLogic
 from .RouterFunctions.ProfileShowForRefferPoint import ProfileForRefferal
-from .RouterFunctions.Refferal import refferalsLogic
+from .RouterFunctions.Refferal import get_my_referrals
 from .RouterFunctions.CreateUserOrder import CreateOrderUser
 from .RouterFunctions.ForgotPassword import FPassword
 from .RouterFunctions.ResetPassword import RPassword
 from .RouterFunctions.VerifyOTP import VOtp
 from .RouterFunctions.ProfileView import ProfiView
+from .RouterFunctions.LboardView import board
+from utils.CuJWTAuthenticat import CustomJWTAuthentication
+# .................................................. UserAccount Portion ...........................................
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.authentication import BaseAuthentication
+from mongo.collections import users_col, user_addresses_col, orders_col
+import jwt
+from django.conf import settings
+from datetime import datetime
+from utils.password import verify_password, hash_password
+from bson import ObjectId
+import traceback
 
 
 
 
 load_dotenv()
 
-MONGO_URI = os.getenv(
-    "MONGO_URI",
-    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
-)
-mongo_client = MongoClient(MONGO_URI)
-db = mongo_client["sssuppliment_db"]  
-orders_collection = db['orders']
-users_collection = db['users']
+#MONGO_URI = os.getenv(
+#    "MONGO_URI",
+#    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority"
+#)
+#mongo_client = MongoClient(MONGO_URI)
+#db = mongo_client["sssuppliment_db"]  
+#orders_collection = db['orders']
+#users_collection = db['users']
+#user_addresses_col = db['user_address']
+
+
+
+
+
+
+#####################################################################################################################
+# .................................................. UserAccount Portion ...........................................
+class ProfileForAccountView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    def get(self, request):
+        try:
+            if not request.user or 'id' not in request.user:
+                return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            user_id = request.user['id']
+            
+            
+            user_data = users_col.find_one({"_id": ObjectId(str(user_id))})
+            if not user_data:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+         
+            address_data = user_addresses_col.find_one({"user_id": str(user_id)})
+            
+          
+            if address_data:
+                address_dict = dict(address_data)
+                if '_id' in address_dict:
+                    address_dict['id'] = str(address_dict['_id'])
+                    del address_dict['_id']
+            else:
+                address_dict = {}
+            
+            response_data = {
+                "id": str(user_id),
+                "email": user_data.get('email', '') or '',
+                "name": user_data.get('name', '') or '',
+                "phone": user_data.get('phone', '') or '',
+                "address": address_data.get('full_address', '') if address_data else '',
+                "points": user_data.get('points', 0),
+                "address_fields": address_dict  
+            }
+            
+            print(f"Returning: {response_data}") 
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"GET Profile ERROR: {str(e)}")
+            print(traceback.format_exc())
+            return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def put(self, request):
+        try:
+            print(f"PUT Profile - request.user: {request.user}")
+            
+            if not request.user or 'id' not in request.user:
+                return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            user_id = request.user['id']
+            data = request.data
+            print(f"Frontend sent: {data}")
+            
+           
+            address_fields = data.get('address_fields', {})
+            full_address = data.get('address', '')
+            
+            print(f"Full address: {full_address}")
+            print(f"Address fields: {address_fields}")
+            
+            
+            address_doc = {
+                "user_id": str(user_id),  
+                "full_address": full_address or '',
+                "delivery_phone": address_fields.get('delivery_phone', '') or '',
+                "flat_house": address_fields.get('flat_house', '') or '',
+                "address2": address_fields.get('address2', '') or '',
+                "address3": address_fields.get('address3', '') or '',
+                "area_street": address_fields.get('area_street', '') or '',
+                "town_city": address_fields.get('town_city', '') or '',
+                "state": address_fields.get('state', '') or '',
+                "pincode": address_fields.get('pincode', '') or '',
+                "landmark": address_fields.get('landmark', '') or '',
+                "updated_at": datetime.utcnow()
+            }
+            
+            print(f"Saving address_doc: {address_doc}")
+            
+           
+            result = user_addresses_col.update_one(
+                {"user_id": str(user_id)},
+                {"$set": address_doc},
+                upsert=True
+            )
+            
+            print(f"Update result: {result.modified_count} modified, {result.upserted_id}") 
+            
+            return Response({
+                "message": "Profile updated successfully",
+                "address": full_address,
+                "address_fields": address_fields
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"PUT Profile ERROR: {str(e)}")
+            print(traceback.format_exc())
+            return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ChangePasswordView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    
+    def post(self, request):
+        try:
+            if not request.user or 'id' not in request.user:
+                return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            user_id = request.user['id']
+            data = request.data
+            
+            user_data = users_col.find_one({"_id": ObjectId(str(user_id))})
+            if not user_data:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            
+            current_password = data.get('current_password', '')
+            if not current_password:
+                return Response({"error": "Current password required"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            if not verify_password(current_password, user_data.get('password')):
+                return Response({"error": "Current password incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            new_password = data.get('new_password', '')
+            confirm_password = data.get('confirm_password', '')
+            
+            if new_password != confirm_password:
+                return Response({"error": "New passwords do not match"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if len(new_password) < 6:
+                return Response({"error": "New password must be at least 6 characters"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            new_hashed = hash_password(new_password)
+            users_col.update_one(
+                {"_id": ObjectId(str(user_id))}, 
+                {"$set": {"password": new_hashed, "updated_at": datetime.utcnow()}}
+            )
+            
+            return Response({"message": "Password changed successfully"})
+            
+        except Exception as e:
+            #print(f"Change Password ERROR: {str(e)}")
+            #print(traceback.format_exc())
+            return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 
@@ -197,43 +367,29 @@ class ProfileView(APIView):
             return Response({"detail": "Invalid token"}, status=401)
 
 
-# # .............................................. MY REFERRALS ..................................................
-# Future Test <<<<-----  Target codes.... 
+# # .............................................. MY REFERRALS .................................................. 
 class MyReferralsView(APIView):
     def get(self, request):
-        auth = request.headers.get("Authorization")
-        try :
-            referrals = refferalsLogic(auth)
-
-            return Response([
-                {
-                    "id": str(r["_id"]),
-                    "referee_name": r["referred_user"]["name"],
-                    "referee_phone": r["referred_user"]["phone"],
-                    "referrer_points": r["referrer_points"],
-                    "referee_points": r["referee_points"],
-                    "created_at": r["created_at"],
-                }
-                for r in referrals
-            ], status=200)
+        try:
+            auth = request.headers.get("Authorization")
+            referrals = get_my_referrals(auth)  
+            return Response(referrals, status=status.HTTP_200_OK)
+            
         except Exception as e:
-            print("REFERRAL ERROR:", e)
-            return Response([], status=200)
+            print("REFERRAL VIEW ERROR:", e)
+            return Response([], status=status.HTTP_200_OK)
 
 
 # .................................................. LEADERBOARD ...................................................
 class LeaderboardView(APIView):
     permission_classes = [AllowAny]
+    
     def get(self, request):
-        users = users_col.find().sort("points", -1).limit(50)
-        return Response([
-            {
-                "id": str(u["_id"]),
-                "name": u["name"],
-                "points": u.get("points", 0),
-            }
-            for u in users
-        ])
+            print('Leaderboard requested...')
+            users_cursor = users_col.find().sort("points", -1).limit(50)
+            return board(users_cursor)
+            
+
 
 
 
@@ -256,8 +412,8 @@ def create_order(request):
         order_id, earned_points, new_points = CreateOrderUser(
             auth_header, 
             data, 
-            users_collection, 
-            orders_collection
+            users_col, 
+            orders_col
         )
         
         return Response({
@@ -289,7 +445,7 @@ def create_order(request):
 # ................................................ profile_view .............................................
 @api_view(['GET'])
 def profile_view(request):
-    return ProfiView(request, users_collection)
+    return ProfiView(request, users_col)
 
 
 
@@ -321,3 +477,8 @@ def verify_otp(request):
 @permission_classes([AllowAny])
 def reset_password(request):
     return RPassword(request, otps_col, users_col, hash_password)
+
+
+
+
+
