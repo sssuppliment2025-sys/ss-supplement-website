@@ -25,7 +25,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              Your one-stop destination for premium quality health supplements. We offer 100% authentic products from
+              Your one-step destination for premium quality health supplements. We offer 100% authentic products from
               top brands.
             </p>
             <div className="flex gap-3">
