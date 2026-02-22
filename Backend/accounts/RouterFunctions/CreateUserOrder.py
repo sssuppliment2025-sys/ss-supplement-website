@@ -57,7 +57,7 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
         max_coins_allowed = math.floor(max_coin_discount_value / COIN_VALUE)
         
         print(f"DEBUG: max_coins_allowed={max_coins_allowed}")
-        
+
         # ✅ AUTO-CORRECT coins
         if coins_used > max_coins_allowed:
             coins_used = max_coins_allowed
@@ -65,28 +65,30 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
         if coins_used < 0:
             coins_used = 0
 
-        # ✅ TEMPORARILY DISABLE TOTAL VALIDATION
-        # Frontend has calculation bug - use THEIR total_paid instead
-        expected_total = round(total_paid, 2)
-        print(f"✅ USING FRONTEND TOTAL: {expected_total} (skipped validation)")
-
-        # ✅ CHECK COINS
+        # ✅ COINS DEDUCTION - HANDLE ZERO COINS CORRECTLY
         current_points = user.get("points", 0)
-        if current_points < coins_used:
-            raise ValueError(f"Insufficient coins. Need {coins_used}, have {current_points}")
+        print(f"DEBUG: current_points={current_points}, coins_used={coins_used}")
+        
+        if coins_used > 0:  # ✅ ONLY deduct if coins_used > 0
+            if current_points < coins_used:
+                raise ValueError(f"Insufficient coins. Need {coins_used}, have {current_points}")
+            
+            # -------- DEDUCT COINS FIRST --------
+            deduct_result = users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$inc": {"points": -coins_used}}
+            )
+            
+            if deduct_result.modified_count == 0:
+                raise ValueError("Failed to deduct coins")
+            
+            print(f"✅ DEDUCTED {coins_used} coins successfully")
+        else:
+            print("✅ No coins to deduct (coins_used=0)")
 
         # -------- EARN COINS --------
-        earned_coins = 0    #math.floor(cart_total * 0.04 / 0.2)
+        earned_coins = 0 #math.floor(actual_subtotal * 0.04 / 0.2)  # ✅ 4% of items only
         print(f"DEBUG: coins_used={coins_used}, earned_coins={earned_coins}")
-
-        # -------- DEDUCT COINS --------
-        deduct_result = users_collection.update_one(
-            {"_id": ObjectId(user_id)},
-            {"$inc": {"points": -coins_used}}
-        )
-        
-        if deduct_result.modified_count == 0:
-            raise ValueError("Failed to deduct coins")
 
         # -------- ORDER ID --------
         order_id = str(uuid.uuid4())[:8].upper()
@@ -114,7 +116,7 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
             "cart_total": round(cart_total, 2),
             "coins_used": coins_used,
             "coin_discount_value": round(coins_used * COIN_VALUE, 2),
-            "cash_paid": round(total_paid, 2),  # ✅ Use frontend's total
+            "cash_paid": round(total_paid, 2),
             "earned_points": earned_coins,
             "order_items": order_items,
             "payment_method": data.get("payment_method", "cod"),
@@ -125,14 +127,16 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
         })
 
         # -------- ADD EARNED COINS --------
-        users_collection.update_one(
-            {"_id": ObjectId(user_id)},
-            {"$inc": {"points": earned_coins}}
-        )
+        if earned_coins > 0:  # ✅ Only if earned > 0
+            users_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$inc": {"points": earned_coins}}
+            )
+            print(f"✅ ADDED {earned_coins} earned coins")
 
-        # ✅ FINAL POINTS
+        # ✅ FINAL POINTS CHECK
         final_user = users_collection.find_one({"_id": ObjectId(user_id)})
-        final_points = final_user.get("points", 0) if final_user else current_points
+        final_points = final_user.get("points", 0) if final_user else current_points - coins_used + earned_coins
         
         print(f"✅ FINAL: User {user_id} points = {final_points} (used {coins_used}, earned {earned_coins})")
 
@@ -140,13 +144,17 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
 
     except Exception as e:
         print("Order Error:", str(e))
+        # ✅ ROLLBACK only if we actually deducted coins
         try:
             if 'coins_used' in locals() and coins_used > 0:
-                users_collection.update_one(
-                    {"_id": ObjectId(user_id)},
-                    {"$inc": {"points": coins_used}}
-                )
-                print(f"✅ ROLLBACK: Added back {coins_used} coins")
+                # Check current points after potential deduction
+                current_after = users_collection.find_one({"_id": ObjectId(user_id)}).get("points", 0)
+                if current_after < user.get("points", 0):  # Coins were deducted
+                    users_collection.update_one(
+                        {"_id": ObjectId(user_id)},
+                        {"$inc": {"points": coins_used}}
+                    )
+                    print(f"✅ ROLLBACK: Added back {coins_used} coins")
         except:
             pass
         raise ValueError(str(e))
