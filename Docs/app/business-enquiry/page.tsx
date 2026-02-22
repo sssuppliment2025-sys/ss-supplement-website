@@ -168,7 +168,7 @@ Message: ${formData.message}
                     <Mail className="h-6 w-6 text-primary mt-1 shrink-0" />
                     <div className="min-w-0">
                       <p className="font-medium text-foreground">Email</p>
-                      <p className="text-muted-foreground whitespace-nowrap">@sssupplement.com</p>
+                      <p className="text-muted-foreground whitespace-nowrap">info@sssupplement.com</p>
                     </div>
                   </div>
                 </CardContent>
