@@ -29,16 +29,16 @@ export function Footer() {
               top brands.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="text-muted-foreground hover:text-primary">
+              <a href="https://www.facebook.com/share/1AgAAprSJz/" className="text-muted-foreground hover:text-primary">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary">
+              <a href="https://www.instagram.com/sssupplements.fitness?igsh=aDdzdDYxb2cza2d2" className="text-muted-foreground hover:text-primary">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="text-muted-foreground hover:text-primary">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary">
+              <a href="https://youtube.com/@sssupplements.fitness?si=aq8DptOS0v0MOxRe" className="text-muted-foreground hover:text-primary">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
