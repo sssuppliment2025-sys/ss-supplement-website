@@ -399,6 +399,12 @@ class LeaderboardView(APIView):
 
 
 # ................................................ Order placed with coin =.............................................
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 @api_view(['POST'])
 def create_order(request):
     try:
@@ -415,6 +421,7 @@ def create_order(request):
             orders_col
         )
         
+        print(f"✅ Order {order_id} created! Earned: {earned_points}, New points: {new_points}")
         
         return Response({
             'order': {
@@ -438,6 +445,8 @@ def create_order(request):
             'error': str(e),
             'detail': 'Order creation failed'
         }, status=500)
+
+
 
 
 
