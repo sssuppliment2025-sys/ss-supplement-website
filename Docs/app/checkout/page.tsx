@@ -29,7 +29,7 @@ const SHIPPING_FEE = 50         // ₹50 if below threshold
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, getCartTotal, clearCart } = useCart()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const { toast } = useToast()
 
   // ✅ FLEXIBLE COINS STATE
@@ -314,6 +314,33 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
       setOrderId(successData.order?.id || "SUCCESS")
       window.open(generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend), '_blank')
+
+      // ✅ Save order to localStorage for "My Orders" page
+      const savedOrderId = successData.order?.id || `ORD-${Date.now()}`
+      const localOrder = {
+        id: savedOrderId,
+        items: items.map((item) => {
+          const price = typeof item.product.flavors === "string"
+            ? item.product.price
+            : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+          return {
+            product: item.product.name,
+            flavor: item.selectedFlavor || "",
+            weight: item.selectedWeight || "",
+            quantity: item.quantity,
+            price,
+          }
+        }),
+        total: Number(finalTotal.toFixed(2)),
+        address: formData,
+        paymentMethod,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        userId: user?.id,
+      }
+      const existingOrders = JSON.parse(localStorage.getItem("ss_orders") || "[]")
+      existingOrders.push(localOrder)
+      localStorage.setItem("ss_orders", JSON.stringify(existingOrders))
 
       toast({
         title: "✅ Order Placed Successfully! 🎉",
