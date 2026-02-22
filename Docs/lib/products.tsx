@@ -1288,7 +1288,7 @@ export const products: Product[] = [
 },
 {
   id: "703",
-  name: "Wellbeing Nutrition Clean Whey Protein Isolate 1kg Unflavoured",
+  name: "Wellbeing Nutrition Clean Whey Protein Isolate",
   brand: "Wellbeing Nutrition",
   category: "Whey Protein",
   ...PRICING.WBN_CLN_WPI_UNFLAV_1KG,
@@ -1313,7 +1313,7 @@ export const products: Product[] = [
 },
 {
   id: "704",
-  name: "Wellbeing Nutrition Clean Whey Protein Isolate 1kg Dark Chocolate",
+  name: "Wellbeing Nutrition Clean Whey Protein Isolate",
   brand: "Wellbeing Nutrition",
   category: "Whey Protein",
   ...PRICING.WBN_CLN_WPI_DARK_CHOC_1KG,
