@@ -50,7 +50,13 @@ const PRICING = {
 
   //ISOPURE
   ISOPURE_1KG: getPrice(4799, 5289),
-  //ISOPURE_2KG: getPrice(8299, 11649),  
+  //ISOPURE_2KG: getPrice(8299, 11649),
+
+  //WELLBEING
+  WBN_CLN_WPC_1KG_unflavoured: getPrice(2499,2999),
+  WBN_CLN_WPI_WPC_SWISS_1KG: getPrice(3299,3999),
+  WBN_CLN_WPI_UNFLAV_1KG: getPrice(3699,4999),
+  WBN_CLN_WPI_DARK_CHOC_1KG: getPrice(3699,4999),
 
   //MB
   MB_BIO_PER_1KG: getPrice(2749, 2989),
@@ -1227,6 +1233,109 @@ export const products: Product[] = [
   //   inStock: true,
   // },
 
+
+  //WELLBEING
+  {
+  id: "701",
+  name: "Wellbeing Nutrition Clean Whey Protein Concentrate 1kg",
+  brand: "Wellbeing Nutrition",
+  category: "Whey Protein",
+  ...PRICING.WBN_CLN_WPC_1KG_unflavoured,
+  rating: 4.5,
+  reviews: 1200,
+  image: "/image/Whey_Protein/wellbeing_clean_whey_protein_concentrate_1kg_unflavoured.jpg",
+  image1: "/image/Whey_Protein/wellbeing_clean_whey_protein_concentrate_1kg_unflavoured1.jpg",
+  image2: "/image/Whey_Protein/wellbeing_clean_whey_protein_concentrate_1kg_unflavoured2.jpg",
+  image3: "/image/Whey_Protein/wellbeing_clean_whey_protein_concentrate_1kg_unflavoured3.jpg",
+  images: [],
+  flavors: [{ name: "Unflavoured", price: PRICING.WBN_CLN_WPC_1KG_unflavoured.price }],
+  weight: "1KG",
+  weights: ["1KG"],
+  description: "Unflavoured native whey protein concentrate supporting daily protein needs",
+  keyBenefits: [
+    "Supports lean muscle growth & strength",
+    "High in essential amino acids (EAAs) & BCAAs",
+    "Includes probiotics & digestive enzymes for easier digestion"
+  ],
+  nutritionalInfo: "Per serving: ~27g protein, ~12.7g EAAs, ~6g BCAAs, plus 4B CFU probiotics & digestive enzymes for gut comfort",  
+  inStock: true,
+},
+{
+  id: "702",
+  name: "Wellbeing Nutrition Clean Whey Protein Isolate & Concentrate 1kg Swiss Chocolate",
+  brand: "Wellbeing Nutrition",
+  category: "Whey Protein",
+  ...PRICING.WBN_CLN_WPI_WPC_SWISS_1KG,
+  rating: 4.7,
+  reviews: 1800,
+  image: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_concentrate_swiss_chocolate_1kg.jpg",
+  image1: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_concentrate_swiss_chocolate_1kg1.jpg",
+  image2: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_concentrate_swiss_chocolate_1kg2.jpg",
+  image3: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_concentrate_swiss_chocolate_1kg3.jpg",
+  images: [],
+  flavors: [{ name: "Swiss Chocolate", price: PRICING.WBN_CLN_WPI_WPC_SWISS_1KG.price }],
+  weight: "1KG",
+  weights: ["1KG"],
+  description: "Swiss chocolate flavoured whey isolate & concentrate with Velositol®, probiotics & digestive enzymes",  
+  keyBenefits: [
+    "24g high-quality protein per serving",
+    "Enhances muscle strength, endurance & recovery",
+    "Velositol® to improve protein synthesis",
+    "Probiotics & enzymes for gut-friendly digestion"
+  ],
+  nutritionalInfo: "Per serving: ~24g protein, ~11.5g EAAs, ~5.4g BCAAs, 1g glutamine, 4B CFU probiotics & digestive enzymes",  
+  inStock: true,
+},
+{
+  id: "703",
+  name: "Wellbeing Nutrition Clean Whey Protein Isolate 1kg Unflavoured",
+  brand: "Wellbeing Nutrition",
+  category: "Whey Protein",
+  ...PRICING.WBN_CLN_WPI_UNFLAV_1KG,
+  rating: 4.6,
+  reviews: 1500,
+  image: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_unflavoured.jpg",
+  image1: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_unflavoured1.jpg",
+  image2: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_unflavoured2.jpg",
+  image3: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_unflavoured3.jpg",
+  images: [],
+  flavors: [{ name: "Unflavoured", price: PRICING.WBN_CLN_WPI_UNFLAV_1KG.price }],
+  weight: "1KG",
+  weights: ["1KG"],
+  description: "Ultra-pure unflavoured whey protein isolate delivering fast-absorbing protein",  
+  keyBenefits: [
+    "High protein content (~30g per serving)",
+    "Fast muscle recovery & reduced soreness",
+    "Probiotics & digestive enzymes to support digestion"
+  ],
+  nutritionalInfo: "Per serving: ~26–31g ultra-pure protein, EAAs, BCAAs & 4B CFU probiotics for better tolerance and muscle support",  
+  inStock: true,
+},
+{
+  id: "704",
+  name: "Wellbeing Nutrition Clean Whey Protein Isolate 1kg Dark Chocolate",
+  brand: "Wellbeing Nutrition",
+  category: "Whey Protein",
+  ...PRICING.WBN_CLN_WPI_DARK_CHOC_1KG,
+  rating: 4.7,
+  reviews: 1600,
+  image: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_dark_chocolate.jpg",
+  image1: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_dark_chocolate1.jpg",
+  image2: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_dark_chocolate2.jpg",
+  image3: "/image/Whey_Protein/wellbeing_clean_whey_protein_isolate_1kg_dark_chocolate3.jpg",
+  images: [],
+  flavors: [{ name: "Dark Chocolate", price: PRICING.WBN_CLN_WPI_DARK_CHOC_1KG.price }],
+  weight: "1KG",
+  weights: ["1KG"],
+  description: "Dark chocolate flavoured fast-absorbing whey protein isolate",  
+  keyBenefits: [
+    "Rich protein (~26.6g per serving) to support muscle growth",
+    "Fast absorption for post-workout recovery",
+    "Digestive enzymes & probiotics for smoother digestion"
+  ],
+  nutritionalInfo: "Per serving: ~26.6g protein, EAAs, BCAAs & 4B CFU probiotics to aid muscle repair and gut health",  
+  inStock: true,
+},
   // MUSCLEBLAZE BIOZYME
   {
     id: "41",
