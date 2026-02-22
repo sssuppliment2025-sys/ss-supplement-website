@@ -51,8 +51,6 @@ export default function OrdersPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "pending":
-        return <Clock className="h-4 w-4" />
       case "confirmed":
         return <Check className="h-4 w-4" />
       case "shipped":
@@ -66,8 +64,6 @@ export default function OrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
-        return "bg-warning/20 text-warning"
       case "confirmed":
         return "bg-primary/20 text-primary"
       case "shipped":
@@ -121,10 +117,12 @@ export default function OrdersPage() {
                       <p className="text-sm text-muted-foreground">Total Amount</p>
                       <p className="text-lg font-bold text-foreground">₹{order.total}</p>
                     </div>
-                    <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
-                      {getStatusIcon(order.status)}
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </Badge>
+                    {order.status !== "pending" && (
+                      <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
+                        {getStatusIcon(order.status)}
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </Badge>
+                    )}
                   </div>
 
                   <div className="border-t border-border pt-4">
