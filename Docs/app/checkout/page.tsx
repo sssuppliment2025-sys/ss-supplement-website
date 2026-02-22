@@ -23,7 +23,7 @@ const ADMIN_WHATSAPP = "919547899170"
 const ADMIN_UPI_ID = "sssupplement@upi"
 
 // ✅ CONDITIONAL SHIPPING CONFIGURATION
-const SHIPPING_THRESHOLD = 999  // Free shipping above ₹999
+const SHIPPING_THRESHOLD = 1000  // Free shipping above ₹999
 const SHIPPING_FEE = 50         // ₹50 if below threshold
 
 export default function CheckoutPage() {
