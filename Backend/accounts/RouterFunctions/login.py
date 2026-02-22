@@ -11,6 +11,6 @@ def LoginLogic(phone, password) :
     user = users_col.find_one({"phone": phone})
     if not user or not verify_password(password, user["password"]):
         return Response({"detail": "Invalid credentials"}, status=401)
-
+     
     tokens = generate_tokens_for_user(str(user["_id"]))
     return tokens, user

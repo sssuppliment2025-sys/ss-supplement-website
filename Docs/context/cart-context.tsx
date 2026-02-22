@@ -16,7 +16,9 @@ interface CartContextType {
   removeFromCart: (productId: string, flavor: string, weight: string) => void
   updateQuantity: (productId: string, flavor: string, weight: string, quantity: number) => void
   clearCart: () => void
-  getCartTotal: () => number
+  getCartTotal: () => number                   
+  getCartSubtotal: () => number                 
+  getShippingFee: () => number                  
   getCartCount: () => number
   getCartItemPrice: (productId: string, flavor: string, weight: string) => number
 }
@@ -90,11 +92,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([])
   }
 
-  // ✅ FIXED: Proper price calculation for BOTH flavor AND weight
+  
   const getItemPrice = (product: Product, flavor: string, weight: string): number => {
-    let price = product.price // fallback to base price
+    let price = product.price 
 
-    // 1. Check flavor price first (handles both array and string flavors)
+    
     if (Array.isArray(product.flavors) && product.flavors.length > 0) {
       const flavorObj = product.flavors.find((f) => {
         if (typeof f === "string") {
@@ -106,11 +108,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         price = flavorObj.price
       }
     } else if (typeof product.flavors === "string" && product.flavors === flavor) {
-      // String flavor - use base price
       price = product.price
     }
 
-    // 2. Override with weight-specific price if available
+    
     if (weight && (product.weights || product.weightVariants)) {
       const weightsArray = product.weights || product.weightVariants || []
       const weightVariant = weightsArray.find((w: any) => 
@@ -121,15 +122,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // 3. Final fallback to original price
+    
     return price || product.originalPrice || 0
   }
 
-  const getCartTotal = () => {
+ 
+  const getCartSubtotal = () => {
     return items.reduce((total, item) => {
       const itemPrice = getItemPrice(item.product, item.selectedFlavor, item.selectedWeight)
       return total + (itemPrice * item.quantity)
     }, 0)
+  }
+
+  
+  const getShippingFee = () => {
+    const subtotal = getCartSubtotal()
+    return subtotal <= 999 ? 50 : 0
+  }
+
+  
+  const getCartTotal = () => {
+    return getCartSubtotal() + getShippingFee()
   }
 
   const getCartCount = () => {
@@ -152,7 +165,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
-        getCartTotal,
+        getCartTotal,      
+        getCartSubtotal,  
+        getShippingFee,    
         getCartCount,
         getCartItemPrice,
       }}

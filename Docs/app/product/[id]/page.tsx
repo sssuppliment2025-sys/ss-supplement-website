@@ -27,6 +27,7 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useProducts } from "@/context/product-context"
 import { useCart } from "@/context/cart-context"
+import { useWishlist } from "@/context/wishlist-context"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ProductPage() {
@@ -34,6 +35,7 @@ export default function ProductPage() {
   const router = useRouter()
   const { getProductById, products, getProductVariants, findProductByVariant } = useProducts()
   const { addToCart } = useCart()
+  const { isInWishlist, toggleWishlist } = useWishlist()
   const { toast } = useToast()
 
   const product = getProductById(params.id as string)
@@ -44,6 +46,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [showMagnifier, setShowMagnifier] = useState(false)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>()
+  const [wishlistPulse, setWishlistPulse] = useState(false)
 
   // ✅ FIXED: Initialize with CURRENT product weight
   useEffect(() => {
@@ -88,6 +91,12 @@ export default function ProductPage() {
       carouselApi.scrollTo(selectedImage)
     }
   }, [carouselApi, selectedImage])
+
+  useEffect(() => {
+    if (!wishlistPulse) return
+    const timer = window.setTimeout(() => setWishlistPulse(false), 180)
+    return () => window.clearTimeout(timer)
+  }, [wishlistPulse])
 
   // Get all variants of this product
   const productVariants = product ? getProductVariants(product.name, product.brand) : []
@@ -179,6 +188,51 @@ export default function ProductPage() {
     router.push("/cart")
   }
 
+  const handleShare = async () => {
+    const shareUrl = typeof window !== "undefined" ? window.location.href : `/product/${product.id}`
+    const shareData = {
+      title: `${product.name} | ${product.brand}`,
+      text: `Check out this product: ${product.name}`,
+      url: shareUrl,
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share(shareData)
+        return
+      }
+
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl)
+        toast({
+          title: "Link copied",
+          description: "Product link copied to clipboard.",
+        })
+        return
+      }
+
+      toast({
+        title: "Share unavailable",
+        description: "Your browser does not support sharing on this device.",
+      })
+    } catch {
+      toast({
+        title: "Share canceled",
+        description: "Sharing was canceled or failed.",
+      })
+    }
+  }
+
+  const handleWishlistToggle = () => {
+    if (!product?.id) return
+    setWishlistPulse(true)
+    toggleWishlist(product.id)
+    toast({
+      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
+      description: product.name,
+    })
+  }
+
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
   const otherCategoryProducts = products
     .filter((p) => p.category !== product.category)
@@ -188,6 +242,7 @@ export default function ProductPage() {
     .filter((p) => p.id !== product.id)
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 8)
+  const isWishlisted = isInWishlist(product?.id ?? "")
 
   return (
     <div className="min-h-screen bg-background">
@@ -209,6 +264,28 @@ export default function ProductPage() {
           <div className="space-y-4">
             <div className="md:hidden">
               <div className="relative rounded-xl overflow-hidden border border-border bg-card">
+                <div className="absolute top-2.5 right-2.5 z-20">
+                  <div className="flex items-center gap-0.5">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                      className={`h-10 w-10 rounded-full p-0 transition-all duration-200 ${isWishlisted ? "text-primary bg-primary/10 ring-1 ring-primary/30" : "text-primary hover:text-primary/90 hover:bg-primary/5"} ${wishlistPulse ? "scale-110" : "scale-100"}`}
+                      onClick={handleWishlistToggle}
+                    >
+                      <Heart className={`h-[18px] w-[18px] transition-all duration-200 ${isWishlisted ? "fill-current" : ""}`} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-10 rounded-full px-3.5 text-sm text-primary hover:text-primary/90 hover:bg-primary/5 transition-all duration-200"
+                      onClick={handleShare}
+                    >
+                      <Share2 className="h-[18px] w-[18px] mr-1.5" />
+                      Share
+                    </Button>
+                  </div>
+                </div>
                 <Carousel setApi={setCarouselApi} opts={{ loop: galleryImages.length > 1 }}>
                   <CarouselContent className="ml-0">
                     {galleryImages.map((img, index) => (
@@ -252,6 +329,28 @@ export default function ProductPage() {
               onMouseEnter={() => setShowMagnifier(true)}
               onMouseLeave={() => setShowMagnifier(false)}
             >
+              <div className="absolute top-4 right-4 z-20">
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    className={`h-12 w-12 rounded-full p-0 transition-all duration-200 ${isWishlisted ? "text-primary bg-primary/10 ring-1 ring-primary/30" : "text-primary hover:text-primary/90 hover:bg-primary/5"} ${wishlistPulse ? "scale-110" : "scale-100"}`}
+                    onClick={handleWishlistToggle}
+                  >
+                    <Heart className={`h-[22px] w-[22px] transition-all duration-200 ${isWishlisted ? "fill-current" : ""}`} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-12 rounded-full px-5 text-base text-primary hover:text-primary/90 hover:bg-primary/5 transition-all duration-200"
+                    onClick={handleShare}
+                  >
+                    <Share2 className="h-[22px] w-[22px] mr-2" />
+                    Share
+                  </Button>
+                </div>
+              </div>
               {showMagnifier ? (
                 <ImageMagnifier
                   src={galleryImages[selectedImage] || "/placeholder.svg"}
@@ -411,18 +510,6 @@ export default function ProductPage() {
               </Button>
               <Button size="lg" className="flex-1 bg-primary hover:bg-primary/90" onClick={handleBuyNow}>
                 Buy Now
-              </Button>
-            </div>
-
-            {/* Share & Wishlist */}
-            <div className="flex gap-3">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                <Heart className="h-4 w-4 mr-2" />
-                Add to Wishlist
-              </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
               </Button>
             </div>
 

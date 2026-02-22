@@ -72,8 +72,8 @@ Message: ${formData.message}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
               <Card className="bg-card border-border">
                 <CardHeader>
                   <CardTitle className="text-foreground">Send us your enquiry</CardTitle>
@@ -153,9 +153,9 @@ Message: ${formData.message}
             <div className="space-y-4">
               <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <Phone className="h-5 w-5 text-primary mt-1" />
-                    <div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    <Phone className="h-6 w-6 text-primary mt-1 shrink-0" />
+                    <div className="min-w-0">
                       <p className="font-medium text-foreground">Phone</p>
                       <p className="text-muted-foreground">+91 95478 99170</p>
                     </div>
@@ -164,23 +164,25 @@ Message: ${formData.message}
               </Card>
               <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 text-primary mt-1" />
-                    <div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    <Mail className="h-6 w-6 text-primary mt-1 shrink-0" />
+                    <div className="min-w-0">
                       <p className="font-medium text-foreground">Email</p>
-                      <p className="text-muted-foreground">business@sssupplement.com</p>
+                      <p className="text-muted-foreground whitespace-nowrap">info@sssupplement.com</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-primary mt-1" />
-                    <div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    <MapPin className="h-6 w-6 text-primary mt-1 shrink-0" />
+                    <div className="min-w-0">
                       <p className="font-medium text-foreground">Address</p>
-                      <p className="text-muted-foreground text-sm">
-                        123 Fitness Street, Sector 14, Gurgaon, Haryana - 122001
+                      <p className="text-muted-foreground text-sm break-words">
+                        Haldia, Bhabanipur.,Babajibasa, 721657
+                        Near Ambuja City centre Mall 
+                        Opposite Meghnath Saha institute of technology
                       </p>
                     </div>
                   </div>

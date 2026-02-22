@@ -18,8 +18,8 @@ const offers = [
   },
   {
     icon: RefreshCw,
-    title: "Easy Returns",
-    description: "30-day return policy",
+    title: "Easy Updates",
+    description: "24x7 support",
   },
 ]
 

@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
 import { ProductProvider } from "@/context/product-context"
 import { CartProvider } from "@/context/cart-context"
+import { WishlistProvider } from "@/context/wishlist-context"
 import { AuthProvider } from "@/context/auth-context"
 import "./globals.css"
 
@@ -57,8 +58,10 @@ export default function RootLayout({
         <AuthProvider>
           <ProductProvider>
             <CartProvider>
-              {children}
-              <Toaster />
+              <WishlistProvider>
+                {children}
+                <Toaster />
+              </WishlistProvider>
             </CartProvider>
           </ProductProvider>
         </AuthProvider>

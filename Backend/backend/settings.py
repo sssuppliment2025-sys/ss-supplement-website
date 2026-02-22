@@ -149,6 +149,15 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ),
 }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 # ---------------------------------------------------------------------------
 # JWT
@@ -165,8 +174,8 @@ SIMPLE_JWT = {
 # Referral Points
 # ---------------------------------------------------------------------------
 
-REFERRAL_POINTS_FOR_REFERRER = 4
-REFERRAL_POINTS_FOR_REFEREE = 2
+REFERRAL_POINTS_FOR_REFERRER = 100
+REFERRAL_POINTS_FOR_REFEREE = 50
 
 # ---------------------------------------------------------------------------
 # Internationalization / Static
