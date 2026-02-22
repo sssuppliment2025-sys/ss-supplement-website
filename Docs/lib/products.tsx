@@ -13,7 +13,7 @@ const PRICING = {
   // Whey
   //ON
   ON_WHEY_100_gold_2LB: getPrice(3287, 3779),
-  ON_WHEY_100_gold_5LB: getPrice(7194, 8269),
+  ON_WHEY_100_gold_5LB: getPrice(7399, 8269),
 
   //Dymatize
   DYMATIZE_Elite_100_5LB: getPrice(8399, 12999),
@@ -22,12 +22,12 @@ const PRICING = {
   //Labrada
   LABRADA_500G: getPrice(1549, 1799),
   LABRADA_1KG: getPrice(2799, 4199),
-  LABRADA_1_8KG: getPrice(4999, 8499),
+  LABRADA_1_8KG: getPrice(4799, 8499),
 
   //Muscletech
   //NITRO_450G: getPrice(1599, 1839),
-  NITRO_907G: getPrice(2399, 3639),
-  NITRO_1_8KG: getPrice(5699, 6939),
+  NITRO_907G: getPrice(2799, 3639),
+  NITRO_1_8KG: getPrice(5299, 6939),
 
   //GNC
   GNC_PRO_2LB: getPrice(2399, 3099),
@@ -49,37 +49,37 @@ const PRICING = {
   // ONE_SCI_4LB: getPrice(4299, 4944),
 
   //ISOPURE
-  ISOPURE_1KG: getPrice(4399, 5289),
+  ISOPURE_1KG: getPrice(4799, 5289),
   //ISOPURE_2KG: getPrice(8299, 11649),  
 
   //MB
-  MB_BIO_PER_1KG: getPrice(2690, 2989),
-  MB_BIO_PER_2KG: getPrice(5048, 5609),
-  MB_BIO_PER_1KG_REFFIL: getPrice(2590, 2989),
+  MB_BIO_PER_1KG: getPrice(2749, 2989),
+  MB_BIO_PER_2KG: getPrice(5199, 5609),
+  MB_BIO_PER_1KG_REFFIL: getPrice(2649, 2989),
 
-  MB_BIO_ISOZ_1KG: getPrice(3969, 4409),
-  MB_BIO_ISOZ_2KG: getPrice(7613, 8459),
+  MB_BIO_ISOZ_1KG: getPrice(4099, 5399),
+  MB_BIO_ISOZ_2KG: getPrice(7999, 10499),
 
-  MB_BIO_PER_PR_1KG: getPrice(3005, 3339),
-  MB_BIO_PER_PR_2KG: getPrice(5606, 6229),
+  MB_BIO_PER_PR_1KG: getPrice(2999, 4149),
+  MB_BIO_PER_PR_2KG: getPrice(5699, 6399),
 
   //AVVATAR
-  AVVATAR_WHEY_1KG: getPrice(2899, 4229),
+  AVVATAR_WHEY_1KG: getPrice(3099, 4229),
   AVVATAR_WHEY_2KG: getPrice(5599, 7699),
 
-  AVVATAR_PER_WHEY_1KG: getPrice(2399, 3559),
-  AVVATAR_PER_WHEY_2KG: getPrice(4599, 6849),
+  AVVATAR_PER_WHEY_1KG: getPrice(2499, 3559),
+  AVVATAR_PER_WHEY_2KG: getPrice(4999, 6849),
 
   AVVATAR_ISO_P_1KG: getPrice(4003, 5469),
-  AVVATAR_ISO_P_2KG: getPrice(7829, 10189),
+  AVVATAR_ISO_P_2KG: getPrice(7499, 10189),
 
   //FUELONE
   FUELONE_1KG: getPrice(1725, 2299),
-  FUELONE_2KG: getPrice(3280, 4099),
+  FUELONE_2KG: getPrice(3279, 4099),
 
   //ATOM
-  ATOM_1KG: getPrice(2072, 3047),
-  ATOM_2KG: getPrice(4065, 5978),
+  ATOM_1KG: getPrice(2149, 3047),
+  ATOM_2KG: getPrice(4199, 7043),
 
   //DE MOREPEN
   MORPH_TURBO_1KG: getPrice(2504, 3558),
@@ -93,16 +93,16 @@ const PRICING = {
 
   // ********CREATINE************
   //MB
-  MB_CREA_MONO_100G: getPrice(489, 719),
+  MB_CREA_MONO_100G: getPrice(479, 719),
   MB_CREA_MONO_250G: getPrice(849, 1429),
-  MB_CREA_MONO_FLAV_120G: getPrice(489, 799),
+  MB_CREA_MONO_FLAV_120G: getPrice(479, 799),
   MB_CREA_MONO_FLAV_320G: getPrice(849, 1599),
 
   //WELLCORE
-  WELL_UF_100G: getPrice(569, 699),
-  WELL_UF_250G: getPrice(1139, 1399),
-  WELL_F_122G: getPrice(569, 749),
-  WELL_F_307G: getPrice(1139, 1499),
+  WELL_UF_100G: getPrice(499, 699),
+  WELL_UF_250G: getPrice(999, 1399),
+  WELL_F_122G: getPrice(499, 749),
+  WELL_F_307G: getPrice(999, 1499),
 
   //GNC
   GNC_PRO_P_100G: getPrice(399, 799),
@@ -252,7 +252,7 @@ const PRICING = {
 
   //*********** Recovery & Misc *************
   MB_L_GLUT: getPrice(799, 1029),
-  GNC_PRO_L_GLUT: getPrice(599, 1159),
+  GNC_PRO_L_GLUT: getPrice(699, 1159),
 
 //*********** INTRA WORKOUT *************
   MB_BCAA_PRO_450: getPrice(1499, 2299),
@@ -261,7 +261,7 @@ const PRICING = {
   ON_BCCA_5000: getPrice(867, 1239),
 
   //********* minarels ***********                 -----recheck
-  GNC_CAL_1000MG: getPrice(599, 1019),
+  GNC_CAL_1000MG: getPrice(329, 399),
   GNC_ZINC: getPrice(499, 889),
 
   //********* BEAUTY **************
@@ -270,16 +270,22 @@ const PRICING = {
   WB_VC_ZINC_1100MG: getPrice(319, 399),
 
   // Peanut Butter & Snacks
-  MF_S_1_25: getPrice(599, 689),
-  MF_S_510: getPrice(449, 401),
-  MF_S_227: getPrice(349, 401),
+  MF_S_chocolate_1_25: getPrice(459, 669),
+  MF_S_chocolate_510: getPrice(240, 299),   //515151
+  MF_S_chocolate_227: getPrice(149, 159),
+  MF_S_dark_chocolate_510: getPrice(269, 359),
+  
 
+  MF_CRU_chocolate_1200: getPrice(459, 669),
+  MF_CRU_chocolate_510: getPrice(240, 299),
+  MF_CRU_chocolate_227: getPrice(149, 159),
 
-  MF_CRU_1000: getPrice(199, 229),
-  MF_CRU_510: getPrice(199, 229),
-  MF_CRU_227: getPrice(199, 229),
+  MF_CRU_dark_chocolate_1000: getPrice(449, 669),
+  MF_CRU_dark_chocolate_510: getPrice(269, 359),
+  
 
-  MF_CRI_227: getPrice(219, 252),
+  MF_CRI_chocolate_227: getPrice(149, 159),
+  MF_CRI_chocolate_1200: getPrice(459, 669),
 
   PIN_C_1KG: getPrice(449, 516),
 
@@ -429,7 +435,7 @@ export const products: Product[] = [
 
   {
     id: "500",
-    name: "Dymatize Elite 100% Whey Protein",
+    name: "Dymatize ISO 100 Hydrolyzed Whey Protein",
     brand: "Dymatize",
     category: "Whey Protein",
     ...PRICING.DYMATIZE_ISO_100_Hydrolyzed_5LB,
@@ -5324,7 +5330,7 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_S_1_25,
+    ...PRICING.MF_S_chocolate_1_25,
     rating: 4.7,
     reviews: 8500,
     image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_choc_1.25kg.jpg",
@@ -5332,7 +5338,7 @@ export const products: Product[] = [
     image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_choc_1.25kg2.jpg",
     image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_choc_1.25kg3.jpg",
     images: [],
-    flavors: [{ name: "Chocolate", price: PRICING.MF_S_1_25.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_S_chocolate_1_25.price }],
     weight: "1.25KG",
     weights: ["227G", "510G", "1.25KG"],
     description: "High protein peanut butter",
@@ -5345,7 +5351,7 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_S_510,
+    ...PRICING.MF_S_dark_chocolate_510,
     rating: 4.7,
     reviews: 7800,
     image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g.jpg",
@@ -5353,7 +5359,28 @@ export const products: Product[] = [
     image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g2.jpg",
     image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g3.jpg",
     images: [],
-    flavors: [{ name: "Dark Chocolate", price:  PRICING.MF_S_510.price }],
+    flavors: [{ name: "Dark Chocolate", price:  PRICING.MF_S_dark_chocolate_510.price }],
+    weight: "510G",
+    weights: ["227G", "510G", "1.25KG"],
+    description: "High protein peanut butter",
+    keyBenefits: ["High protein", "No added sugar", "Great taste"],
+    nutritionalInfo: "Per 32g: Protein 10g, Carbs 6g, Fat 14g",
+    inStock: true,
+  },
+  {
+    id: "600",
+    name: "MyFitness Peanut Butter Smooth",
+    brand: "MyFitness",
+    category: "Peanut Butter & Oats",
+    ...PRICING.MF_S_chocolate_510,
+    rating: 4.7,
+    reviews: 7800,
+    image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g.jpg",
+    image1: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g1.jpg",
+    image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g2.jpg",
+    image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_dark_choc_510g3.jpg",
+    images: [],
+    flavors: [{ name: "Chocolate", price:  PRICING.MF_S_chocolate_510.price }],
     weight: "510G",
     weights: ["227G", "510G", "1.25KG"],
     description: "High protein peanut butter",
@@ -5366,13 +5393,13 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_S_227,
+    ...PRICING.MF_S_chocolate_227,
     rating: 4.5,
     reviews: 5200,
     image: "",
     image1: "",
     images: [],
-    flavors: [{ name: "Chocolate", price: PRICING.MF_S_227.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_S_chocolate_227.price }],
     weight: "227G",
     weights: ["227G", "510G", "1.25KG"],
     description: "MyFitness smooth peanut butter with dark chocolate",
@@ -5386,12 +5413,31 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_CRU_1000,
+    ...PRICING.MF_CRU_chocolate_1200,
     rating: 4.5,
     reviews: 5200,
     image: "",
     images: [],
-    flavors: [{ name: "Dark Chocolate", price: PRICING.MF_CRU_1000.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_CRU_chocolate_1200.price }],
+    weight: "1KG",
+    weights: ["227G", "510G", "1.2KG"],
+    description: "MyFitness smooth peanut butter with chocolate",
+    keyBenefits: ["High protein", "No added sugar", "Smooth texture"],
+    nutritionalInfo: "Per Serving: 7g Protein, Healthy Fats",
+    inStock: true
+  },
+
+  {
+    id: "219",
+    name: "MyFitness Peanut Butter Crunchy",
+    brand: "MyFitness",
+    category: "Peanut Butter & Oats",
+    ...PRICING.MF_CRU_dark_chocolate_1000,
+    rating: 4.5,
+    reviews: 5200,
+    image: "",
+    images: [],
+    flavors: [{ name: "Dark Chocolate", price: PRICING.MF_CRU_dark_chocolate_1000.price }],
     weight: "1KG",
     weights: ["227G", "510G", "1KG"],
     description: "MyFitness smooth peanut butter with chocolate",
@@ -5405,7 +5451,7 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_CRU_510,
+    ...PRICING.MF_CRU_chocolate_510,
     rating: 4.5,
     reviews: 4800,
     image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g.jpg",
@@ -5413,7 +5459,29 @@ export const products: Product[] = [
     image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g2.jpg",
     image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g3.jpg",
     images: [],
-    flavors: [{ name: "Dark Chocolate", price: PRICING.MF_CRU_510.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_CRU_chocolate_510.price }],
+    weight: "510G",
+    weights: ["227G", "510G", "1KG"],
+    description: "MyFitness crunchy peanut butter with dark chocolate",
+    keyBenefits: ["High protein", "Crunchy texture", "Real peanut pieces"],
+    nutritionalInfo: "Per Serving: 7g Protein, Healthy Fats",
+    inStock: true
+  },
+
+  {
+    id: "601",
+    name: "MyFitness Peanut Butter Crunchy",
+    brand: "MyFitness",
+    category: "Peanut Butter & Oats",
+    ...PRICING.MF_CRU_dark_chocolate_510,
+    rating: 4.5,
+    reviews: 4800,
+    image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g.jpg",
+    image1: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g1.jpg",
+    image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g2.jpg",
+    image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_dark_choc_510g3.jpg",
+    images: [],
+    flavors: [{ name: "Dark Chocolate", price: PRICING.MF_CRU_dark_chocolate_510.price }],
     weight: "510G",
     weights: ["227G", "510G", "1KG"],
     description: "MyFitness crunchy peanut butter with dark chocolate",
@@ -5427,7 +5495,7 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_CRU_227,
+    ...PRICING.MF_CRU_chocolate_227,
     rating: 4.5,
     reviews: 4800,
     image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_choc_227g.jpg",
@@ -5435,7 +5503,7 @@ export const products: Product[] = [
     image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_choc_227g2.jpg",
     image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crunchy_choc_227g3.jpg",
     images: [],
-    flavors: [{ name: "Chocolate", price: PRICING.MF_CRU_227.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_CRU_chocolate_227.price }],
     weight: "227G",
     weights: ["227G", "510G", "1KG"],
     description: "MyFitness crunchy peanut butter with chocolate",
@@ -5449,7 +5517,7 @@ export const products: Product[] = [
     name: "MyFitness Peanut Butter Crispy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
-    ...PRICING.MF_CRU_227,
+    ...PRICING.MF_CRI_chocolate_227,
     rating: 4.4,
     reviews: 3600,
     image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g.jpg",
@@ -5457,9 +5525,31 @@ export const products: Product[] = [
     image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g2.jpg",
     image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g3.jpg",
     images: [],
-    flavors: [{ name: "Chocolate", price: PRICING.MF_CRU_227.price }],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_CRI_chocolate_227.price }],
     weight: "227G",
-    weights: ["227G"],
+    weights: ["227G", "1.20KG"],
+    description: "MyFitness crispy peanut butter with chocolate",
+    keyBenefits: ["High protein", "Extra crispy", "Unique texture"],
+    nutritionalInfo: "Per Serving: 7g Protein, Healthy Fats",
+    inStock: true
+  },
+
+  {
+    id: "602",
+    name: "MyFitness Peanut Butter Crispy",
+    brand: "MyFitness",
+    category: "Peanut Butter & Oats",
+    ...PRICING.MF_CRI_chocolate_1200,
+    rating: 4.4,
+    reviews: 3600,
+    image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g.jpg",
+    image1: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g1.jpg",
+    image2: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g2.jpg",
+    image3: "/image/Peanut_butter_oats/my_fitness_peanut_butter_crispy_choc_227g3.jpg",
+    images: [],
+    flavors: [{ name: "Chocolate", price: PRICING.MF_CRI_chocolate_1200.price }],
+    weight: "1.20G",
+    weights: ["227G", "1.20KG"],
     description: "MyFitness crispy peanut butter with chocolate",
     keyBenefits: ["High protein", "Extra crispy", "Unique texture"],
     nutritionalInfo: "Per Serving: 7g Protein, Healthy Fats",
