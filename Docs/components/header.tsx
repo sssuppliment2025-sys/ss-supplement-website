@@ -280,10 +280,10 @@ export function Header() {
             <li>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1 text-foreground hover:text-primary">
+                  {/* <Button variant="ghost" size="sm" className="gap-1 text-foreground hover:text-primary">
                     AUTHENTICITY
                     <ChevronDown className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-card border-border">
                   <DropdownMenuItem>Verify Product</DropdownMenuItem>

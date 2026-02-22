@@ -9,17 +9,17 @@ const categories = [
   { name: "Whey Protein", image: "/image/Whey_protien/MB_performance/mb_kesar_1kg.png" },
   { name: "Creatine", image: "/image/Creatine/Wellcore/Wellcore_kiwi_122gm.jpg" },
   { name: "Mass Gainer", image: "/image/Mass_Gainner/MuscleTech/Muscletech_mass_vanilla_3kg.jpg" },
-  { name: "Multivitamin", image: "/multivitamin-tablets-bottle.jpg" },
-  { name: "Pre Workout", image: "/pre-workout-supplement-jar.jpg" },
-  { name: "Weight Loss", image: "/gym-energy-booster.jpg" },
+  { name: "Multivitamin", image: "/image/Multivitamin/MB_5_in_one/Mb_5_in_one_multivitamin.jpg" },
+  { name: "Pre Workout", image: "/image/Pre_Workout/BigDaddy/FruitPrinch_300g.jpg" },
+  { name: "Weight Loss", image: "/image/Weight_loss/Gnc/L_carnitine_3000mg_450ml.webp" },
   { name: "Recovery", image: "/image/Recovery/gnc_l_glutamine_250gm.jpg" },
   { name: "Intra Workout", image: "/image/Intra_Workout/Mb_bcaa_pro_Watermelon_250g.jpg" },
   { name: "Peanut Butter & Oats", image: "/image/Peanut_butter_oats/my_fitness_peanut_butter_smooth_choc_227g.jpg" },
   { name: "Ayurvedic Products", image: "/image/Ayurvedic/kapiva_20g.jpg" },
-  { name: "Protein Bars & Snacks", image: "/image/Protien_bar_and_Snacks/MB/Choco_Almond_10g.jpg" },
+  { name: "Protein Bars & Snacks", image: "/image/Protien_bar_and_Snacks/max/choco_date_almond_10g.jpg" },
   { name: "Accessories", image: "/image/Accessories/mb_gymbag.jpg" },
-  { name: "Beauty", image: "/health-vitamins.jpg" },
-  { name: "Fish Oil", image: "/image/Fishoil/ON/on_fishoil_60N.jpg" },
+  { name: "Beauty", image: "/image/Minerals_Health/gnc_collagen_lemon_200g.jpg" },
+  { name: "Fish Oil", image: "/image/Fishoil/MB/MB_fishoil_gold_60N.jpg" },
   { name: "Minerals & Health", image: "/image/Minerals_Health/gnc_calcium_plus_60n.jpg" },
 ]
 
@@ -54,12 +54,6 @@ export function CategoryBar() {
     if (!node) return
 
     const media = window.matchMedia("(min-width: 768px)")
-    const getScrollStep = () => {
-      const firstItem = node.querySelector<HTMLElement>('a[data-desktop-item="true"]')
-      if (!firstItem) return 100
-      const gap = Number.parseFloat(window.getComputedStyle(node).columnGap || "0")
-      return Math.round(firstItem.getBoundingClientRect().width + gap)
-    }
 
     const updateDesktopScrollState = () => {
       if (!media.matches) return
@@ -68,23 +62,11 @@ export function CategoryBar() {
       setCanScrollDesktopRight(scrollLeft + clientWidth < scrollWidth - 2)
     }
 
-    const autoScroll = () => {
-      if (!media.matches) return
-      const step = getScrollStep()
-      if (node.scrollLeft + node.clientWidth >= node.scrollWidth - 2) {
-        node.scrollTo({ left: 0, behavior: "auto" })
-        return
-      }
-      node.scrollBy({ left: step, behavior: "smooth" })
-    }
-
     updateDesktopScrollState()
-    const interval = window.setInterval(autoScroll, 2200)
     node.addEventListener("scroll", updateDesktopScrollState, { passive: true })
     window.addEventListener("resize", updateDesktopScrollState)
 
     return () => {
-      window.clearInterval(interval)
       node.removeEventListener("scroll", updateDesktopScrollState)
       window.removeEventListener("resize", updateDesktopScrollState)
     }
