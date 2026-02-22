@@ -301,10 +301,13 @@ const PRICING = {
   PINTOLA_HIGH_PROTEIN_OATS_DARK_CHOC_1KG: getPrice(499,620),
   PINTOLA_HIGH_PROTEIN_MUESLI_DARK_CHOC_1KG: getPrice(599,710),
   //************ AURVEDIC PRODUCT ************
-  KAP_SHIL: getPrice(799, 919),
-  KAP_GOLD: getPrice(999, 1149),
-  KAP_ASHW_GOLD: getPrice(699, 804),
-  KAP_SHIL_GOLD: getPrice(899, 1033),
+  KAP_SHIL: getPrice(949, 1199),
+  KAP_GOLD: getPrice(1299, 1549),
+  KAP_ASHW_GOLD: getPrice(449, 562),
+  KAPIVA_KSM66_ASHWAGANDHA_60N: getPrice(649, 1099),
+  KAPIVA_SHILAJIT_GUMMIES_60N: getPrice(949, 1030),
+  KAPIVA_TEST_HD_ELITE_60N: getPrice(1299, 1779),
+  
 
 //************ PROTEIN BARS ************
   MAX_B_10G: getPrice(50, 58),
@@ -5909,6 +5912,75 @@ export const products: Product[] = [
     nutritionalInfo: "Per Capsule: Ashwagandha 500mg",
     inStock: true,
   },
+  {
+  id: "901",
+  name: "Kapiva KSM-66 Ashwagandha",
+  brand: "Kapiva",
+  category: "Ayurvedic Products",
+  ...PRICING.KAPIVA_KSM66_ASHWAGANDHA_60N,
+  rating: 4.5,
+  reviews: 42000,
+  image: "/image/Ayurveda/kapiva_ksm66_ashwagandha_60n.jpg",
+  images: [],
+  flavors: [{ name: "Unflavoured", price: PRICING.KAPIVA_KSM66_ASHWAGANDHA_60N.price }],
+  weight: "60N",
+  weights: ["60N"],
+  description: "Clinically studied KSM-66® Ashwagandha for stress, strength and vitality",
+  keyBenefits: [
+    "Helps reduce stress & anxiety",
+    "Supports muscle strength & recovery",
+    "Improves stamina, focus & overall vitality",
+    "Clinically researched KSM-66® extract"
+  ],
+  nutritionalInfo: "Per serving (1 capsule): 600mg KSM-66® Ashwagandha root extract",
+  inStock: true
+},
+{
+  id: "902",
+  name: "Kapiva Shilajit Gummies",
+  brand: "Kapiva",
+  category: "Ayurvedic Products",
+  ...PRICING.KAPIVA_SHILAJIT_GUMMIES_60N,
+  rating: 4.3,
+  reviews: 18500,
+  image: "/image/Ayurveda/kapiva_shilajit_gummies_60n.jpg",
+  images: [],
+  flavors: [{ name: "Unflavoured", price: PRICING.KAPIVA_SHILAJIT_GUMMIES_60N.price }],
+  weight: "60N",
+  weights: ["60N"],
+  description: "Tasty shilajit gummies for energy, stamina and performance",
+  keyBenefits: [
+    "Boosts daily energy & endurance",
+    "Supports strength and physical performance",
+    "Easy-to-consume gummy format",
+    "Made with purified Himalayan Shilajit"
+  ],
+  nutritionalInfo: "Per serving (2 gummies): Shilajit extract, essential minerals, natural fruit pectin",
+  inStock: true
+},
+{
+  id: "903",
+  name: "Muscletech Test HD Elite",
+  brand: "Muscletech",
+  category: "Ayurvedic Products",
+  ...PRICING.KAPIVA_TEST_HD_ELITE_60N,
+  rating: 4.4,
+  reviews: 9600,
+  image: "/image/Ayurveda/kapiva_test_hd_elite_60n.jpg",
+  images: [],
+  flavors: [{ name: "Unflavoured", price: PRICING.KAPIVA_TEST_HD_ELITE_60N.price }],
+  weight: "60N",
+  weights: ["60N"],
+  description: "Advanced herbal formula to support testosterone, strength and stamina",
+  keyBenefits: [
+    "Supports healthy testosterone levels",
+    "Improves muscle strength & stamina",
+    "Enhances energy & male vitality",
+    "Ayurvedic blend with clinically backed herbs"
+  ],
+  nutritionalInfo: "Per serving (1 capsule): Ashwagandha, Safed Musli, Gokshura, Shilajit & herbal extracts",
+  inStock: true
+},
   // {
   //   id: "229",
   //   name: "Kapiva Shilajit Gold Capsul",
