@@ -190,8 +190,8 @@ export default function PrivacyPolicyPage() {
                 </ul>
                 <p className="text-muted-foreground leading-relaxed mt-3">
                   To exercise any of these rights, contact us at{" "}
-                  <a href="mailto:info@sssupplement.com" className="text-primary hover:underline">
-                    info@sssupplement.com
+                  <a href="mailto:info.sssupplements@gmail.com" className="text-primary hover:underline">
+                    info.sssupplements@gmail.com
                   </a>
                   .
                 </p>
@@ -226,8 +226,8 @@ export default function PrivacyPolicyPage() {
                 <ul className="text-sm text-muted-foreground mt-3 space-y-1">
                   <li>
                     <strong className="text-foreground">Email:</strong>{" "}
-                    <a href="mailto:info@sssupplement.com" className="text-primary hover:underline">
-                      info@sssupplement.com
+                    <a href="mailto:info.sssupplements@gmail.com" className="text-primary hover:underline">
+                      info.sssupplements@gmail.com
                     </a>
                   </li>
                   <li>

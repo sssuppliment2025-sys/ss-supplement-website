@@ -46,7 +46,7 @@ export default function ChatSupportPage() {
               <CardContent className="p-6 text-center">
                 <Mail className="h-8 w-8 text-primary mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">Email Us</h3>
-                <p className="text-muted-foreground text-sm">info@sssupplement.com</p>
+                <p className="text-muted-foreground text-sm">info.sssupplements@gmail.com</p>
               </CardContent>
             </Card>
             <Card className="bg-card border-border">

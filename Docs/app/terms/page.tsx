@@ -190,8 +190,8 @@ export default function TermsOfServicePage() {
                 <p className="text-muted-foreground leading-relaxed">
                   You are responsible for maintaining the confidentiality of your account credentials. Any activity
                   that occurs under your account is your responsibility. Notify us immediately at{" "}
-                  <a href="mailto:info@sssupplement.com" className="text-primary hover:underline">
-                    info@sssupplement.com
+                  <a href="mailto:info.sssupplements@gmail.com" className="text-primary hover:underline">
+                    info.sssupplements@gmail.com
                   </a>{" "}
                   if you suspect unauthorized use of your account.
                 </p>
@@ -226,8 +226,8 @@ export default function TermsOfServicePage() {
                 <ul className="text-sm text-muted-foreground mt-3 space-y-1">
                   <li>
                     <strong className="text-foreground">Email:</strong>{" "}
-                    <a href="mailto:info@sssupplement.com" className="text-primary hover:underline">
-                      info@sssupplement.com
+                    <a href="mailto:info.sssupplements@gmail.com" className="text-primary hover:underline">
+                      info.sssupplements@gmail.com
                     </a>
                   </li>
                   <li>
