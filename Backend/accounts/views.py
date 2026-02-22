@@ -408,7 +408,6 @@ def create_order(request):
         if not auth_header or not auth_header.startswith('Bearer '):
             return Response({'error': 'Token required'}, status=401)
         
-      
         order_id, earned_points, new_points = CreateOrderUser(
             auth_header, 
             data, 
@@ -416,14 +415,15 @@ def create_order(request):
             orders_col
         )
         
+        
         return Response({
-            'success': True,
             'order': {
                 'id': order_id,
                 'earnedPoints': earned_points  
             },
+            'earnedPoints': earned_points,  
             'user': {
-                'points': new_points 
+                'points': new_points         
             }
         }, status=201)
         
@@ -438,6 +438,7 @@ def create_order(request):
             'error': str(e),
             'detail': 'Order creation failed'
         }, status=500)
+
 
 
 

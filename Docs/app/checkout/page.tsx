@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle, Coins } from "lucide-react"
+import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle, Coins, AlertCircle } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -28,9 +28,9 @@ export default function CheckoutPage() {
   const { isAuthenticated } = useAuth()
   const { toast } = useToast()
 
-  // ✅ COINS STATE - INCLUDING EARNED POINTS
+  // ✅ FLEXIBLE COINS STATE
   const [points, setPoints] = useState<number>(0)
-  const [earnedPoints, setEarnedPoints] = useState<number>(0) // NEW: Track earned points
+  const [earnedPoints, setEarnedPoints] = useState<number>(0)
   const [loadingPoints, setLoadingPoints] = useState(true)
   const [useCoins, setUseCoins] = useState(false)
 
@@ -68,14 +68,10 @@ export default function CheckoutPage() {
     }
 
     fetch(`${API_URL}/api/profile/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
-      .then(data => {
-        setPoints(data.points || 0)
-      })
+      .then(data => setPoints(data.points || 0))
       .catch(() => {
         toast({
           title: "Error",
@@ -86,38 +82,36 @@ export default function CheckoutPage() {
       .finally(() => setLoadingPoints(false))
   }, [isAuthenticated, toast])
 
-  /* ================= PRICE CALCULATIONS - 20% MIN PAYMENT ================= */
+  /* ================= ✅ FLEXIBLE 4% MAX COINS ================= */
   const subtotal = getCartTotal()
-  const maxCoinsAllowed = Math.floor(subtotal * 0.8)  // 80% max coins
-  const availableCoinsForDiscount = Math.min(points, maxCoinsAllowed)
-  const coinsUsed = useCoins ? availableCoinsForDiscount : 0
-  const minimumCashPayment = Math.max(subtotal * 0.2, 50)
-  const finalTotal = Math.max(subtotal - coinsUsed, minimumCashPayment)
+  const COIN_PERCENT = 0.04      // MAX 4%
+  const COIN_VALUE = 0.2         // 1 coin = ₹0.2
 
-  console.log("🪙 COINS CALC:", {
-    subtotal,
-    points,
-    maxCoinsAllowed,
-    coinsUsed,
-    minimumCashPayment,
-    finalTotal
-  })
+  const maxCoinDiscountValue = subtotal * COIN_PERCENT
+  const maxCoinsAllowed = Math.floor(maxCoinDiscountValue / COIN_VALUE)
+  const coinsToUse = useCoins ? Math.min(points, maxCoinsAllowed) : 0
+  const finalTotal = subtotal - (coinsToUse * COIN_VALUE)
 
-  /* ================= WHATSAPP MESSAGE - UPDATED WITH EARNED POINTS ================= */
+  const hasEnoughForMax = points >= maxCoinsAllowed
+
+  /* ================= WHATSAPP MESSAGE ================= */
   const generateWhatsAppMessage = (backendCoins: number, backendEarned: number) => {
     const orderItems = items
       .map((item) => {
-        const price =
-          typeof item.product.flavors === "string"
-            ? item.product.price
-            : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
-        return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${price * item.quantity}`
+        const price = typeof item.product.flavors === "string"
+          ? item.product.price
+          : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+        return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${(price * item.quantity).toLocaleString()}`
       })
       .join("\n")
 
     const paymentInfo = paymentMethod === "upi" 
       ? `💳 *Payment:* UPI\n📱 UTR: ${utrNumber}\n👛 UPI ID: ${ADMIN_UPI_ID}`
       : "💰 *Payment:* Cash on Delivery"
+
+    const coinsInfo = coinsToUse > 0 
+      ? `🪙 Coins Used: ${coinsToUse} (${((coinsToUse * COIN_VALUE / subtotal) * 100).toFixed(1)}%)`
+      : "🪙 No coins used"
 
     const message = `
 🛒 *NEW ORDER #${orderId || "TEMP"} - SS Supplement*
@@ -126,9 +120,10 @@ export default function CheckoutPage() {
 ${orderItems}
 
 💰 *Billing:*
-Subtotal: ₹${subtotal}
-${coinsUsed > 0 ? `🎁 Coins Used: ${coinsUsed}` : ""}
-Total: *₹${finalTotal}*
+Subtotal: ₹${subtotal.toLocaleString()}
+${coinsInfo}
+💳 Cash Paid: ₹${finalTotal.toLocaleString()}
+Total: *₹${finalTotal.toLocaleString()}*
 
 👛 *COINS UPDATE:*
 🎉 *Earned:* +${backendEarned} coins
@@ -189,7 +184,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     }
   }
 
-  /* ================= ✅ ORDER SUBMIT - FULLY UPDATED WITH EARNED POINTS ================= */
+  /* ================= ✅ FIXED ORDER SUBMIT - TYPE SAFE ================= */
   const handleSubmit = async () => {
     if (paymentMethod === "upi" && !utrNumber.trim()) {
       toast({
@@ -223,44 +218,66 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             selectedWeight: item.selectedWeight,
           })),
           total: finalTotal,
-          coins_used: coinsUsed,
+          coins_used: coinsToUse,
           payment_method: paymentMethod,
           utr_number: paymentMethod === "upi" ? utrNumber : null,
           address: formData,
         }),
       })
 
-      const orderData = await orderRes.json()
-      
-      if (!orderRes.ok) {
-        const errorText = await orderRes.text()
-        console.error("Order error response:", errorText)
-        throw new Error(orderData.error || orderData.detail || "Failed to create order")
+      // ✅ TYPE SAFE: Define API response/error interfaces
+      interface ApiError {
+        error?: string
+        detail?: string
+        message?: string
       }
 
-      // ✅ CAPTURE EARNED POINTS FROM BACKEND RESPONSE
-      const earnedPointsFromBackend = orderData.order?.earnedPoints || orderData.earnedPoints || 0
+      interface ApiSuccess {
+        order: {
+          id: string
+          earnedPoints: number
+        }
+        earnedPoints?: number
+        user?: {
+          points: number
+        }
+      }
+
+      type ApiResponse = ApiError | ApiSuccess
+
+      const orderData = await orderRes.json() as ApiResponse
+      
+      if (!orderRes.ok) {
+        // ✅ TYPE SAFE ERROR HANDLING
+        const error = orderData as ApiError
+        console.error("Order error:", error)
+        throw new Error(
+          error.error || 
+          error.detail || 
+          error.message || 
+          "Failed to create order"
+        )
+      }
+
+      // ✅ TYPE SAFE SUCCESS HANDLING
+      const successData = orderData as ApiSuccess
+      const earnedPointsFromBackend = successData.order?.earnedPoints || successData.earnedPoints || 0
       setEarnedPoints(earnedPointsFromBackend)
 
-      // ✅ REFRESH COINS FROM BACKEND (new total points)
+      // ✅ REFRESH COINS
       const profileRes = await fetch(`${API_URL}/api/profile/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       const profileData = await profileRes.json()
       const newTotalPoints = profileData.points || 0
       setPoints(newTotalPoints)
 
-      setOrderId(orderData.order?.id || orderData.id || "SUCCESS")
-
-      // ✅ UPDATED WHATSAPP WITH EARNED POINTS
-      const whatsappUrl = generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend)
-      window.open(whatsappUrl, '_blank')
+      setOrderId(successData.order?.id || "SUCCESS")
+      window.open(generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend), '_blank')
 
       toast({
         title: "✅ Order Placed Successfully! 🎉",
-        description: `Order #${orderId}. Earned +${earnedPointsFromBackend} coins! New balance: ${newTotalPoints} coins. Pay ₹${finalTotal.toLocaleString()}`,
+        description: `Order #${orderId}. Used ${coinsToUse.toLocaleString()} coins. Earned +${earnedPointsFromBackend.toLocaleString()}! Pay ₹${finalTotal.toLocaleString()}`,
       })
 
       clearCart()
@@ -289,7 +306,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     return null
   }
 
-  // ✅ UPDATED SUCCESS SCREEN WITH EARNED POINTS DISPLAY
+  // Success screen
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-background">
@@ -304,7 +321,6 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
               Order details sent to WhatsApp. Please pay ₹{finalTotal.toLocaleString()}.
             </p>
             
-            {/* ✅ EARNED POINTS CELEBRATION */}
             <div className="bg-gradient-to-r from-yellow-500/10 to-success/10 border border-yellow-200/50 rounded-2xl p-6 mb-8 space-y-4">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Coins className="h-8 w-8 text-yellow-500 animate-bounce" />
@@ -314,8 +330,8 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
               </div>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Previous Balance:</span>
-                  <span>{(points - earnedPoints).toLocaleString()}</span>
+                  <span>Coins used:</span>
+                  <span>{coinsToUse.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Earned this order:</span>
@@ -344,7 +360,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     )
   }
 
-  // UPI QR Code screen
+  // UPI screen
   if (showQRCode) {
     return (
       <div className="min-h-screen bg-background">
@@ -353,10 +369,13 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
           <div className="max-w-md mx-auto">
             <Card className="bg-card border-border">
               <CardHeader className="text-center">
-                <CardTitle className="text-foreground flex items-center justify-center gap-2">
+                <CardTitle className="text-foreground flex items-center justify-center gap-2 text-xl">
                   <QrCode className="h-6 w-6 text-primary" />
                   Pay ₹{finalTotal.toLocaleString()} via UPI
                 </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {coinsToUse > 0 ? `+ ${coinsToUse.toLocaleString()} coins used` : "No coins used"}
+                </p>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="bg-white p-4 rounded-xl mx-auto w-fit shadow-lg">
@@ -377,7 +396,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 <div className="bg-secondary/50 rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-3">Or send to UPI ID:</p>
                   <div className="flex items-center justify-between gap-2">
-                    <code className="text-foreground font-mono text-lg bg-background px-2 py-1 rounded">
+                    <code className="text-foreground font-mono text-lg bg-background px-2 py-1 rounded flex-1">
                       {ADMIN_UPI_ID}
                     </code>
                     <Button variant="outline" size="sm" onClick={copyUpiId}>
@@ -397,9 +416,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                     className="bg-secondary border-border"
                     placeholder="Enter 12-digit UTR number from your UPI app"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Find UTR in your UPI app → Transaction History
-                  </p>
+                  <p className="text-xs text-muted-foreground">Find UTR in your UPI app → Transaction History</p>
                 </div>
 
                 <div className="flex gap-3">
@@ -439,7 +456,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     )
   }
 
-  // Main checkout form (unchanged - same as before)
+  // Main checkout form
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -461,90 +478,38 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      className="bg-secondary border-border"
-                    />
+                    <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} className="bg-secondary border-border" />
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="bg-secondary border-border"
-                    />
+                    <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} className="bg-secondary border-border" />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="email">Email (Optional)</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="bg-secondary border-border"
-                  />
+                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} className="bg-secondary border-border" />
                 </div>
                 <div>
                   <Label htmlFor="address">Complete Address <span className="text-destructive">*</span></Label>
-                  <Textarea
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="bg-secondary border-border min-h-[80px]"
-                    placeholder="House No., Street, Area, Colony"
-                  />
+                  <Textarea id="address" name="address" value={formData.address} onChange={handleInputChange} className="bg-secondary border-border min-h-[80px]" placeholder="House No., Street, Area, Colony" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="city">City <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="bg-secondary border-border"
-                    />
+                    <Input id="city" name="city" value={formData.city} onChange={handleInputChange} className="bg-secondary border-border" />
                   </div>
                   <div>
                     <Label htmlFor="state">State <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="state"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      className="bg-secondary border-border"
-                    />
+                    <Input id="state" name="state" value={formData.state} onChange={handleInputChange} className="bg-secondary border-border" />
                   </div>
                   <div>
                     <Label htmlFor="pincode">Pincode <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="pincode"
-                      name="pincode"
-                      value={formData.pincode}
-                      onChange={handleInputChange}
-                      className="bg-secondary border-border"
-                    />
+                    <Input id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} className="bg-secondary border-border" />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="landmark">Landmark (Optional)</Label>
-                  <Input
-                    id="landmark"
-                    name="landmark"
-                    value={formData.landmark}
-                    onChange={handleInputChange}
-                    className="bg-secondary border-border"
-                    placeholder="Near temple, opposite school, etc."
-                  />
+                  <Input id="landmark" name="landmark" value={formData.landmark} onChange={handleInputChange} className="bg-secondary border-border" placeholder="Near temple, opposite school, etc." />
                 </div>
               </CardContent>
             </Card>
@@ -603,10 +568,9 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 {/* Cart Items */}
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {items.map((item) => {
-                    const price =
-                      typeof item.product.flavors === "string"
-                        ? item.product.price
-                        : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+                    const price = typeof item.product.flavors === "string"
+                      ? item.product.price
+                      : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
 
                     return (
                       <div key={`${item.product.id}-${item.selectedFlavor}-${item.selectedWeight}`} className="flex gap-3 p-2 rounded-lg hover:bg-accent">
@@ -619,14 +583,10 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium line-clamp-1 text-foreground">
-                            {item.product.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {item.selectedFlavor} • {item.selectedWeight}
-                          </p>
+                          <p className="text-sm font-medium line-clamp-1 text-foreground">{item.product.name}</p>
+                          <p className="text-xs text-muted-foreground">{item.selectedFlavor} • {item.selectedWeight}</p>
                           <p className="text-sm font-medium">
-                            ₹{price} × {item.quantity} = <span className="font-bold">₹{price * item.quantity}</span>
+                            ₹{price} × {item.quantity} = <span className="font-bold">₹{(price * item.quantity).toLocaleString()}</span>
                           </p>
                         </div>
                       </div>
@@ -634,14 +594,12 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   })}
                 </div>
 
-                {/* Coins Section */}
+                {/* ✅ FLEXIBLE COINS SECTION WITH CHECKBOX */}
                 <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Coins className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium">
-                        Available Coins: {loadingPoints ? "Loading..." : points.toLocaleString()}
-                      </span>
+                      <span className="text-sm font-medium">Available Coins</span>
                     </div>
                     <Checkbox
                       checked={useCoins}
@@ -649,27 +607,28 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                       disabled={loadingPoints || points === 0}
                     />
                   </div>
-                  
+
                   {useCoins && points > 0 && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center p-2 bg-success/10 border border-success/20 rounded-md">
-                        <span className="text-xs text-success font-medium">
-                          Max 80% discount: ₹{maxCoinsAllowed.toLocaleString()}
-                        </span>
+                    <div className="space-y-2 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium text-success">Max 4% discount</span>
                         <span className="text-sm font-bold text-success">
-                          -₹{coinsUsed.toLocaleString()}
+                          {coinsToUse.toLocaleString()} coins (-₹{(coinsToUse * COIN_VALUE).toLocaleString(undefined, {maximumFractionDigits: 0})})
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Min cash payment:</span>
-                        <span>₹{minimumCashPayment.toLocaleString()}</span>
+                        <span>Max allowed:</span>
+                        <span>{maxCoinsAllowed.toLocaleString()}</span>
                       </div>
+                      {!hasEnoughForMax && (
+                        <div className="text-xs text-destructive">
+                          Only {points.toLocaleString()} available (need {maxCoinsAllowed.toLocaleString()})
+                        </div>
+                      )}
                     </div>
                   )}
                   {useCoins && points === 0 && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      No coins available
-                    </p>
+                    <p className="text-xs text-muted-foreground text-center">No coins available</p>
                   )}
                 </div>
 
@@ -680,10 +639,10 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                     <span>₹{subtotal.toLocaleString()}</span>
                   </div>
                   
-                  {useCoins && coinsUsed > 0 && (
+                  {useCoins && coinsToUse > 0 && (
                     <div className="flex justify-between text-success font-semibold text-sm">
-                      <span>🪙 Coins Discount (80% max)</span>
-                      <span>-₹{coinsUsed.toLocaleString()}</span>
+                      <span>🪙 Coins Discount (up to 4%)</span>
+                      <span>-₹{(coinsToUse * COIN_VALUE).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
                     </div>
                   )}
 
@@ -693,11 +652,12 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                     <span>Total to Pay</span>
                     <span className="text-2xl text-primary">₹{finalTotal.toLocaleString()}</span>
                   </div>
-                  {finalTotal === minimumCashPayment && (
-                    <p className="text-xs text-success text-center font-medium">
-                      💰 Minimum 20% cash payment required
-                    </p>
-                  )}
+                  <p className="text-xs text-muted-foreground text-center">
+                    {useCoins && coinsToUse > 0 
+                      ? `${coinsToUse.toLocaleString()} coins used (${((coinsToUse * COIN_VALUE / subtotal) * 100).toFixed(1)}% discount)`
+                      : "No coins discount applied"
+                    }
+                  </p>
                 </div>
 
                 {/* Place Order Button */}
@@ -705,7 +665,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   onClick={handleProceedToPayment}
                   className="w-full h-12 text-lg"
                   size="lg"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loadingPoints}
                 >
                   {paymentMethod === "upi" 
                     ? `Proceed to UPI Payment (₹${finalTotal.toLocaleString()})` 

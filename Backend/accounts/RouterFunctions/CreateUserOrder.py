@@ -2,135 +2,112 @@ from utils.jwt_helper import decode_token
 from bson import ObjectId
 from datetime import datetime
 import uuid
+import math
 
 def CreateOrderUser(auth_header, data, users_collection, orders_collection):
-    """
-    FIXED: Always returns tuple (order_id, earned_points, new_points)
-    No Response objects inside this function!
-    """
     try:
-        token = auth_header.split(' ')[1]
+        # -------- AUTH --------
+        token = auth_header.split(" ")[1]
         payload = decode_token(token)
-        user_id = payload['user_id']
-        
+        user_id = payload["user_id"]
+
         user = users_collection.find_one({"_id": ObjectId(user_id)})
         if not user:
-            raise ValueError('User not found')
-        
-        
-        subtotal = sum(float(item.get('price', 0)) * int(item.get('quantity', 0)) for item in data.get('items', []))
-        coins_used = float(data.get('coins_used', 0))
-        final_total = float(data.get('total', 0))
+            raise ValueError("User not found")
 
-       
-        min_cash_payment = max(subtotal * 0.2, 50)
-        if final_total < min_cash_payment:
-            raise ValueError(f'Minimum 20% cash payment required. Min: ₹{int(min_cash_payment)}, Got: ₹{int(final_total)}')
+        # -------- VALIDATE INPUT --------
+        items = data.get("items", [])
+        coins_used = int(data.get("coins_used", 0))  # Frontend sends flexible amount
+        total_paid = float(data.get("total", 0))
+        
+        if not items:
+            raise ValueError("No items in order")
 
-        
-        max_coins_allowed = subtotal * 0.8
-        if coins_used > max_coins_allowed:
-            raise ValueError(f'Maximum 80% coins allowed. Max: ₹{int(max_coins_allowed)}, Requested: ₹{int(coins_used)}')
+        # -------- CALCULATE SUBTOTAL --------
+        subtotal = sum(
+            float(i["price"]) * int(i["quantity"])
+            for i in items
+        )
 
-       
-        current_points = user.get('points', 0)
-        if coins_used > 0:
-            if current_points < coins_used:
-                raise ValueError(f'Insufficient coins. Available: {int(current_points)}, Required: {int(coins_used)}')
-            
-           
-            users_collection.update_one(
-                {"_id": ObjectId(user_id)},
-                {"$inc": {"points": -coins_used}}
-            )
+        # -------- ✅ FLEXIBLE 4% MAX COINS --------
+        MAX_COIN_PERCENT = 0.04  # MAXIMUM 4%
+        COIN_VALUE = 0.2
         
-     
-        updated_user = users_collection.find_one({"_id": ObjectId(user_id)})
-        new_points_after_deduction = int(updated_user.get('points', 0))
+        max_coin_discount_value = subtotal * MAX_COIN_PERCENT  # ₹224.24 max
+        max_coins_allowed = math.floor(max_coin_discount_value / COIN_VALUE)  # 1121 max
         
-       
-        order_id = str(uuid.uuid4())[:8].upper()
+        # ✅ ACCEPT 0 to MAX coins (flexible)
+        if coins_used < 0 or coins_used > max_coins_allowed:
+            raise ValueError(f"Coins must be 0-{max_coins_allowed} (max 4% = ₹{max_coin_discount_value:.0f})")
         
-      
-        address_data = data.get('address', {})
-        address_array = [
-            {"type": "fullName", "value": address_data.get('fullName', '')},
-            {"type": "phone", "value": address_data.get('phone', '')},
-            {"type": "email", "value": address_data.get('email', '')},
-            {"type": "address", "value": address_data.get('address', '')},
-            {"type": "city", "value": address_data.get('city', '')},
-            {"type": "state", "value": address_data.get('state', '')},
-            {"type": "pincode", "value": address_data.get('pincode', '')},
-            {"type": "landmark", "value": address_data.get('landmark', '')}
-        ]
-      
-        enhanced_items = []
-        for item in data.get('items', []):
-            flavor = (item.get('selectedFlavor') or 
-                     item.get('flavor') or 
-                     item.get('variant') or 
-                     item.get('flavour') or 
-                     'N/A')
-            
-            weight = (item.get('selectedWeight') or 
-                     item.get('weight') or 
-                     item.get('size') or 
-                     item.get('variantWeight') or
-                     'N/A')
-            
-            enhanced_items.append({
-                "product_id": str(item.get('productId', '')),
-                "name": item.get('name', ''),
-                "quantity": int(item.get('quantity', 0)),
-                "price": float(item.get('price', 0)),
-                "total": float(item.get('price', 0)) * int(item.get('quantity', 0)),
-                "flavor": flavor,
-                "weight": weight
-            })
-        
-       
-        earned_points = int(final_total * 0.05)
-        
-  
-        order_data = {
-            '_id': ObjectId(),
-            'order_id': order_id,
-            'user_id': user_id,
-            'user_phone': user.get('phone', ''),
-            'user_name': user.get('name', ''),
-            'user_email': user.get('email', ''),
-            'address_details': address_array,
-            'order_items': enhanced_items,
-            'subtotal': float(subtotal),
-            'coins_used': float(coins_used),
-            'final_total': float(final_total),
-            'payment_method': data.get('payment_method', 'cod'),
-            'utr_number': data.get('utr_number'),
-            'status': 'pending',
-            'earned_points': earned_points,
-            'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow(),
-        }
-        
-     
-        orders_collection.insert_one(order_data)
-        
+        # ✅ Validate total matches coins used
+        expected_total = subtotal - (coins_used * COIN_VALUE)
+        if abs(total_paid - expected_total) > 0.01:  # Allow tiny float diff
+            raise ValueError(f"Total mismatch. Expected ₹{expected_total:.2f}, got ₹{total_paid}")
+
+        # ✅ Check user has enough coins
+        if user.get("points", 0) < coins_used:
+            raise ValueError(f"Insufficient coins. Need {coins_used}, have {user.get('points', 0)}")
+
+        # -------- DEDUCT COINS --------
         users_collection.update_one(
             {"_id": ObjectId(user_id)},
-            {"$inc": {"points": earned_points}}  
+            {"$inc": {"points": -coins_used}}  # ✅ Use actual coins_used
         )
-        
-        
+
+        # -------- ORDER ID --------
+        order_id = str(uuid.uuid4())[:8].upper()
+
+        # -------- ORDER ITEMS --------
+        order_items = []
+        for item in items:
+            order_items.append({
+                "product_id": str(item.get("productId")),
+                "name": item.get("name"),
+                "price": float(item.get("price")),
+                "quantity": int(item.get("quantity")),
+                "total": float(item.get("price")) * int(item.get("quantity")),
+                "flavor": item.get("selectedFlavor", "N/A"),
+                "weight": item.get("selectedWeight", "N/A"),
+            })
+
+        # -------- COINS EARNED (SAME AS USED) --------
+        earned_coins = coins_used  # ✅ Flexible earned coins
+
+        # -------- SAVE ORDER --------
+        orders_collection.insert_one({
+            "_id": ObjectId(),
+            "order_id": order_id,
+            "user_id": user_id,
+            "subtotal": subtotal,
+            "coins_used": coins_used,  # ✅ Flexible amount
+            "coin_discount_value": coins_used * COIN_VALUE,
+            "cash_paid": total_paid,
+            "earned_points": earned_coins,
+            "order_items": order_items,
+            "payment_method": data.get("payment_method", "cod"),
+            "utr_number": data.get("utr_number"),
+            "address": data.get("address", {}),
+            "status": "pending",
+            "created_at": datetime.utcnow()
+        })
+
+        # -------- ADD EARNED COINS BACK --------
+        users_collection.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$inc": {"points": earned_coins}}
+        )
+
+        # -------- RETURN UPDATED USER POINTS --------
         final_user = users_collection.find_one({"_id": ObjectId(user_id)})
-        final_points = int(final_user.get('points', 0))
-        
-        print(f"Order created: {order_id}")
-        print(f"Subtotal: ₹{subtotal}, Coins Used: ₹{coins_used}, Final: ₹{final_total}")
-        print(f"Points: Before={int(current_points)}, After Deduction={new_points_after_deduction}, Earned=+{earned_points}, Final={final_points}")
-        
-       
-        return order_id, earned_points, final_points
-        
+        final_points = final_user["points"] if final_user else user.get("points", 0)
+
+        return {
+            "order_id": order_id,
+            "earnedPoints": earned_coins,  # ✅ Frontend expects this
+            "new_points": final_points     # ✅ Frontend expects this
+        }
+
     except Exception as e:
-        print(f"CreateOrderUser error: {str(e)}")
-        raise e 
+        print("Order Error:", str(e))
+        raise ValueError(str(e))
