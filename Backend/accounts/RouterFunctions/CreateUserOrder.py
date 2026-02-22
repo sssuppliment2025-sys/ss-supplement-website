@@ -72,7 +72,7 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
             })
 
         # -------- COINS EARNED (SAME AS USED) --------
-        earned_coins = coins_used  # ✅ Flexible earned coins
+        earned_coins = 0  # ✅ Flexible earned coins
 
         # -------- SAVE ORDER --------
         orders_collection.insert_one({
