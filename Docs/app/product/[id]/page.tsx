@@ -27,6 +27,7 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useProducts } from "@/context/product-context"
 import { useCart } from "@/context/cart-context"
+import { useWishlist } from "@/context/wishlist-context"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ProductPage() {
@@ -34,6 +35,7 @@ export default function ProductPage() {
   const router = useRouter()
   const { getProductById, products, getProductVariants, findProductByVariant } = useProducts()
   const { addToCart } = useCart()
+  const { isInWishlist, toggleWishlist } = useWishlist()
   const { toast } = useToast()
 
   const product = getProductById(params.id as string)
@@ -451,9 +453,22 @@ export default function ProductPage() {
 
             {/* Share & Wishlist */}
             <div className="flex gap-3">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                <Heart className="h-4 w-4 mr-2" />
-                Add to Wishlist
+              <Button
+                variant="ghost"
+                size="sm"
+                className={isInWishlist(product?.id ?? "") ? "text-primary" : "text-muted-foreground"}
+                onClick={() => {
+                  if (product?.id) {
+                    toggleWishlist(product.id)
+                    toast({
+                      title: isInWishlist(product.id) ? "Removed from wishlist" : "Added to wishlist",
+                      description: product.name,
+                    })
+                  }
+                }}
+              >
+                <Heart className={`h-4 w-4 mr-2 ${isInWishlist(product?.id ?? "") ? "fill-current" : ""}`} />
+                {isInWishlist(product?.id ?? "") ? "In Wishlist" : "Add to Wishlist"}
               </Button>
               <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />

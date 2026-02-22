@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, User, Menu, X, ChevronDown, Phone, MessageCircle, Gift, Coins } from "lucide-react"
+import { ShoppingCart, User, Menu, X, ChevronDown, Phone, MessageCircle, Gift, Coins, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SearchResults } from "@/components/search-results"
 import { useCart } from "@/context/cart-context"
+import { useWishlist } from "@/context/wishlist-context"
 import { useAuth } from "@/context/auth-context"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -36,6 +37,7 @@ export function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [referralCoins, setReferralCoins] = useState(0)
   const { getCartCount } = useCart()
+  const { getWishlistCount } = useWishlist()
   const { user, isAuthenticated, logout } = useAuth()
   const apiBase = process.env.NEXT_PUBLIC_API_URL
 
@@ -128,8 +130,8 @@ export function Header() {
             <SearchResults />
           </div>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-2">
+          {/* Right actions - tighter gap on mobile between icons */}
+          <div className="flex items-center gap-1 md:gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -178,6 +180,17 @@ export function Header() {
                 </Button>
               </Link>
             )}
+
+            <Link href="/wishlist">
+              <Button variant="ghost" size="sm" className="relative" aria-label="Wishlist">
+                <Heart className="h-5 w-5" />
+                {getWishlistCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+                    {getWishlistCount()}
+                  </span>
+                )}
+              </Button>
+            </Link>
 
             <Link href="/cart">
               <Button variant="ghost" size="sm" className="relative">
@@ -310,6 +323,17 @@ export function Header() {
               <li>
                 <Link href="/offers" className="block py-2 text-primary font-semibold">
                   OFFERS
+                </Link>
+              </li>
+              <li>
+                <Link href="/wishlist" className="block py-2 text-foreground flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                  <Heart className="h-4 w-4" />
+                  WISHLIST
+                  {getWishlistCount() > 0 && (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                      {getWishlistCount()}
+                    </span>
+                  )}
                 </Link>
               </li>
               <li>
