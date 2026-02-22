@@ -37,6 +37,9 @@ export default function ChatSupportPage() {
                 <Phone className="h-8 w-8 text-primary mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">Call Us</h3>
                 <p className="text-muted-foreground text-sm">+91 95478 99170</p>
+                <Button asChild size="sm" className="mt-3">
+                  <a href="tel:+919547899170">Call Now</a>
+                </Button>
               </CardContent>
             </Card>
             <Card className="bg-card border-border">

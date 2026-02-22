@@ -234,8 +234,11 @@ export default function PrivacyPolicyPage() {
                     <strong className="text-foreground">Phone:</strong> +91 95478 99170
                   </li>
                   <li>
-                    <strong className="text-foreground">Address:</strong> 123 Fitness Street, Sector 14, Gurgaon,
-                    Haryana - 122001
+                    <strong className="text-foreground">Address:</strong> Haldia, Bhabanipur ,Babajibasa, 721657
+                    <br />
+                    Near Ambuja City centre Mall
+                    <br />
+                    Opposite Meghnath Saha institute of technology
                   </li>
                 </ul>
               </div>

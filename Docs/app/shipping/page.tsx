@@ -269,6 +269,13 @@ export default function ShippingPolicyPage() {
                     <strong className="text-foreground">WhatsApp:</strong> +91 95478 99170
                   </li>
                   <li>
+                    <strong className="text-foreground">Address:</strong> Haldia, Bhabanipur ,Babajibasa, 721657
+                    <br />
+                    Near Ambuja City centre Mall
+                    <br />
+                    Opposite Meghnath Saha institute of technology
+                  </li>
+                  <li>
                     <strong className="text-foreground">Support Hours:</strong> Mon-Sat, 10:00 AM - 7:00 PM IST
                   </li>
                 </ul>
