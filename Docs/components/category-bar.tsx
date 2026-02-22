@@ -54,12 +54,6 @@ export function CategoryBar() {
     if (!node) return
 
     const media = window.matchMedia("(min-width: 768px)")
-    const getScrollStep = () => {
-      const firstItem = node.querySelector<HTMLElement>('a[data-desktop-item="true"]')
-      if (!firstItem) return 100
-      const gap = Number.parseFloat(window.getComputedStyle(node).columnGap || "0")
-      return Math.round(firstItem.getBoundingClientRect().width + gap)
-    }
 
     const updateDesktopScrollState = () => {
       if (!media.matches) return
@@ -68,23 +62,11 @@ export function CategoryBar() {
       setCanScrollDesktopRight(scrollLeft + clientWidth < scrollWidth - 2)
     }
 
-    const autoScroll = () => {
-      if (!media.matches) return
-      const step = getScrollStep()
-      if (node.scrollLeft + node.clientWidth >= node.scrollWidth - 2) {
-        node.scrollTo({ left: 0, behavior: "auto" })
-        return
-      }
-      node.scrollBy({ left: step, behavior: "smooth" })
-    }
-
     updateDesktopScrollState()
-    const interval = window.setInterval(autoScroll, 2200)
     node.addEventListener("scroll", updateDesktopScrollState, { passive: true })
     window.addEventListener("resize", updateDesktopScrollState)
 
     return () => {
-      window.clearInterval(interval)
       node.removeEventListener("scroll", updateDesktopScrollState)
       window.removeEventListener("resize", updateDesktopScrollState)
     }
