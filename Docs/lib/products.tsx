@@ -955,27 +955,7 @@ export const products: Product[] = [
     inStock: true,
   },
 
-  {
-    id: "501",
-    name: "GNC AMP Pure Isolate (zero carb)",
-    brand: "GNC",
-    category: "Whey Protein",
-    ...PRICING.GNC_AMP_ISO_1KG,
-    rating: 4.7,
-    reviews: 4900,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "CHOCOLATE", price: PRICING.GNC_AMP_ISO_1KG.price }],
-    weight: "1KG",
-    weights: ["1KG", "2KG"],
-    description: "Pure whey isolate for lean muscle",
-    keyBenefits: ["25g protein per serving", "Zero sugar", "Fast absorbing isolate"],
-    nutritionalInfo: "Per Serving: 25g Protein, 1g Carbs, 0.5g Fat",
-    inStock: true,
-  },
+  
 
   {
     id: "28",
@@ -1021,27 +1001,6 @@ export const products: Product[] = [
     inStock: true,
   },
 
-  {
-    id: "502",
-    name: "GNC AMP Pure Isolate (zero carb)",
-    brand: "GNC",
-    category: "Whey Protein",
-    ...PRICING.GNC_AMP_ISO_2KG,
-    rating: 4.8,
-    reviews: 6200,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "CHOCOLLATE", price: PRICING.GNC_AMP_ISO_2KG.price }],
-    weight: "2KG",
-    weights: ["1KG", "2KG"],
-    description: "Pure whey isolate for lean muscle",
-    keyBenefits: ["25g protein per serving", "Zero sugar", "Fast absorbing isolate"],
-    nutritionalInfo: "Per Serving: 25g Protein, 1g Carbs, 0.5g Fat",
-    inStock: true,
-  },
 
   // GNC SELECT
   {
@@ -2395,7 +2354,7 @@ export const products: Product[] = [
   // CREATINE - MUSCLEBLAZE
   {
     id: "89",
-    name: "MuscleBlaze Creatine Monohydrate CreAMP",
+    name: "MuscleBlaze Creatine Monohydrate CreAMP unflavoured",
     brand: "MuscleBlaze",
     category: "Creatine",
     ...PRICING.MB_CREA_MONO_100G,
@@ -2416,7 +2375,7 @@ export const products: Product[] = [
   },
   {
     id: "90",
-    name: "MuscleBlaze Creatine Monohydrate CreAMP",
+    name: "MuscleBlaze Creatine Monohydrate CreAMP unflavoured",
     brand: "MuscleBlaze",
     category: "Creatine",
     ...PRICING.MB_CREA_MONO_250G,
@@ -2565,7 +2524,7 @@ export const products: Product[] = [
   // WELLCORE
   {
     id: "97",
-    name: "Wellcore - Pure Micronised Creatine Monohydrate",
+    name: "Wellcore - Pure Micronised Creatine Monohydrate Unflavoured",
     brand: "Wellcore",
     category: "Creatine",
     ...PRICING.WELL_UF_100G,
@@ -2586,7 +2545,7 @@ export const products: Product[] = [
   },
   {
     id: "98",
-    name: "Wellcore - Pure Micronised Creatine Monohydrate",
+    name: "Wellcore - Pure Micronised Creatine Monohydrate Unflavoured",
     brand: "Wellcore",
     category: "Creatine",
     ...PRICING.WELL_UF_250G,
