@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await res.json()
 
       if (!res.ok) {
-        return { success: false, message: data.detail || "Login failed" }
+        return { success: false, message: data.detail || "Login failed...." }
       }
 
       localStorage.setItem("access", data.tokens.access)
@@ -133,9 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: data.user.is_staff || false,
       })
 
-      return { success: true, message: "Login successful" }
+      return { success: true, message: "Login successful...." }
     } catch {
-      return { success: false, message: "Server error" }
+      return { success: false, message: "Password Incorrect...." }
     }
   }
 
