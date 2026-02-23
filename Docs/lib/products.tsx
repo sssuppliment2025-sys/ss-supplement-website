@@ -2242,29 +2242,6 @@ export const products: Product[] = [
     inStock: true,
   },
 
-  // {
-  //   id: "84",
-  //   name: "Dr. Morepen 100% Whey Protein",
-  //   brand: "Morphenlab",
-  //   category: "Whey Protein",
-  //   ...PRICING.MORPH_W_2KG,
-  //   rating: 4.4,
-  //   reviews: 3400,
-  //   image: "/image/Whey_protien/Morphen_whey/Whey_choc_2kg.webp",
-  //   image1: "/image/Whey_protien/Morphen_whey/Whey_choc_2kg2.webp",
-  //   image2: "/image/Whey_protien/Morphen_whey/Whey_choc_2kg3.webp",
-  //   image3: "/image/Whey_protien/Morphen_whey/Whey_choc_2kg4.webp",
-  //   images: [],
-  //   flavors: [{ name: "Chocolate", price: PRICING.MORPH_W_2KG.price }],
-  //   weight: "2KG",
-  //   weights: ["2KG"],
-  //   description: "Quality whey protein at affordable price",
-  //   keyBenefits: ["23g protein per serving", "Good mixability", "Affordable"],
-  //   nutritionalInfo: "Per Serving: 23g Protein, 4g Carbs, 2g Fat",
-  //   inStock: true,
-  // },
-
-
   // ABSOLUTE
   {
     id: "85",
@@ -4163,27 +4140,6 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: Essential Vitamins & Minerals",
     inStock: true
   },
-  // {
-  //   id: "167",
-  //   name: "C4 Multivitamin",
-  //   brand: "C4",
-  //   category: "Multivitamin",
-  //   ...PRICING.C4_MULTI,
-  //   rating: 4.4,
-  //   reviews: 3600,
-  //   image: "",
-  //   image1: "",
-  //   image2: "",
-  //   image3: "",
-  //   images: [],
-  //   flavors: [{ name: "Unflavoured", price: PRICING.C4_MULTI.price }],
-  //   weight: "180N",
-  //   weights: ["180N"],
-  //   description: "C4 multivitamin for peak performance",
-  //   keyBenefits: ["180 tablets", "Premium formula", "Performance support"],
-  //   nutritionalInfo: "Per Serving: 30+ Essential Nutrients",
-  //   inStock: true
-  // },
 
   // ************FISH OIL************
   {
@@ -4705,71 +4661,7 @@ export const products: Product[] = [
     inStock: true
   },
 
-  /*
-  {
-    id: "191",
-    name: "Wellversed Dynamite",
-    brand: "Wellversed",
-    category: "Pre Workout",
-    ...PRICING.WV_PRE,
-    rating: 4.3,
-    reviews: 2600,
-    image: "/image/Pre_Workout/Wellversed/Fruit_420gm.jpg",
-    image1: "/image/Pre_Workout/Wellversed/Fruit_420gm1.jpg",
-    image2: "/image/Pre_Workout/Wellversed/Fruit_420gm2.jpg",
-    image3: "/image/Pre_Workout/Wellversed/Fruit_420gm3.jpg",
-    images: [],
-    flavors: [{ name: "Fruit Blast", price: PRICING.WV_PRE.price }],
-    weight: "420GM",
-    weights: ["420GM"],
-    description: "Wellversed Dynamite pre-workout for explosive workouts",
-    keyBenefits: ["Clean energy", "No crash", "Great taste"],
-    nutritionalInfo: "Per Serving: 150mg Caffeine, 3g Citrulline",
-    inStock: true
-  },
-  {
-    id: "192",
-    name: "Wellversed Dynamite",
-    brand: "Wellversed",
-    category: "Pre Workout",
-    ...PRICING.WV_PRE,
-    rating: 4.3,
-    reviews: 2600,
-    image: "/image/Pre_Workout/Wellversed/Berry_420gm.jpg",
-    image1: "/image/Pre_Workout/Wellversed/Berry_420gm1.jpg",
-    image2: "/image/Pre_Workout/Wellversed/Berry_420gm2.jpg",
-    image3: "/image/Pre_Workout/Wellversed/Berry_420gm3.jpg",
-    images: [],
-    flavors: [{ name: "Berry Burst", price: PRICING.WV_PRE.price }],
-    weight: "420GM",
-    weights: ["420GM"],
-    description: "Wellversed Dynamite pre-workout for explosive workouts",
-    keyBenefits: ["Clean energy", "No crash", "Great taste"],
-    nutritionalInfo: "Per Serving: 150mg Caffeine, 3g Citrulline",
-    inStock: true
-  },
-  {
-    id: "193",
-    name: "Wellversed Dynamite",
-    brand: "Wellversed",
-    category: "Pre Workout",
-    ...PRICING.WV_PRE,
-    rating: 4.3,
-    reviews: 2600,
-    image: "/image/Pre_Workout/Wellversed/Watermelon_420gm.jpg",
-    image1: "/image/Pre_Workout/Wellversed/Watermelon_420gm1.jpg",
-    image2: "/image/Pre_Workout/Wellversed/Watermelon_420gm2.jpg",
-    image3: "/image/Pre_Workout/Wellversed/Watermelon_420gm3.jpg",
-    images: [],
-    flavors: [{ name: "Watermelon Ice", price: PRICING.WV_PRE.price }],
-    weight: "420GM",
-    weights: ["420GM"],
-    description: "Wellversed Dynamite pre-workout for explosive workouts",
-    keyBenefits: ["Clean energy", "No crash", "Great taste"],
-    nutritionalInfo: "Per Serving: 150mg Caffeine, 3g Citrulline",
-    inStock: true
-  },
-  */
+  
 
   //FAST & UP
   {
@@ -4970,52 +4862,6 @@ export const products: Product[] = [
     inStock: true
   },
 
-
-  /*
-  {
-    id: "201",
-    name: "Fast And Up L-Carnitine 3000mg",
-    brand: "Fast & Up",
-    category: "Weight Loss",
-    ...PRICING.FU_LC,
-    rating: 4.4,
-    reviews: 2800,
-    image: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_300mg.jpg",
-    image1: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_300mg1.jpg",
-    image2: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_300mg2.jpg",
-    image3: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_300mg3.jpg",
-    images: [],
-    flavors: [{ name: "Lemon", price: 0 }],
-    weight: "30N",
-    weights: ["30N"],
-    description: "Fast & Up L-Carnitine 3000mg effervescent tablets for weight management",
-    keyBenefits: ["Effervescent formula", "Quick absorption", "Convenient"],
-    nutritionalInfo: "Per Tablet: 3000mg L-Carnitine",
-    inStock: true
-  },
-
-  {
-    id: "202",
-    name: "Fast And Up L-Carnitine 3000mg",
-    brand: "Fast & Up",
-    category: "Weight Loss",
-    ...PRICING.FU_LC,
-    rating: 4.4,
-    reviews: 2800,
-    image: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_Orange_300mg.jpg",
-    image1: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_Orange_300mg1.jpg",
-    image2: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_Orange_300mg2.jpg",
-    image3: "/image/Weight_loss/Fast_And_Up/Fast_And_Up_L_carnitine_Orange_300mg3.jpg",
-    images: [],
-    flavors: [{ name: "Orange", price: 0 }],
-    weight: "30N",
-    weights: ["30N"],
-    description: "Fast & Up L-Carnitine 3000mg effervescent tablets for weight management",
-    keyBenefits: ["Effervescent formula", "Quick absorption", "Convenient"],
-    nutritionalInfo: "Per Tablet: 3000mg L-Carnitine",
-    inStock: true
-  },
-  */
   
   {
     id: "204",
@@ -5298,111 +5144,7 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: 10g Hydrolyzed Collagen Peptides",
     inStock: true
   },
-/*
-  {
-    id: "302",
-    name: "Biotin Capsules",
-    brand: "Generic",
-    category: "Beauty",
-    ...PRICING.ZERO,
-    rating: 0,
-    reviews: 0,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "Default", price: 0 }],
-    weight: "60 Capsules",
-    weights: ["60 Capsules"],
-    description: "Biotin supplement for stronger hair, skin, and nails.",
-    keyBenefits: [
-      "Reduces hair fall",
-      "Strengthens nails",
-      "Improves skin health"
-    ],
-    nutritionalInfo: "Per Serving: Biotin 10,000 mcg",
-    inStock: true,
-  },
 
-  {
-    id: "303",
-    name: "Vitamin D3",
-    brand: "Generic",
-    category: "Beauty",
-    ...PRICING.ZERO,
-    rating: 0,
-    reviews: 0,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "Default", price: 0 }],
-    weight: "60 Tablets",
-    weights: ["60 Tablets"],
-    description: "Vitamin D supplement to support bones, immunity, and skin health.",
-    keyBenefits: [
-      "Boosts immunity",
-      "Strengthens bones",
-      "Supports healthy skin"
-    ],
-    nutritionalInfo: "Per Serving: Vitamin D3 2000 IU",
-    inStock: true,
-  },
-
-  {
-    id: "304",
-    name: "Vitamin C",
-    brand: "Generic",
-    category: "Beauty",
-    ...PRICING.ZERO,
-    rating: 0,
-    reviews: 0,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "Default", price: 0 }],
-    weight: "120 Tablets",
-    weights: ["120 Tablets"],
-    description: "Vitamin C for glowing skin and strong immunity.",
-    keyBenefits: [
-      "Brightens skin",
-      "Boosts collagen production",
-      "Improves immunity"
-    ],
-    nutritionalInfo: "Per Serving: Vitamin C 1000 mg",
-    inStock: true,
-  },
-
-  {
-    id: "305",
-    name: "Glutathione",
-    brand: "Generic",
-    category: "Beauty",
-    ...PRICING.ZERO,
-    rating: 0,
-    reviews: 0,
-    image: "",
-    image1: "",
-    image2: "",
-    image3: "",
-    images: [],
-    flavors: [{ name: "Default", price: 0 }],
-    weight: "60 Capsules",
-    weights: ["60 Capsules"],
-    description: "Glutathione supplement for skin brightening and detoxification.",
-    keyBenefits: [
-      "Improves skin tone",
-      "Powerful antioxidant",
-      "Supports liver detox"
-    ],
-    nutritionalInfo: "Per Serving: Glutathione 500 mg",
-    inStock: true,
-  },
-  */
   // ==================== PEANUT BUTTER ====================
   {
     id: "215",
@@ -5643,27 +5385,7 @@ export const products: Product[] = [
     inStock: true
   },
 
-  // {
-  //   id: "222",
-  //   name: "Pintola Peanut Butter Creamy",
-  //   brand: "Pintola",
-  //   category: "Peanut Butter & Oats",
-  //   ...PRICING.PIN_CREAMY_1KG,
-  //   rating: 4.6,
-  //   reviews: 6800,
-  //   image: "/image/Peanut_butter_oats/Pintola_peanut_butter_Classic_1kg.jpg",
-  //   image1: "/image/Peanut_butter_oats/Pintola_peanut_butter_Classic_1kg1.webp",
-  //   image2: "/image/Peanut_butter_oats/Pintola_peanut_butter_Classic_1kg2.webp",
-  //   image3: "/image/Peanut_butter_oats/Pintola_peanut_butter_Classic_1kg3.webp",
-  //   images: [],
-  //   flavors: [{ name: "Dark Chocolate", price: PRICING.PIN_CREAMY_1KG.price }],
-  //   weight: "1KG",
-  //   weights: ["1KG"],
-  //   description: "Pintola all-natural peanut butter classic flavor",
-  //   keyBenefits: ["100% natural", "High protein", "No additives"],
-  //   nutritionalInfo: "Per Serving: 8g Protein, Zero Trans Fat",
-  //   inStock: true
-  // },
+  
 {
   id: "801",
   name: "Pintola Peanut Butter Crunchy",
@@ -5883,27 +5605,7 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: Shilajit + Gold Bhasma",
     inStock: true,
   },
-  // {
-  //   id: "228",
-  //   name: "Kapiva Ashwagandha Gold Capsul",
-  //   brand: "Kapiva",
-  //   category: "Ayurvedic Products",
-  //   ...PRICING.KAP_ASHW_GOLD,
-  //   rating: 4.5,
-  //   reviews: 4800,
-  //   image: "/image/Ayurvedic/kapiva_aswagandha_60n.jpg",
-  //   image1: "/image/Ayurvedic/kapiva_aswagandha_60n1.jpg",
-  //   image2: "/image/Ayurvedic/kapiva_aswagandha_60n2.jpg",
-  //   image3: "/image/Ayurvedic/kapiva_aswagandha_60n3.jpg",
-  //   images: [],
-  //   flavors: [{ name: "Natural", price: PRICING.KAP_ASHW_GOLD.price }],
-  //   weight: "60N",
-  //   weights: ["60N"],
-  //   description: "Ashwagandha for stress relief",
-  //   keyBenefits: ["Stress relief", "Energy boost", "Hormonal balance"],
-  //   nutritionalInfo: "Per Capsule: Ashwagandha 500mg",
-  //   inStock: true,
-  // },
+  
   {
   id: "901",
   name: "Kapiva KSM-66 Ashwagandha",
@@ -5982,27 +5684,7 @@ export const products: Product[] = [
   nutritionalInfo: "Per serving (1 capsule): Ashwagandha, Safed Musli, Gokshura, Shilajit & herbal extracts",
   inStock: true
 },
-  // {
-  //   id: "229",
-  //   name: "Kapiva Shilajit Gold Capsul",
-  //   brand: "Kapiva",
-  //   category: "Ayurvedic Products",
-  //   ...PRICING.KAP_SHIL_GOLD,
-  //   rating: 4.5,
-  //   reviews: 4200,
-  //   image: "/image/Ayurvedic/kapiva_gold_60n.jpg",
-  //   image1: "/image/Ayurvedic/kapiva_gold_60n1.jpg",
-  //   image2: "/image/Ayurvedic/kapiva_gold_60n2.jpg",
-  //   image3: "/image/Ayurvedic/kapiva_gold_60n3.jpg",
-  //   images: [],
-  //   flavors: [{ name: "Natural", price: PRICING.KAP_SHIL_GOLD.price }],
-  //   weight: "60N",
-  //   weights: ["60N"],
-  //   description: "Kapiva Shilajit Gold capsules for vitality and stamina",
-  //   keyBenefits: ["Boost energy & stamina", "Improve strength", "Natural wellness"],
-  //   nutritionalInfo: "Per Serving: Pure Himalayan Shilajit with Gold",
-  //   inStock: true
-  // },
+
 
   // ==================== PROTEIN BARS ====================
   {
