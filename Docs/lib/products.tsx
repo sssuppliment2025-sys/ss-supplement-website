@@ -448,7 +448,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "500",
+    id: "6",
     name: "Dymatize ISO 100 Hydrolyzed Whey Protein",
     brand: "Dymatize",
     category: "Whey Protein",
@@ -471,7 +471,7 @@ export const products: Product[] = [
 
   // LABRADA
   {
-    id: "6",
+    id: "7",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -491,7 +491,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "7",
+    id: "8",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -511,7 +511,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "8",
+    id: "9",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -532,7 +532,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "9",
+    id: "10",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -552,7 +552,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "10",
+    id: "11",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -572,7 +572,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "11",
+    id: "12",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -592,7 +592,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "12",
+    id: "13",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -612,7 +612,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "13",
+    id: "14",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -632,7 +632,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "14",
+    id: "15",
     name: "Labrada 100% Whey Protein",
     brand: "Labrada",
     category: "Whey Protein",
@@ -698,7 +698,7 @@ export const products: Product[] = [
   // },
 
   {
-    id: "17",
+    id: "16",
     name: "Muscletech Nitro Tech Whey Protein",
     brand: "MuscleTech",
     category: "Whey Protein",
@@ -719,7 +719,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "18",
+    id: "17",
     name: "Muscletech Nitro Tech Whey Protein",
     brand: "MuscleTech",
     category: "Whey Protein",
@@ -740,7 +740,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "19",
+    id: "18",
     name: "Muscletech Nitro Tech Whey Protein",
     brand: "MuscleTech",
     category: "Whey Protein",
@@ -761,7 +761,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "20",
+    id: "19",
     name: "Muscletech Nitro Tech Whey Protein",
     brand: "MuscleTech",
     category: "Whey Protein",
@@ -784,7 +784,7 @@ export const products: Product[] = [
 
   // GNC
   {
-    id: "21",
+    id: "20",
     name: "GNC Pro Performance 100% Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -805,7 +805,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "22",
+    id: "21",
     name: "GNC Pro Performance 100% Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -826,7 +826,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "23",
+    id: "22",
     name: "GNC Pro Performance 100% Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -847,7 +847,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "24",
+    id: "23",
     name: "GNC Pro Performance 100% Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -868,7 +868,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "25",
+    id: "24",
     name: "GNC Pro Performance 100% Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -889,7 +889,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "26",
+    id: "25",
     name: "GNC Pro Performance 100% Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -912,7 +912,7 @@ export const products: Product[] = [
 
   // GNC ISOLATE
   {
-    id: "27",
+    id: "26",
     name: "GNC AMP Pure Isolate (zero carb)",
     brand: "GNC",
     category: "Whey Protein",
@@ -934,7 +934,7 @@ export const products: Product[] = [
   },
   
   {
-    id: "29",
+    id: "27",
     name: "GNC AMP Pure Isolate (zero carb)",
     brand: "GNC",
     category: "Whey Protein",
@@ -980,7 +980,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "30",
+    id: "29",
     name: "GNC AMP Pure Isolate (zero carb)",
     brand: "GNC",
     category: "Whey Protein",
@@ -1004,7 +1004,7 @@ export const products: Product[] = [
 
   // GNC SELECT
   {
-    id: "32",
+    id: "30",
     name: "GNC Select Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -1025,7 +1025,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "33",
+    id: "31",
     name: "GNC Select Whey Protein",
     brand: "GNC",
     category: "Whey Protein",
@@ -1048,7 +1048,7 @@ export const products: Product[] = [
 
   // BPI
   {
-    id: "34",
+    id: "32",
     name: "BPI  Sports Whey HD",
     brand: "BPI",
     category: "Whey Protein",
@@ -1069,7 +1069,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "35",
+    id: "33",
     name: "BPI  Sports Whey HD",
     brand: "BPI",
     category: "Whey Protein",
@@ -1158,7 +1158,7 @@ export const products: Product[] = [
 
   // ISOPURE
   {
-    id: "39",
+    id: "34",
     name: " Isopure low carbs Isolate Whey Protein",
     brand: "Isopure",
     category: "Whey Protein",
@@ -1203,7 +1203,7 @@ export const products: Product[] = [
 
   //WELLBEING
   {
-  id: "701",
+  id: "35",
   name: "Wellbeing Nutrition Clean Whey Protein Concentrate 1kg",
   brand: "Wellbeing Nutrition",
   category: "Whey Protein",
@@ -1228,7 +1228,7 @@ export const products: Product[] = [
   inStock: true,
 },
 {
-  id: "702",
+  id: "36",
   name: "Wellbeing Nutrition Clean Whey Protein Isolate & Concentrate 1kg Swiss Chocolate",
   brand: "Wellbeing Nutrition",
   category: "Whey Protein",
@@ -1254,7 +1254,7 @@ export const products: Product[] = [
   inStock: true,
 },
 {
-  id: "703",
+  id: "37",
   name: "Wellbeing Nutrition Clean Whey Protein Isolate",
   brand: "Wellbeing Nutrition",
   category: "Whey Protein",
@@ -1279,7 +1279,7 @@ export const products: Product[] = [
   inStock: true,
 },
 {
-  id: "704",
+  id: "38",
   name: "Wellbeing Nutrition Clean Whey Protein Isolate",
   brand: "Wellbeing Nutrition",
   category: "Whey Protein",
@@ -1305,7 +1305,7 @@ export const products: Product[] = [
 },
   // MUSCLEBLAZE BIOZYME
   {
-    id: "41",
+    id: "39",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1326,7 +1326,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "42",
+    id: "40",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1347,7 +1347,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "43",
+    id: "41",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1368,7 +1368,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "44",
+    id: "42",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1389,7 +1389,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "45",
+    id: "43",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1410,7 +1410,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "46",
+    id: "44",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1431,7 +1431,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "47",
+    id: "45",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1452,7 +1452,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "48",
+    id: "46",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1473,7 +1473,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "49",
+    id: "47",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1494,7 +1494,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "50",
+    id: "48",
     name: "Muscleblaze Biozyme Performance Whey",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1515,7 +1515,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "290",
+    id: "49",
     name: "Muscleblaze Biozyme Performance Whey Reffil Pack",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1538,7 +1538,7 @@ export const products: Product[] = [
 
   // ISOZERO
   {
-    id: "51",
+    id: "50",
     name: "Muscleblaze Biozyme Iso-Zero",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1559,7 +1559,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "52",
+    id: "51",
     name: "Muscleblaze Biozyme Iso-Zero",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1580,7 +1580,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "53",
+    id: "52",
     name: "Muscleblaze Biozyme Iso-Zero",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1601,7 +1601,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "54",
+    id: "53",
     name: "Muscleblaze Biozyme Iso-Zero",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1624,7 +1624,7 @@ export const products: Product[] = [
 
   // MB PR
   {
-    id: "55",
+    id: "54",
     name: "Muscleblaze Biozyme Performance Whey PR",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1645,7 +1645,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "56",
+    id: "55",
     name: "Muscleblaze Biozyme Performance Whey PR",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1666,7 +1666,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "57",
+    id: "56",
     name: "Muscleblaze Biozyme Performance Whey PR",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1687,7 +1687,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "58",
+    id: "57",
     name: "Muscleblaze Biozyme Performance Whey PR",
     brand: "MuscleBlaze",
     category: "Whey Protein",
@@ -1710,7 +1710,7 @@ export const products: Product[] = [
 
   // AVVATAR
   {
-    id: "59",
+    id: "58",
     name: "Avvatar Whey Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1731,7 +1731,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "60",
+    id: "59",
     name: "Avvatar Whey Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1752,7 +1752,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "61",
+    id: "60",
     name: "Avvatar Whey Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1773,7 +1773,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "62",
+    id: "61",
     name: "Avvatar Whey Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1794,7 +1794,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "63",
+    id: "62",
     name: "Avvatar Whey Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1815,7 +1815,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "64",
+    id: "63",
     name: "Avvatar Whey Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1836,7 +1836,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "65",
+    id: "64",
     name: "Avvatar 100% Performance Whey",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1857,7 +1857,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "66",
+    id: "65",
     name: "Avvatar 100% Performance Whey",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1878,7 +1878,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "67",
+    id: "66",
     name: "Avvatar 100% Performance Whey",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1899,7 +1899,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "68",
+    id: "67",
     name: "Avvatar 100% Performance Whey",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1920,7 +1920,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "69",
+    id: "68",
     name: "Avvatar 100% Performance Whey",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1941,7 +1941,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "70",
+    id: "69",
     name: "Avvatar 100% Performance Whey",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1962,7 +1962,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "71",
+    id: "70",
     name: "Avvatar Isorich Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -1983,7 +1983,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "72",
+    id: "71",
     name: "Avvatar Isorich Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -2004,7 +2004,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "73",
+    id: "72",
     name: "Avvatar Isorich Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -2025,7 +2025,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "74",
+    id: "73",
     name: "Avvatar Isorich Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -2046,7 +2046,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "75",
+    id: "74",
     name: "Avvatar Isorich Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -2067,7 +2067,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "76",
+    id: "75",
     name: "Avvatar Isorich Protein",
     brand: "Avvatar",
     category: "Whey Protein",
@@ -2090,7 +2090,7 @@ export const products: Product[] = [
 
   // FUELONE
   {
-    id: "77",
+    id: "76",
     name: "Fuel One Whey Protein Powder",
     brand: "Fuelone",
     category: "Whey Protein",
@@ -2111,7 +2111,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "78",
+    id: "77",
     name: "Fuel One Whey Protein Powder",
     brand: "Fuelone",
     category: "Whey Protein",
@@ -2134,7 +2134,7 @@ export const products: Product[] = [
 
   // ATOM
   {
-    id: "79",
+    id: "78",
     name: "ATOM Whey Protein",
     brand: "Attom",
     category: "Whey Protein",
@@ -2155,7 +2155,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "80",
+    id: "79",
     name: "ATOM Whey Protein",
     brand: "Attom",
     category: "Whey Protein",
@@ -2176,7 +2176,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "81",
+    id: "80",
     name: "ATOM Whey Protein",
     brand: "Attom",
     category: "Whey Protein",
@@ -2198,7 +2198,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "82",
+    id: "81",
     name: "ATOM Whey Protein",
     brand: "Attom",
     category: "Whey Protein",
@@ -2221,7 +2221,7 @@ export const products: Product[] = [
 
   // MORPHEN
   {
-    id: "83",
+    id: "82",
     name: "Dr. Morepen Turbo Whey Protein",
     brand: "Morphenlab",
     category: "Whey Protein",
@@ -2267,7 +2267,7 @@ export const products: Product[] = [
 
   // ABSOLUTE
   {
-    id: "85",
+    id: "83",
     name: "Absolute Whey Legender (Alpha Series)",
     brand: "Absolute",
     category: "Whey Protein",
@@ -2288,7 +2288,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "86",
+    id: "84",
     name: "Absolute Whey Legender (Alpha Series)",
     brand: "Absolute",
     category: "Whey Protein",
@@ -2309,7 +2309,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "87",
+    id: "85",
     name: "Absolute Whey Legender (Alpha Series)",
     brand: "Absolute",
     category: "Whey Protein",
@@ -2330,7 +2330,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "88",
+    id: "86",
     name: "Absolute Whey Legender (Alpha Series)",
     brand: "Absolute",
     category: "Whey Protein",
@@ -2353,7 +2353,7 @@ export const products: Product[] = [
 
   // CREATINE - MUSCLEBLAZE
   {
-    id: "89",
+    id: "87",
     name: "MuscleBlaze Creatine Monohydrate CreAMP unflavoured",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2374,7 +2374,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "90",
+    id: "88",
     name: "MuscleBlaze Creatine Monohydrate CreAMP unflavoured",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2395,7 +2395,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "91",
+    id: "89",
     name: "MuscleBlaze Creatine Monohydrate CreAMP",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2416,7 +2416,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "92",
+    id: "90",
     name: "MuscleBlaze Creatine Monohydrate CreAMP",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2437,7 +2437,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "93",
+    id: "91",
     name: "MuscleBlaze Creatine Monohydrate CreAMP",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2458,7 +2458,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "94",
+    id: "92",
     name: "MuscleBlaze Creatine Monohydrate CreAMP",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2479,7 +2479,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "95",
+    id: "93",
     name: "MuscleBlaze Creatine Monohydrate CreAMP",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2500,7 +2500,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "96",
+    id: "94",
     name: "MuscleBlaze Creatine Monohydrate CreAMP",
     brand: "MuscleBlaze",
     category: "Creatine",
@@ -2523,7 +2523,7 @@ export const products: Product[] = [
 
   // WELLCORE
   {
-    id: "97",
+    id: "95",
     name: "Wellcore - Pure Micronised Creatine Monohydrate Unflavoured",
     brand: "Wellcore",
     category: "Creatine",
@@ -2544,7 +2544,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "98",
+    id: "96",
     name: "Wellcore - Pure Micronised Creatine Monohydrate Unflavoured",
     brand: "Wellcore",
     category: "Creatine",
@@ -2565,7 +2565,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "99",
+    id: "97",
     name: "Wellcore - Pure Micronised Creatine Monohydrate",
     brand: "Wellcore",
     category: "Creatine",
@@ -2586,7 +2586,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "100",
+    id: "98",
     name: "Wellcore - Pure Micronised Creatine Monohydrate",
     brand: "Wellcore",
     category: "Creatine",
@@ -2607,7 +2607,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "101",
+    id: "99",
     name: "Wellcore - Pure Micronised Creatine Monohydrate",
     brand: "Wellcore",
     category: "Creatine",
@@ -2628,7 +2628,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "102",
+    id: "100",
     name: "Wellcore - Pure Micronised Creatine Monohydrate",
     brand: "Wellcore",
     category: "Creatine",
@@ -2649,7 +2649,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "103",
+    id: "101",
     name: "Wellcore - Pure Micronised Creatine Monohydrate",
     brand: "Wellcore",
     category: "Creatine",
@@ -2670,7 +2670,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "104",
+    id: "102",
     name: "Wellcore - Pure Micronised Creatine Monohydrate",
     brand: "Wellcore",
     category: "Creatine",
@@ -2693,7 +2693,7 @@ export const products: Product[] = [
 
   // GNC CREATINE
   {
-    id: "105",
+    id: "103",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2714,7 +2714,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "106",
+    id: "104",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2735,7 +2735,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "107",
+    id: "105",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2756,7 +2756,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "108",
+    id: "106",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2777,7 +2777,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "109",
+    id: "107",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2798,7 +2798,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "110",
+    id: "108",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2819,7 +2819,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "111",
+    id: "109",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2840,7 +2840,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "112",
+    id: "110",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2861,7 +2861,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "113",
+    id: "111",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2882,7 +2882,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "114",
+    id: "112",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2903,7 +2903,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "115",
+    id: "113",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2924,7 +2924,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "116",
+    id: "114",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2945,7 +2945,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "117",
+    id: "115",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2966,7 +2966,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "118",
+    id: "116",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -2987,7 +2987,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "119",
+    id: "117",
     name: "GNC Pro Performance Creatine Monohydrate",
     brand: "GNC",
     category: "Creatine",
@@ -3010,7 +3010,7 @@ export const products: Product[] = [
 
   // GNC ELECTROLYTES
   {
-    id: "120",
+    id: "118",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3031,7 +3031,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "121",
+    id: "119",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3052,7 +3052,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "122",
+    id: "120",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3073,7 +3073,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "123",
+    id: "121",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3094,7 +3094,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "124",
+    id: "122",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3115,7 +3115,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "125",
+    id: "123",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3136,7 +3136,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "126",
+    id: "124",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3157,7 +3157,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "127",
+    id: "125",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3178,7 +3178,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "128",
+    id: "126",
     name: "GNC Creatine + Electrolytes",
     brand: "GNC",
     category: "Creatine",
@@ -3201,7 +3201,7 @@ export const products: Product[] = [
 
   // FAST & UP
   {
-    id: "129",
+    id: "127",
     name: "Fast&Up Creatine Monohydrate Essentials",
     brand: "Fast & Up",
     category: "Creatine",
@@ -3224,7 +3224,7 @@ export const products: Product[] = [
 
   //MUSCLE TECH
   {
-    id: "130",
+    id: "128",
     name: "Muscletech Platinum 100% Creatine",
     brand: "MuscleTech",
     category: "Creatine",
@@ -3245,7 +3245,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "131",
+    id: "129",
     name: "Muscletech Platinum 100% Creatine",
     brand: "MuscleTech",
     category: "Creatine",
@@ -3266,7 +3266,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "132",
+    id: "130",
     name: "Muscletech Platinum 100% Creatine",
     brand: "MuscleTech",
     category: "Creatine",
@@ -3289,7 +3289,7 @@ export const products: Product[] = [
 
   //LABRADA
   {
-    id: "133",
+    id: "131",
     name: "Labrada Crealean Strength Creatine Powder",
     brand: "Labrada",
     category: "Creatine",
@@ -3310,7 +3310,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "134",
+    id: "132",
     name: "Labrada Crealean Strength Creatine Powder",
     brand: "Labrada",
     category: "Creatine",
@@ -3333,7 +3333,7 @@ export const products: Product[] = [
 
   //ON
   {
-    id: "135",
+    id: "133",
     name: "ON Micronised Creatine Powder Unflavored",
     brand: "Optimum Nutrition",
     category: "Creatine",
@@ -3354,7 +3354,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "136",
+    id: "134",
     name: "ON Micronised Creatine Powder Unflavored",
     brand: "Optimum Nutrition",
     category: "Creatine",
@@ -3377,7 +3377,7 @@ export const products: Product[] = [
 
   // MASS GAINER
   {
-    id: "137",
+    id: "135",
     name: "MuscleBlaze Mass Gainer XXL",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
@@ -3398,7 +3398,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "138",
+    id: "136",
     name: "MuscleBlaze Mass Gainer XXL",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
@@ -3419,7 +3419,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "139",
+    id: "137",
     name: "MuscleBlaze Mass Gainer XXL",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
@@ -3442,7 +3442,7 @@ export const products: Product[] = [
 
 
   {
-    id: "503",
+    id: "138",
     name: "MuscleBlaze Super Gainer XXL Weight Gainer",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
@@ -3463,7 +3463,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "504",
+    id: "139",
     name: "MuscleBlaze Super Gainer XXL Weight Gainer",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
@@ -3484,7 +3484,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "505",
+    id: "140",
     name: "MuscleBlaze Super Gainer XXL Weight Gainer",
     brand: "MuscleBlaze",
     category: "Mass Gainer",
@@ -3508,7 +3508,7 @@ export const products: Product[] = [
 
   //GNC
   {
-    id: "140",
+    id: "141",
     name: "GNC AMP Mass XXX",
     brand: "GNC",
     category: "Mass Gainer",
@@ -3530,7 +3530,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "506",
+    id: "142",
     name: "GNC AMP Mass XXX",
     brand: "GNC",
     category: "Mass Gainer",
@@ -3552,7 +3552,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "507",
+    id: "143",
     name: "GNC Pro Performance Weight Gainer",
     brand: "GNC",
     category: "Mass Gainer",
@@ -3574,7 +3574,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "508",
+    id: "144",
     name: "GNC Pro Performance Weight Gainer",
     brand: "GNC",
     category: "Mass Gainer",
@@ -3597,7 +3597,7 @@ export const products: Product[] = [
 
   //LABRADA
   {
-    id: "141",
+    id: "145",
     name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
@@ -3618,7 +3618,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "142",
+    id: "146",
     name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
@@ -3639,7 +3639,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "143",
+    id: "147",
     name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
@@ -3660,7 +3660,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "144",
+    id: "148",
     name: "LABRADA Muscle Mass Gainer",
     brand: "Labrada",
     category: "Mass Gainer",
@@ -3683,7 +3683,7 @@ export const products: Product[] = [
 
   //MUSCLE TECH
   {
-    id: "145",
+    id: "149",
     name: "MuscleTech Masstech Extreme 2000",
     brand: "MuscleTech",
     category: "Mass Gainer",
@@ -3704,7 +3704,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "146",
+    id: "150",
     name: "MuscleTech Masstech Extreme 2000",
     brand: "MuscleTech",
     category: "Mass Gainer",
@@ -3727,7 +3727,7 @@ export const products: Product[] = [
 
   //ON
   {
-    id: "147",
+    id: "151",
     name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition(ON)",
     category: "Mass Gainer",
@@ -3748,7 +3748,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "148",
+    id: "152",
     name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition(ON)",
     category: "Mass Gainer",
@@ -3769,7 +3769,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "149",
+    id: "153",
     name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition(ON)",
     category: "Mass Gainer",
@@ -3790,7 +3790,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "150",
+    id: "154",
     name: "ON Serious Mass Weight Gainer",
     brand: "Optimum Nutrition(ON)",
     category: "Mass Gainer",
@@ -3813,7 +3813,7 @@ export const products: Product[] = [
 
   //DR. MOREPEN
   {
-    id: "151",
+    id: "155",
     name: "Dr. Morepen  Mass Gainer",
     brand: "Dr. Morphen",
     category: "Mass Gainer",
@@ -3834,7 +3834,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "152",
+    id: "156",
     name: "Dr. Morepen  Mass Gainer",
     brand: "Dr. Morphen",
     category: "Mass Gainer",
@@ -3857,7 +3857,7 @@ export const products: Product[] = [
 
   //ABSOLUTE
   {
-    id: "153",
+    id: "157",
     name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
@@ -3878,7 +3878,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "154",
+    id: "158",
     name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
@@ -3899,7 +3899,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "155",
+    id: "159",
     name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
@@ -3920,7 +3920,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "156",
+    id: "160",
     name: "Absolute Nutrition Mass Gainer",
     brand: "Absolute",
     category: "Mass Gainer",
@@ -3943,7 +3943,7 @@ export const products: Product[] = [
 
   //AVVATAR
   {
-    id: "157",
+    id: "161",
     name: "Avvatar Muscle Gainer",
     brand: "Avvatar",
     category: "Mass Gainer",
@@ -3964,7 +3964,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "158",
+    id: "162",
     name: "Avvatar Mass Gainer",
     brand: "Avvatar",
     category: "Mass Gainer",
@@ -3987,7 +3987,7 @@ export const products: Product[] = [
 
   // MULTIVITAMINS
   {
-    id: "159",
+    id: "163",
     name: "MuscleBlaze MB-VITE Daily Multivitamin",
     brand: "MuscleBlaze",
     category: "Multivitamin",
@@ -4008,7 +4008,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "160",
+    id: "164",
     name: "MuscleBlaze MB-VITE Daily Multivitamin",
     brand: "MuscleBlaze",
     category: "Multivitamin",
@@ -4030,7 +4030,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "161",
+    id: "165",
     name: "MuscleBlaze Biozyme 5 in 1 Multivitamin",
     brand: "MuscleBlaze",
     category: "Multivitamin",
@@ -4053,7 +4053,7 @@ export const products: Product[] = [
 
   //GNC
   {
-    id: "162",
+    id: "166",
     name: "GNC MEGA MEN One Daily Multivitamin",
     brand: "GNC",
     category: "Multivitamin",
@@ -4074,7 +4074,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "163",
+    id: "167",
     name: "GNC MEGA MEN One Daily Multivitamin",
     brand: "GNC",
     category: "Multivitamin",
@@ -4097,7 +4097,7 @@ export const products: Product[] = [
 
   //MUSCLETECH
   {
-    id: "164",
+    id: "168",
     name: "MUSCLETECH PLATINUM MULTIVITAMIN",
     brand: "MuscleTech",
     category: "Multivitamin",
@@ -4120,7 +4120,7 @@ export const products: Product[] = [
 
   //ON
   {
-    id: "165",
+    id: "169",
     name: "ON Multivitamin for MEN",
     brand: "Optimum Nutrition(ON)",
     category: "Multivitamin",
@@ -4143,7 +4143,7 @@ export const products: Product[] = [
 
   //BIGMUSCLE
   {
-    id: "166",
+    id: "170",
     name: "BIGMUSCLE True Vitamin MultivitaminM",
     brand: "BigMuscle",
     category: "Multivitamin",
@@ -4187,7 +4187,7 @@ export const products: Product[] = [
 
   // ************FISH OIL************
   {
-    id: "168",
+    id: "171",
     name: "MuscleBlaze Omega 3 Fish Oil 1000mg",
     brand: "MuscleBlaze",
     category: "Fish Oil",
@@ -4208,7 +4208,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "169",
+    id: "172",
     name: "MuscleBlaze Omega 3 Fish Oil 1000mg",
     brand: "MuscleBlaze",
     category: "Fish Oil",
@@ -4229,7 +4229,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "170",
+    id: "173",
     name: "MuscleBlaze Omega 3 Fish Oil Gold 3x Triple Strength",
     brand: "MuscleBlaze",
     category: "Fish Oil",
@@ -4252,7 +4252,7 @@ export const products: Product[] = [
 
   //GNC
   {
-    id: "171",
+    id: "174",
     name: "GNC Fish Oil Omega 3 Capsules - 1000mg",
     brand: "GNC",
     category: "Fish Oil",
@@ -4273,7 +4273,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "172",
+    id: "175",
     name: "GNC Fish Oil Omega 3 Capsules - 1000mg",
     brand: "GNC",
     category: "Fish Oil",
@@ -4294,7 +4294,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "173",
+    id: "176",
     name: "GNC Triple Strength Fish Oil",
     brand: "GNC",
     category: "Fish Oil",
@@ -4317,7 +4317,7 @@ export const products: Product[] = [
 
   //ON
   {
-    id: "174",
+    id: "177",
     name: "ON Omega-3 Fishoil",
     brand: "Optimum Nutrition(ON)",
     category: "Fish Oil",
@@ -4338,7 +4338,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "175",
+    id: "178",
     name: "Sunline Alaska Deep Sea Fish Oil Omega-3",
     brand: "Alaska",
     category: "Fish Oil",
@@ -4359,7 +4359,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "176",
+    id: "179",
     name: "MUSCLETECH PLATINUM 100% OMEGA FISH OIL",
     brand: "MuscleTech",
     category: "Fish Oil",
@@ -4380,7 +4380,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "177",
+    id: "180",
     name: "NEUHERBS Deep Sea Fish Oil - 2500 mg Omega 3",
     brand: "Neuherbs",
     category: "Fish Oil",
@@ -4403,7 +4403,7 @@ export const products: Product[] = [
 
   // PRE-WORKOUT
   {
-    id: "178",
+    id: "181",
     name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4424,7 +4424,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "179",
+    id: "182",
     name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4445,7 +4445,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "180",
+    id: "183",
     name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4466,7 +4466,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "181",
+    id: "184",
     name: "MuscleBlaze PRE Workout 200 Xtreme",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4488,7 +4488,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "182",
+    id: "185",
     name: "MuscleBlaze Pre Workout WrathX",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4509,7 +4509,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "183",
+    id: "186",
     name: "MuscleBlaze Pre Workout WrathX",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4530,7 +4530,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "184",
+    id: "187",
     name: "MuscleBlaze Pre Workout WrathX",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4551,7 +4551,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "185",
+    id: "188",
     name: "MuscleBlaze Pre Workout WrathX",
     brand: "MuscleBlaze",
     category: "Pre Workout",
@@ -4574,7 +4574,7 @@ export const products: Product[] = [
 
   //BIGDADDY
   {
-    id: "186",
+    id: "189",
     name: "Black Beast The Big Daddy Inferno Pre workout",
     brand: "Big Daddy",
     category: "Pre Workout",
@@ -4597,7 +4597,7 @@ export const products: Product[] = [
 
   //GNC
   {
-    id: "187",
+    id: "190",
     name: "GNC Pre Performance Pre-Workout",
     brand: "GNC",
     category: "Pre Workout",
@@ -4619,7 +4619,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "195",
+    id: "191",
     name: "GNC L-ARGININE 1100mg",
     brand: "GNC",
     category: "Pre Workout",
@@ -4642,7 +4642,7 @@ export const products: Product[] = [
 
   //BIG MUSCLE
   {
-    id: "188",
+    id: "192",
     name: "BIGMUSCLE Karnage PreWorkout",
     brand: "BigMuscle",
     category: "Pre Workout",
@@ -4663,7 +4663,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "189",
+    id: "193",
     name: "BIGMUSCLE Karnage PreWorkout",
     brand: "BigMuscle",
     category: "Pre Workout",
@@ -4684,7 +4684,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "190",
+    id: "194",
     name: "BIGMUSCLE Karnage PreWorkout",
     brand: "BigMuscle",
     category: "Pre Workout",
@@ -4773,7 +4773,7 @@ export const products: Product[] = [
 
   //FAST & UP
   {
-    id: "194",
+    id: "195",
     name: "Fast&Up Citrulline Malate",
     brand: "Fast & Up",
     category: "Pre Workout",
@@ -4883,7 +4883,7 @@ export const products: Product[] = [
 
   
   {
-    id: "203",
+    id: "200",
     name: "MuscleBlaze MB Fat Burner PRO",
     brand: "MuscleBlaze",
     category: "Weight Loss",
@@ -4905,7 +4905,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "200",
+    id: "201",
     name: "GNC Triple Strength L-Carnitine Liquid 3000mg",
     brand: "GNC",
     category: "Weight Loss",
@@ -4927,7 +4927,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "509",
+    id: "202",
     name: "GNC L-Carnitine 3000mg for Weight Loss",
     brand: "GNC",
     category: "Weight Loss",
@@ -4949,7 +4949,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "513",
+    id: "203",
     name: "GNC L-Carnitine 3000mg for Weight Loss",
     brand: "GNC",
     category: "Weight Loss",
@@ -5171,7 +5171,7 @@ export const products: Product[] = [
 
   //ON
   {
-    id: "510",
+    id: "211",
     name: "ON BCAA 5000 POWDER",
     brand: "Optimum Nutrition(ON)",
     category: "Intra Workout",
@@ -5194,7 +5194,7 @@ export const products: Product[] = [
 
   //--------------------minarels===============
   {
-    id: "211",
+    id: "212",
     name: "Calcium Plus 1000mg with Magnesium and Vitamin D3",
     brand: "GNC",
     category: "Minerals & Health",
@@ -5215,7 +5215,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "212",
+    id: "213",
     name: "GNC Zinc Magnesium Amino (ZMA) Complex",
     brand: "GNC",
     category: "Minerals & Health",
@@ -5237,7 +5237,7 @@ export const products: Product[] = [
   },
   
   {
-    id: "213",
+    id: "214",
     name: "GNC Marine Collagen Powder",
     brand: "GNC",
     category: "Beauty",
@@ -5258,7 +5258,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "214",
+    id: "215",
     name: "GNC Marine Collagen Powder",
     brand: "GNC",
     category: "Beauty",
@@ -5281,7 +5281,7 @@ export const products: Product[] = [
 
   //WELLBEINGS
   {
-    id: "511",
+    id: "216",
     name: "WELLBEINGS VITAMIN C & ZINC 1100MG",
     brand: "WELLBEINGS",
     category: "Beauty",
@@ -5405,7 +5405,7 @@ export const products: Product[] = [
   */
   // ==================== PEANUT BUTTER ====================
   {
-    id: "215",
+    id: "217",
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5426,7 +5426,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "216",
+    id: "218",
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5447,7 +5447,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "600",
+    id: "219",
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5468,7 +5468,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "217",
+    id: "220",
     name: "MyFitness Peanut Butter Smooth",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5490,7 +5490,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "219",
+    id: "221",
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5512,7 +5512,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "219",
+    id: "222",
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5534,7 +5534,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "218",
+    id: "223",
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5556,7 +5556,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "601",
+    id: "224",
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5578,7 +5578,7 @@ export const products: Product[] = [
   },
   
   {
-    id: "220",
+    id: "225",
     name: "MyFitness Peanut Butter Crunchy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5600,7 +5600,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "221",
+    id: "226",
     name: "MyFitness Peanut Butter Crispy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5622,7 +5622,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "602",
+    id: "227",
     name: "MyFitness Peanut Butter Crispy",
     brand: "MyFitness",
     category: "Peanut Butter & Oats",
@@ -5665,7 +5665,7 @@ export const products: Product[] = [
   //   inStock: true
   // },
 {
-  id: "801",
+  id: "228",
   name: "Pintola Peanut Butter Crunchy",
   brand: "Pintola",
   category: "Peanut Butter & Oats",
@@ -5690,7 +5690,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "802",
+  id: "229",
   name: "Pintola Peanut Butter Creamy",
   brand: "Pintola",
   category: "Peanut Butter & Oats",
@@ -5715,7 +5715,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "803",
+  id: "230",
   name: "Pintola Peanut Butter Crunchy",
   brand: "Pintola",
   category: "Peanut Butter & Oats",
@@ -5723,9 +5723,9 @@ export const products: Product[] = [
   rating: 4.5,
   reviews: 18000,
   image: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg.jpg",
-    image1: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg1.jpg",
-      image2: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg2.jpg",
-        image3: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg3.jpg",
+    image1: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg1.avif",
+      image2: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg2.avif",
+        image3: "/image/Peanut_butter_oats/pintola_peanut_butter_crunchy_dark_chocolate_1kg3.avif",
   images: [],
   flavors: [{ name: "Dark Chocolate", price: PRICING.PINTOLA_CRUNCHY_DARK_CHOC_1KG.price }],
   weight: "1KG",
@@ -5740,7 +5740,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "804",
+  id: "231",
   name: "MB High Protein Oats",
   brand: "MuscleBlaze",
   category: "Peanut Butter & Oats",
@@ -5765,7 +5765,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "805",
+  id: "232",
   name: "MB High Protein Muesli",
   brand: "MuscleBlaze",
   category: "Peanut Butter & Oats",
@@ -5790,17 +5790,17 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "806",
+  id: "233",
   name: "Pintola High Protein Oats",
   brand: "Pintola",
   category: "Peanut Butter & Oats",
   ...PRICING.PINTOLA_HIGH_PROTEIN_OATS_DARK_CHOC_1KG,
   rating: 4.4,
   reviews: 7200,
-  image: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg.jpg",
-    image1: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg1.jpg",
-      image2: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg2.jpg",
-        image3: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg3.jpg",
+  image: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg.avif",
+    image1: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg1.avif",
+      image2: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg2.avif",
+        image3: "/image/Peanut_butter_oats/pintola_high_protein_oats_dark_chocolate_1kg3.avif",
   images: [],
   flavors: [{ name: "Dark Chocolate", price: PRICING.PINTOLA_HIGH_PROTEIN_OATS_DARK_CHOC_1KG.price }],
   weight: "1KG",
@@ -5815,7 +5815,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "807",
+  id: "234",
   name: "Pintola High Protein Muesli",
   brand: "Pintola",
   category: "Peanut Butter & Oats",
@@ -5842,7 +5842,7 @@ export const products: Product[] = [
 
   // ==================== AYURVEDIC ====================
   {
-    id: "226",
+    id: "235",
     name: "Kapiva Shilajit",
     brand: "Kapiva",
     category: "Ayurvedic Products",
@@ -5863,7 +5863,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "227",
+    id: "236",
     name: "Kapiva Shilajit Gold",
     brand: "Kapiva",
     category: "Ayurvedic Products",
@@ -5883,39 +5883,36 @@ export const products: Product[] = [
     nutritionalInfo: "Per Serving: Shilajit + Gold Bhasma",
     inStock: true,
   },
-  // {
-  //   id: "228",
-  //   name: "Kapiva Ashwagandha Gold Capsul",
-  //   brand: "Kapiva",
-  //   category: "Ayurvedic Products",
-  //   ...PRICING.KAP_ASHW_GOLD,
-  //   rating: 4.5,
-  //   reviews: 4800,
-  //   image: "/image/Ayurvedic/kapiva_aswagandha_60n.jpg",
-  //   image1: "/image/Ayurvedic/kapiva_aswagandha_60n1.jpg",
-  //   image2: "/image/Ayurvedic/kapiva_aswagandha_60n2.jpg",
-  //   image3: "/image/Ayurvedic/kapiva_aswagandha_60n3.jpg",
-  //   images: [],
-  //   flavors: [{ name: "Natural", price: PRICING.KAP_ASHW_GOLD.price }],
-  //   weight: "60N",
-  //   weights: ["60N"],
-  //   description: "Ashwagandha for stress relief",
-  //   keyBenefits: ["Stress relief", "Energy boost", "Hormonal balance"],
-  //   nutritionalInfo: "Per Capsule: Ashwagandha 500mg",
-  //   inStock: true,
-  // },
   {
-  id: "901",
+    id: "237",
+    name: "Kapiva Ashwagandha Gold Capsul",
+    brand: "Kapiva",
+    category: "Ayurvedic Products",
+    ...PRICING.KAP_ASHW_GOLD,
+    rating: 4.5,
+    reviews: 4800,
+    image: "/image/Ayurvedic/kapiva_aswagandha_60n.jpg",
+    image1: "/image/Ayurvedic/kapiva_aswagandha_60n1.jpg",
+    image2: "/image/Ayurvedic/kapiva_aswagandha_60n2.jpg",
+    image3: "/image/Ayurvedic/kapiva_aswagandha_60n3.jpg",
+    images: [],
+    flavors: [{ name: "Natural", price: PRICING.KAP_ASHW_GOLD.price }],
+    weight: "60N",
+    weights: ["60N"],
+    description: "Ashwagandha for stress relief",
+    keyBenefits: ["Stress relief", "Energy boost", "Hormonal balance"],
+    nutritionalInfo: "Per Capsule: Ashwagandha 500mg",
+    inStock: true,
+  },
+  {
+  id: "238",
   name: "Kapiva KSM-66 Ashwagandha",
   brand: "Kapiva",
   category: "Ayurvedic Products",
   ...PRICING.KAPIVA_KSM66_ASHWAGANDHA_60N,
   rating: 4.5,
   reviews: 42000,
-  image: "/image/Ayurvedic/kapiva_ksm66_ashwagandha_60n.jpg",
-  image1: "/image/Ayurvedic/kapiva_ksm66_ashwagandha_60n1.avif",
-  image2: "/image/Ayurvedic/kapiva_ksm66_ashwagandha_60n2.avif",
-  image3: "/image/Ayurvedic/kapiva_ksm66_ashwagandha_60n3.avif",
+  image: "/image/Ayurveda/kapiva_ksm66_ashwagandha_60n.jpg",
   images: [],
   flavors: [{ name: "Unflavoured", price: PRICING.KAPIVA_KSM66_ASHWAGANDHA_60N.price }],
   weight: "60N",
@@ -5931,17 +5928,14 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "902",
+  id: "239",
   name: "Kapiva Shilajit Gummies",
   brand: "Kapiva",
   category: "Ayurvedic Products",
   ...PRICING.KAPIVA_SHILAJIT_GUMMIES_60N,
   rating: 4.3,
   reviews: 18500,
-  image: "/image/Ayurvedic/kapiva_shilajit_gummies_60n.jpg",
-  image1: "/image/Ayurvedic/kapiva_shilajit_gummies_60n1.jpg",
-  image2: "/image/Ayurvedic/kapiva_shilajit_gummies_60n2.jpg",
-  image3: "/image/Ayurvedic/kapiva_shilajit_gummies_60n3.jpg",
+  image: "/image/Ayurveda/kapiva_shilajit_gummies_60n.jpg",
   images: [],
   flavors: [{ name: "Unflavoured", price: PRICING.KAPIVA_SHILAJIT_GUMMIES_60N.price }],
   weight: "60N",
@@ -5957,17 +5951,14 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "903",
+  id: "240",
   name: "Muscletech Test HD Elite",
   brand: "Muscletech",
   category: "Ayurvedic Products",
   ...PRICING.KAPIVA_TEST_HD_ELITE_60N,
   rating: 4.4,
   reviews: 9600,
-  image: "/image/Ayurvedic/museltech_test_hd_elite_60n.jpg",
-   image1: "/image/Ayurvedic/museltech_test_hd_elite_60n1.jpg",
-    image2: "/image/Ayurvedic/museltech_test_hd_elite_60n2.jpg",
-     image3: "/image/Ayurvedic/museltech_test_hd_elite_60n3.jpg",
+  image: "/image/Ayurveda/kapiva_test_hd_elite_60n.jpg",
   images: [],
   flavors: [{ name: "Unflavoured", price: PRICING.KAPIVA_TEST_HD_ELITE_60N.price }],
   weight: "60N",
@@ -6006,7 +5997,7 @@ export const products: Product[] = [
 
   // ==================== PROTEIN BARS ====================
   {
-    id: "230",
+    id: "241",
     name: "Max Protein Bar",
     brand: "Max Protein",
     category: "Protein Bars & Snacks",
@@ -6027,7 +6018,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "231",
+    id: "242",
     name: "Max Protein Bar",
     brand: "Max Protein",
     category: "Protein Bars & Snacks",
@@ -6048,7 +6039,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "232",
+    id: "243",
     name: "Max Protein Bar",
     brand: "Max Protein",
     category: "Protein Bars & Snacks",
@@ -6070,7 +6061,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "233",
+    id: "244",
     name: "Max Protein Bar",
     brand: "Max Protein",
     category: "Protein Bars & Snacks",
@@ -6091,7 +6082,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "234",
+    id: "245",
     name: "Max Protein Bar",
     brand: "Max Protein",
     category: "Protein Bars & Snacks",
@@ -6112,7 +6103,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "235",
+    id: "246",
     name: "Max Protein Bar",
     brand: "Max Protein",
     category: "Protein Bars & Snacks",
@@ -6133,17 +6124,17 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "236",
+    id: "247",
     name: "Avvatar Wafer",
     brand: "Avvatar",
     category: "Protein Bars & Snacks",
     ...PRICING.AVV_WAF,
     rating: 4.2,
     reviews: 1800,
-    image: "/image/Protien_bar_and_Snacks/Avtar/Choklet_10g.jpg",
-    image1: "/image/Protien_bar_and_Snacks/Avtar/Choklet_10g1.jpg",
-    image2: "/image/Protien_bar_and_Snacks/Avtar/Choklet_10g2.jpg",
-    image3: "/image/Protien_bar_and_Snacks/Avtar/Choklet_10g3.jpg",
+    image: "/image/Protien_bar_and_Snacks/Avtar/Choklet_coffe_10g.jpg",
+    image1: "/image/Protien_bar_and_Snacks/Avtar/Choklet_coffe_10g1.jpg",
+    image2: "/image/Protien_bar_and_Snacks/Avtar/Choklet_coffe_10g2.jpg",
+    image3: "/image/Protien_bar_and_Snacks/Avtar/Choklet_coffe_10g3.jpg",
     images: [],
     flavors: [{ name: "Chocolate", price: PRICING.AVV_WAF.price }],
     weight: "10GM/Each",
@@ -6154,7 +6145,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "512",
+    id: "248",
     name: "Avvatar Wafer",
     brand: "Avvatar",
     category: "Protein Bars & Snacks",
@@ -6175,7 +6166,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "237",
+    id: "249",
     name: "MB Protein Bar",
     brand: "Muscleblaze",
     category: "Protein Bars & Snacks",
@@ -6196,7 +6187,7 @@ export const products: Product[] = [
     inStock: true
   },
   {
-    id: "238",
+    id: "250",
     name: "MB Protein Bar",
     brand: "Muscleblaze",
     category: "Protein Bars & Snacks",
@@ -6303,7 +6294,7 @@ export const products: Product[] = [
 
   // ==================== ACCESSORIES ====================
   {
-    id: "243",
+    id: "251",
     name: "Gym Bag",
     brand: "MB",
     category: "Accessories",
@@ -6324,7 +6315,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: "244",
+    id: "252",
     name: "Gym Bag",
     brand: "MB",
     category: "Accessories",
@@ -6345,7 +6336,7 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-  id: "1001",
+  id: "253",
   name: "MB Shaker",
   brand: "MuscleBlaze",
   category: "Accessories",
@@ -6368,7 +6359,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "1002",
+  id: "254",
   name: "GNC Shaker",
   brand: "GNC",
   category: "Accessories",
@@ -6391,7 +6382,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "1003",
+  id: "255",
   name: "MB Gallon",
   brand: "MuscleBlaze",
   category: "Accessories",
@@ -6414,7 +6405,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "1004",
+  id: "256",
   name: "Wrist Band",
   brand: "Generic",
   category: "Accessories",
@@ -6437,7 +6428,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "1005",
+  id: "257",
   name: "Hand Gloves",
   brand: "Generic",
   category: "Accessories",
@@ -6460,7 +6451,7 @@ export const products: Product[] = [
   inStock: true
 },
 {
-  id: "1006",
+  id: "258",
   name: "Knee Cap",
   brand: "Generic",
   category: "Accessories",
