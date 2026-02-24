@@ -39,12 +39,10 @@ export default function ForgotPasswordPage() {
 
   // 🔥 SEND EMAIL FROM FRONTEND
   const sendOTPEmail = async (userData: any) => {
-    const otpString = String(userData.otp).replace(/\s+/g, '');
-
     const templateParams = {
       to_email: userData.email,
       to_name: userData.name || 'User',
-      otp: otpString,
+      otp: userData.otp,
       phone: userData.phone,
     }
 

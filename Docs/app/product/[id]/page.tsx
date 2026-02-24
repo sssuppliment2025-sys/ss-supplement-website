@@ -103,7 +103,14 @@ export default function ProductPage() {
   
   // Get unique flavors and weights from all variants
   const availableFlavors = [...new Set(productVariants.map((v) => v.flavor).filter(Boolean))]
-  const availableWeights = [...new Set(productVariants.map((v) => v.weight).filter(Boolean))]
+  // Filter weights to only show those available for the currently selected flavor
+  const currentFlavor = selectedFlavor || (product?.flavors?.[0]?.name || "")
+  const availableWeights = [...new Set(
+    productVariants
+      .filter((v) => !currentFlavor || v.flavor === currentFlavor)
+      .map((v) => v.weight)
+      .filter(Boolean)
+  )]
 
   // ✅ FIXED: Flavor change - Update state FIRST
   const handleFlavorChange = (flavor: string) => {

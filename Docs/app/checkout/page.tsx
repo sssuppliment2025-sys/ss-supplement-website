@@ -24,7 +24,7 @@ const ADMIN_UPI_ID = "sssupplement@upi"
 
 // ✅ CONDITIONAL SHIPPING CONFIGURATION
 const SHIPPING_THRESHOLD = 1000  // Free shipping above ₹999
-const SHIPPING_FEE = 50          // ₹50 if below threshold
+const SHIPPING_FEE = 50         // ₹50 if below threshold
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -116,49 +116,60 @@ export default function CheckoutPage() {
 
   const hasEnoughForMax = points >= maxCoinsAllowed
 
-  /* ================= ✅ iOS-FIXED WHATSAPP MESSAGE (SHORT & SAFE) - ALL PHONES SUPPORT ================= */
+  /* ================= WHATSAPP MESSAGE ================= */
   const generateWhatsAppMessage = (backendCoins: number, backendEarned: number) => {
-    // ✅ iOS-SAFE: Max 3 items, <1400 chars total
-    const orderItemsShort = items
-      .slice(0, 3)
+    const orderItems = items
       .map((item) => {
         const price = typeof item.product.flavors === "string"
           ? item.product.price
           : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
-        const itemName = item.product.name.length > 25 ? item.product.name.slice(0, 25) + "..." : item.product.name
-        return `${itemName} (${item.selectedFlavor}) x${item.quantity} = ₹${(price * item.quantity).toLocaleString('en-IN', {maximumFractionDigits: 0})}`
+        return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${(price * item.quantity).toLocaleString()}`
       })
-      .join("\n• ")
-
-    const moreItems = items.length > 3 ? `\n• +${items.length - 3} more items` : ""
+      .join("\\n")
 
     const paymentInfo = paymentMethod === "upi" 
-      ? `Payment: UPI\nUTR: ${utrNumber}\nUPI ID: ${ADMIN_UPI_ID}`
-      : "Payment: Cash on Delivery"
+      ? `💳 *Payment:* UPI\\n📱 UTR: ${utrNumber}\\n👛 UPI ID: ${ADMIN_UPI_ID}`
+      : "💰 *Payment:* Cash on Delivery"
 
-    const shippingInfo = isFreeShipping ? "FREE Shipping" : `Shipping: ₹${shippingFee}`
+    const shippingInfo = isFreeShipping 
+      ? "🚚 *FREE Shipping* (Order > ₹999)"
+      : `🚚 *Shipping:* ₹${shippingFee.toLocaleString()}`
 
-    // ✅ COMPACT iOS-COMPATIBLE MESSAGE (<1400 chars) - ALL PHONES SUPPORT
-    const message = `*NEW ORDER #${orderId || "TEMP"} - SS Supplements*
+    const coinsInfo = coinsToUse > 0 
+      ? `🪙 Coins Used: ${coinsToUse} (${((coinsToUse * COIN_VALUE / cartTotalWithShipping) * 100).toFixed(1)}% of total)`
+      : "🪙 No coins used"
 
-📦 *Items:*
-• ${orderItemsShort}${moreItems}
+    const message = `
+🛒 *NEW ORDER #${orderId || "TEMP"} - SS Supplement*
 
-💰 *Billing:*
+📦 *Order Items:*
+${orderItems}
+
+💰 *Billing Breakdown:*
 Items: ₹${itemsSubtotal.toLocaleString()}
 ${shippingInfo}
+Cart Total: ₹${cartTotalWithShipping.toLocaleString()}
+${coinsInfo}
+💳 Cash Paid: ₹${finalTotal.toLocaleString()}
 Total: *₹${finalTotal.toLocaleString()}*
-🪙 Coins: ${coinsToUse} (${backendEarned} earned)
 
-💳 *${paymentInfo}*
+👛 *COINS UPDATE:*
+🎉 *Earned:* +${backendEarned} coins
+💰 *New Balance:* ${backendCoins} coins
 
-👤 *${formData.fullName}*
-📱 ${formData.phone}
+${paymentInfo}
 
-📍 *${formData.address}*
+👤 *Customer Details:*
+Name: ${formData.fullName}
+Phone: ${formData.phone}
+Email: ${formData.email || "N/A"}
+
+📍 *Delivery Address:*
+${formData.address}, ${formData.landmark ? `Landmark: ${formData.landmark}` : ""}
 ${formData.city}, ${formData.state} - ${formData.pincode}
 
-⏰ ${new Date().toLocaleString("en-IN")}`.trim()
+⏰ *Order Time:* ${new Date().toLocaleString("en-IN")}
+    `.trim()
 
     return `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(message)}`
   }
@@ -302,12 +313,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
       setPoints(newTotalPoints)
 
       setOrderId(successData.order?.id || "SUCCESS")
-      
-      // ✅ iOS COMPATIBLE WHATSAPP - SHORTENED & SAFE - ALL PHONES SUPPORT
-      const whatsappUrl = generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend)
-      console.log("📱 WhatsApp URL Length:", whatsappUrl.length) // Debug: should be <2000
-      
-      window.open(whatsappUrl, '_blank')
+      window.open(generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend), '_blank')
 
       // ✅ Save order to localStorage for "My Orders" page
       const savedOrderId = successData.order?.id || `ORD-${Date.now()}`
@@ -414,7 +420,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
             <div className="space-y-3">
               <a
-                href={`https://wa.me/919547899170?text=${encodeURIComponent(`Hi! Order #${orderId} status update request. Thanks! 🙏`)}`}
+                href={`https://wa.me/919547899170?text=${encodeURIComponent(`Hi! I just placed an order (Order ID: ${orderId}). I'd like to receive updates on my order status. 🙏`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1ebe57] text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
@@ -689,6 +695,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                     <p className="text-lg font-bold text-emerald-700 bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
                       🎉 FREE Shipping!
                     </p>
+                    {/*<p className="text-xs text-emerald-700">Order value ₹{itemsSubtotal.toLocaleString()} ≥ ₹999</p> */}
                   </div>
                 )}
 
@@ -762,6 +769,14 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                     <span>Total to Pay</span>
                     <span className="text-2xl text-primary">₹{finalTotal.toLocaleString()}</span>
                   </div>
+                  {/*<p className="text-xs text-muted-foreground text-center">
+                    {useCoins && coinsToUse > 0 
+                      ? `${coinsToUse.toLocaleString()} coins used - ${isFreeShipping ? "FREE" : "₹50"} shipping`
+                      : isFreeShipping 
+                      ? `🎉 FREE shipping (₹${itemsSubtotal.toLocaleString()} ≥ ₹999)`
+                      : `🚚 Shipping ₹${shippingFee.toLocaleString()} included`
+                    }
+                  </p>*/}
                 </div>
 
                 {/* Place Order Button */}

@@ -204,23 +204,11 @@ load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
 
-# Admin API settings (used by accounts/db.py + accounts/authentication.py + viewsAdmin.py)
-MONGODB_URI = os.getenv("MONGODB_URI", MONGO_URI)
-MONGODB_NAME = os.getenv("MONGODB_NAME", MONGO_DB_NAME or "sssupplement_db")
-JWT_SECRET = os.getenv("JWT_SECRET", SECRET_KEY)
-JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
-# Keep both user JWT auth (simplejwt) and admin custom JWT auth available.
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "accounts.authentication.JWTAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
 }
 
 

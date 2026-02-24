@@ -63,8 +63,8 @@ export function ProductGrid({
     let items = [...baseProducts]
 
     // if (shuffle) {
-    //   // Shuffle array safely
-    //   items.sort(() => Math.random() - 0.5)
+    // // Shuffle array safely
+    // items.sort(() => Math.random() - 0.5)
     // }
 
     setDisplayProducts(items)

@@ -27,7 +27,7 @@ from rest_framework import status
 from django.conf import settings
 from datetime import datetime, timedelta
 from mongo.collections import users_col, otps_col
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.decorators import api_view, permission_classes
 
 
@@ -406,8 +406,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 @api_view(['POST'])
-@authentication_classes([])
-@permission_classes([AllowAny])
 def create_order(request):
     try:
         auth_header = request.headers.get('Authorization')
