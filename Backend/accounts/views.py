@@ -29,6 +29,7 @@ from datetime import datetime, timedelta
 from mongo.collections import users_col, otps_col
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.decorators import api_view, permission_classes
+from .db import get_products_collection
 
 
 from .RouterFunctions.Signup import signup_logic
@@ -264,6 +265,27 @@ def MailFunction(userMail, userName, password):
 # ================== HEALTH CHECK ==================
 def wake_up(request):
     return JsonResponse({"status": "backend awake"})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def products_public(request):
+    """Public read-only products endpoint for frontend runtime sync."""
+    try:
+        collection = get_products_collection()
+        products = list(collection.find({}))
+        for product in products:
+            if "_id" in product:
+                product["_id"] = str(product["_id"])
+            if "id" in product:
+                product["id"] = str(product["id"])
+
+        return Response({"success": True, "data": products}, status=status.HTTP_200_OK)
+    except Exception as exc:
+        return Response(
+            {"success": False, "data": [], "error": str(exc)},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 # .............................................. SIGNUP ...............................................
