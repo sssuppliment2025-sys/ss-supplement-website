@@ -1,0 +1,18 @@
+[
+  {
+    "file": "products_full_export.csv",
+    "total": 258,
+    "updatedId": 5,
+    "updatedCanon": 5,
+    "unresolved": 0,
+    "unresolvedRows": []
+  },
+  {
+    "file": "products_full_export_backend_live.csv",
+    "total": 258,
+    "updatedId": 5,
+    "updatedCanon": 5,
+    "unresolved": 0,
+    "unresolvedRows": []
+  }
+]
