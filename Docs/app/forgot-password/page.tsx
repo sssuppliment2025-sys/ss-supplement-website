@@ -37,13 +37,25 @@ export default function ForgotPasswordPage() {
     confirm_password: ""
   })
 
+  const normalizePhone = (phone: string) => phone.replace(/\D/g, "").slice(-10)
+
   // 🔥 SEND EMAIL FROM FRONTEND
   const sendOTPEmail = async (userData: any) => {
+    const rawOtp = userData?.otp
+    const otpCode = String(rawOtp ?? "").trim()
+
+    if (!otpCode || otpCode === "XXXXX") {
+      throw new Error("OTP not available in forgot-password response")
+    }
+
     const templateParams = {
       to_email: userData.email,
       to_name: userData.name || 'User',
-      otp: userData.otp,
+      otp: otpCode,
+      otp_code: otpCode,
       phone: userData.phone,
+      subject: "Password Reset OTP",
+      message: `Your OTP: ${otpCode}\n\nValid for 10 minutes.`,
     }
 
     try {
@@ -62,10 +74,12 @@ export default function ForgotPasswordPage() {
     } catch (error) {
       console.error("❌ EmailJS failed:", error)
       // Fallback: Show OTP in console for testing
-      console.log("🔥 DEVELOPMENT OTP (check console):", userData.otp)
+      console.log("🔥 DEVELOPMENT OTP (check console):", otpCode || "(missing)")
       toast({
         title: "OTP Ready! 🔑",
-        description: `Check browser console for OTP: ${userData.otp.slice(0,3)}*** (DEV MODE)`
+        description: otpCode
+          ? `Check browser console for OTP: ${otpCode.slice(0, 3)}*** (DEV MODE)`
+          : "OTP generated, but email template did not include OTP variable.",
       })
       setEmailSent(true)
     }
@@ -76,12 +90,23 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      console.log("🔥 Calling forgotPassword with:", { email: formData.email, phone: formData.phone })
+      const normalizedPhone = normalizePhone(formData.phone)
+      if (normalizedPhone.length !== 10) {
+        toast({
+          title: "Invalid Phone",
+          description: "Enter a valid 10-digit phone number.",
+          variant: "destructive"
+        })
+        return
+      }
+
+      console.log("🔥 Calling forgotPassword with:", { email: formData.email, phone: normalizedPhone })
       
-      const result = await forgotPassword(formData.email, formData.phone)
+      const result = await forgotPassword(formData.email.trim(), normalizedPhone)
       
       if (result.success && result.data) {
         console.log("✅ Backend OTP data:", result.data)
+        setFormData((prev) => ({ ...prev, phone: normalizedPhone, email: formData.email.trim() }))
         
         // 🔥 SEND EMAIL FROM FRONTEND
         await sendOTPEmail(result.data)
@@ -115,7 +140,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const result = await verifyOTP(formData.email, formData.phone, formData.otp)
+      const result = await verifyOTP(formData.email.trim(), normalizePhone(formData.phone), formData.otp)
       
       if (result.success) {
         toast({
@@ -167,8 +192,8 @@ export default function ForgotPasswordPage() {
       console.log("🔥 Resetting password...")
       
       const result = await resetPassword(
-        formData.email,
-        formData.phone,
+        formData.email.trim(),
+        normalizePhone(formData.phone),
         formData.otp,
         formData.new_password
       )

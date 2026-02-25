@@ -17,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
+import emailjs from "@emailjs/browser"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL
 const ADMIN_WHATSAPP = "919547899170"
@@ -187,6 +188,30 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const generateOtpCode = () => Math.floor(100000 + Math.random() * 900000).toString()
+
+  const sendOtpEmail = async (email: string, otpCode: string) => {
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+    if (!serviceId || !templateId || !publicKey) {
+      throw new Error("Email service is not configured. Missing EmailJS environment variables.")
+    }
+
+    await emailjs.send(
+      serviceId,
+      templateId,
+      {
+        to_email: email,
+        otp: otpCode,
+        subject: "Password Reset OTP",
+        message: `Your OTP: ${otpCode}\n\nValid for 10 minutes.`,
+      },
+      publicKey,
+    )
+  }
+
   /* ================= FORM VALIDATION ================= */
   const handleProceedToPayment = () => {
     if (
@@ -314,6 +339,24 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
       setOrderId(successData.order?.id || "SUCCESS")
       window.open(generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend), '_blank')
+
+      if (formData.email.trim()) {
+        const otpCode = generateOtpCode()
+        try {
+          await sendOtpEmail(formData.email.trim(), otpCode)
+          toast({
+            title: "OTP Sent",
+            description: "OTP sent to your email. It is valid for 10 minutes.",
+          })
+        } catch (mailError: unknown) {
+          console.error("Email OTP error:", mailError)
+          toast({
+            title: "Email Error",
+            description: "Order placed, but OTP email could not be sent.",
+            variant: "destructive",
+          })
+        }
+      }
 
       // ✅ Save order to localStorage for "My Orders" page
       const savedOrderId = successData.order?.id || `ORD-${Date.now()}`
