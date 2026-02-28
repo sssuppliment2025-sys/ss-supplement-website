@@ -7,3 +7,6 @@ Hostinger DNS Setup : https://hpanel.hostinger.com/domain/sssuppliment.com/dns?t
 Google Search Console : https://search.google.com/search-console?utm_source=about-page&resource_id=https://www.sssupplement.com/
 
 Backend Server 2 : https://suplimentprojectserver2.onrender.com
+
+
+Admin Page : https://ss-supplement-website-wxfa.vercel.app/
