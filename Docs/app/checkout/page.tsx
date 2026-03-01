@@ -21,7 +21,7 @@ import emailjs from "@emailjs/browser"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL
 const ADMIN_WHATSAPP = "919547899170"
-const ADMIN_UPI_ID = "sssupplement@upi"
+const ADMIN_UPI_ID = "8001101055-5@ybl"
 
 // ✅ CONDITIONAL SHIPPING CONFIGURATION
 const SHIPPING_THRESHOLD = 1000  // Free shipping above ₹999
@@ -507,7 +507,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
               <CardContent className="space-y-6">
                 <div className="bg-white p-4 rounded-xl mx-auto w-fit shadow-lg">
                   <Image
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${ADMIN_UPI_ID}&pn=SS%20Supplement&am=${finalTotal}&cu=INR`}
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${ADMIN_UPI_ID}&pn=Punjab%20National%20Bank%20-%200653&cu=INR`}
                     alt="UPI QR Code"
                     width={200}
                     height={200}
@@ -847,3 +847,4 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     </div>
   )
 }
+
