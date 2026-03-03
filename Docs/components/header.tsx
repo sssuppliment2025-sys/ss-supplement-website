@@ -121,7 +121,7 @@ export function Header() {
               priority
             />
             <div className="hidden sm:block">
-              <h1 className="font-bold text-lg text-foreground">SS Supplement</h1>
+              <h1 className="font-bold text-lg text-foreground">SS Supplements</h1>
               <p className="text-xs text-muted-foreground">Your Fitness Partner</p>
             </div>
           </Link>
