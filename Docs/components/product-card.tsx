@@ -19,11 +19,31 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart()
   const { toast } = useToast()
+  const selectedFlavor = product.flavors?.[0]?.name || "Default"
+  const selectedWeight = product.weight || product.weights?.[0] || ""
+  const canAddToCart = product.inStock && Boolean(selectedWeight)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    addToCart(product, product.flavors[0].name, product.weights[0])
+
+    if (!product.inStock) {
+      toast({
+        title: "Out of stock",
+        description: `${product.name} is currently unavailable.`,
+      })
+      return
+    }
+
+    if (!selectedWeight) {
+      toast({
+        title: "Variant unavailable",
+        description: "Weight information is missing for this product.",
+      })
+      return
+    }
+
+    addToCart(product, selectedFlavor, selectedWeight)
     toast({
       title: "Added to cart",
       description: `${product.name} has been added to your cart.`,
@@ -49,11 +69,17 @@ export function ProductCard({ product }: ProductCardProps) {
                 {product.discount}% OFF
               </Badge>
             )}
+            {!product.inStock && (
+              <Badge className="absolute top-2 right-2 bg-destructive text-destructive-foreground">
+                Out of Stock
+              </Badge>
+            )}
             <Button
               size="icon"
               variant="ghost"
               className="absolute bottom-2 right-2 h-10 w-10 rounded-full border border-white/50 bg-white/35 text-zinc-900 hover:text-zinc-900 dark:text-zinc-100 dark:hover:text-zinc-100 backdrop-blur-md shadow-sm hover:bg-white/55 hover:scale-105 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all"
               onClick={handleAddToCart}
+              disabled={!canAddToCart}
             >
               <ShoppingCart className="h-4 w-4 text-zinc-900 dark:text-zinc-100" />
             </Button>
@@ -75,7 +101,7 @@ export function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {product.flavors[0].name} • {product.weight || product.weights[0]}
+              {selectedFlavor} • {selectedWeight || "N/A"}
             </p>
           </div>
         </CardContent>

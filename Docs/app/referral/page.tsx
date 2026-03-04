@@ -15,13 +15,13 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 
 
 /* ================= TYPES ================= */
 
 interface Profile {
-  id: number
+  id: string
   name: string
   email: string
   phone: string
@@ -31,15 +31,16 @@ interface Profile {
 }
 
 interface Referral {
-  id: number
+  id: string
   referee_name: string
   referee_phone: string
   referrer_points_awarded: number
+  referrer_points?: number
   created_at: string
 }
 
 interface LeaderboardUser {
-  id: number
+  id: string
   name: string
   points: number
 }
@@ -81,14 +82,22 @@ export default function ReferralPage() {
     const fetchAll = async () => {
       try {
         const [p, r, l] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/`, { headers }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/referrals/`, { headers }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/leaderboard/`),
+          fetch(`${API_BASE}/api/profile/`, { headers }),
+          fetch(`${API_BASE}/api/referrals/`, { headers }),
+          fetch(`${API_BASE}/api/leaderboard/`),
         ])
 
-        setProfile(await p.json())
-        setReferrals(await r.json())
-        setLeaderboard(await l.json())
+        const profilePayload = await p.json()
+        const referralsPayload = await r.json()
+        const leaderboardPayload = await l.json()
+
+        if (!p.ok) {
+          throw new Error(profilePayload?.detail || profilePayload?.error || "Failed to load profile")
+        }
+
+        setProfile(profilePayload)
+        setReferrals(Array.isArray(referralsPayload) ? referralsPayload : [])
+        setLeaderboard(Array.isArray(leaderboardPayload) ? leaderboardPayload : [])
       } catch {
         toast({
           title: "Error",
@@ -114,8 +123,8 @@ export default function ReferralPage() {
 
   /* ================= SHARE LOGIC ================= */
 
-  const referralLink =
-  `www.sssupplement.com/login?ref=${profile.referral_code}`
+  const referralCode = profile.referral_code || profile.id
+  const referralLink = `https://www.sssupplement.com/login?ref=${encodeURIComponent(referralCode)}`
 
   const shareText = "Join using my referral link and earn rewards 🎉"
 
@@ -200,9 +209,7 @@ export default function ReferralPage() {
               referrals.map((ref) => (
                 <div key={ref.id} className="flex justify-between text-sm">
                   <span>{ref.referee_name || ref.referee_phone}</span>
-                  <span className="text-muted-foreground">
-                    +{ref.referrer_points_awarded} pts
-                  </span>
+                  <span className="text-muted-foreground">+{ref.referrer_points_awarded ?? ref.referrer_points ?? 0} pts</span>
                 </div>
               ))
             )}

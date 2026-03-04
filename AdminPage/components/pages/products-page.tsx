@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,44 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Plus, Pencil, Trash2, Eye, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+const PRODUCT_CATEGORIES = [
+  "Whey Protein",
+  "Creatine",
+  "Mass Gainer",
+  "Multivitamin",
+  "Pre Workout",
+  "Weight Loss",
+  "Recovery",
+  "Intra Workout",
+  "Peanut Butter & Oats",
+  "Ayurvedic Products",
+  "Protein Bars & Snacks",
+  "Accessories",
+  "Minerals & Health",
+  "Beauty",
+  "Fish Oil",
+]
+
+const CATEGORY_WEIGHT_OPTIONS: Record<string, string[]> = {
+  "Whey Protein": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Creatine": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Mass Gainer": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Multivitamin": ["30 Tablets", "60 Tablets", "90 Tablets", "120 Tablets"],
+  "Pre Workout": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Weight Loss": ["60 Capsules", "90 Capsules", "120 Capsules", "450ml"],
+  "Recovery": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Intra Workout": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Peanut Butter & Oats": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Ayurvedic Products": ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG"],
+  "Protein Bars & Snacks": ["10g", "20g", "40g","50g", "60g", "100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG", "Box of 6", "Box of 12"],
+  Accessories: ["Standard", "Small", "Medium", "Large"],
+  "Minerals & Health": ["60 Tablets", "90 Tablets", "120 Tablets", "200g"],
+  Beauty: ["30 Tablets", "60 Tablets", "100g", "200g"],
+  "Fish Oil": ["60 Softgels", "90 Softgels", "100 Softgels", "120 Softgels"],
+}
+
+const FALLBACK_WEIGHT_OPTIONS = ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG",]
 
 function ProductForm({ product, onSave, onCancel }: { product?: Product | null; onSave: (data: Partial<Product>) => void; onCancel: () => void }) {
   const [formData, setFormData] = useState({
@@ -50,8 +89,34 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
     image2: product?.image2 || "",
     image3: product?.image3 || "",
   })
+  const [weightToAdd, setWeightToAdd] = useState("")
 
   const update = (key: string, value: unknown) => setFormData(prev => ({ ...prev, [key]: value }))
+  const weightOptions = CATEGORY_WEIGHT_OPTIONS[formData.category] || FALLBACK_WEIGHT_OPTIONS
+  const selectedWeights = formData.weights
+    .split(",")
+    .map((w) => w.trim())
+    .filter(Boolean)
+
+  const addWeight = () => {
+    const nextWeight = weightToAdd.trim()
+    if (!nextWeight) return
+    if (selectedWeights.includes(nextWeight)) return
+    const next = [...selectedWeights, nextWeight]
+    update("weights", next.join(","))
+    if (!formData.weight) {
+      update("weight", nextWeight)
+    }
+    setWeightToAdd("")
+  }
+
+  const removeWeight = (weight: string) => {
+    const next = selectedWeights.filter((w) => w !== weight)
+    update("weights", next.join(","))
+    if (formData.weight === weight) {
+      update("weight", next[0] || "")
+    }
+  }
 
   return (
     <form
@@ -69,7 +134,26 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
         </div>
         <div className="flex flex-col gap-2">
           <Label className="text-foreground">Category</Label>
-          <Input value={formData.category} onChange={e => update("category", e.target.value)} className="bg-secondary border-border text-foreground" required />
+          <Select
+            value={formData.category}
+            onValueChange={(value) => {
+              update("category", value)
+              update("weight", "")
+              update("weights", "")
+              setWeightToAdd("")
+            }}
+          >
+            <SelectTrigger className="bg-secondary border-border text-foreground">
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent>
+              {PRODUCT_CATEGORIES.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">
@@ -78,14 +162,58 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
           <Input value={formData.flavor} onChange={e => update("flavor", e.target.value)} className="bg-secondary border-border text-foreground" />
         </div>
         <div className="flex flex-col gap-2">
-          <Label className="text-foreground">Weight</Label>
-          <Input value={formData.weight} onChange={e => update("weight", e.target.value)} className="bg-secondary border-border text-foreground" />
+          <Label className="text-foreground">Primary Weight</Label>
+          <Select value={formData.weight} onValueChange={(value) => update("weight", value)}>
+            <SelectTrigger className="bg-secondary border-border text-foreground">
+              <SelectValue placeholder="Select Weight" />
+            </SelectTrigger>
+            <SelectContent>
+              {weightOptions.map((w) => (
+                <SelectItem key={w} value={w}>
+                  {w}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex flex-col gap-2">
-          <Label className="text-foreground">Weights</Label>
-          <Input value={formData.weights} onChange={e => update("weights", e.target.value)} className="bg-secondary border-border text-foreground" placeholder="e.g. 500g,1KG,2KG" />
+          <Label className="text-foreground">Add Available Weights</Label>
+          <div className="flex gap-2">
+            <Select value={weightToAdd} onValueChange={setWeightToAdd}>
+              <SelectTrigger className="bg-secondary border-border text-foreground">
+                <SelectValue placeholder="Select Weight" />
+              </SelectTrigger>
+              <SelectContent>
+                {weightOptions
+                  .filter((w) => !selectedWeights.includes(w))
+                  .map((w) => (
+                    <SelectItem key={w} value={w}>
+                      {w}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <Button type="button" variant="outline" onClick={addWeight} className="border-border">
+              Add
+            </Button>
+          </div>
         </div>
       </div>
+      {selectedWeights.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedWeights.map((w) => (
+            <button
+              key={w}
+              type="button"
+              onClick={() => removeWeight(w)}
+              className="rounded-full border border-border bg-secondary px-3 py-1 text-xs text-foreground hover:bg-secondary/80"
+              title="Remove weight"
+            >
+              {w} x
+            </button>
+          ))}
+        </div>
+      )}
       <div className="grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-2">
           <Label className="text-foreground">Price (₹)</Label>

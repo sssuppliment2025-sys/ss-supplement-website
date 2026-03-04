@@ -14,6 +14,7 @@ urlpatterns = [
     path("referrals/", views.MyReferralsView.as_view(), name="my_referrals"),
     path("leaderboard/", views.LeaderboardView.as_view(), name="leaderboard"),
     path('profileForOrderPlaced/', views.profile_view, name='profile'),
+    path('orders/quote/', views.order_quote, name='order_quote'),
     path('orders/', views.create_order, name='create_order'),
 
     path('auth/forgot-password/', views.forgot_password, name='forgot_password'),

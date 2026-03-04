@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle, Coins, AlertCircle, Truck } from "lucide-react"
+import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Truck } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -19,9 +19,63 @@ import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import emailjs from "@emailjs/browser"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 const ADMIN_WHATSAPP = "919547899170"
 const ADMIN_UPI_ID = "8001101055-5@ybl"
+
+interface OrderQuote {
+  points: number
+  items_subtotal: number
+  shipping_fee: number
+  is_free_shipping: boolean
+  cart_total_with_shipping: number
+  max_coins_allowed: number
+  coins_used: number
+  coin_discount: number
+  final_total: number
+  coin_value: number
+  coin_percent: number
+  earned_points: number
+}
+
+async function parseJsonSafe(res: Response) {
+  const raw = await res.text()
+  try {
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    const preview = raw.slice(0, 120).replace(/\s+/g, " ").trim()
+    throw new Error(
+      `Invalid server response (${res.status}). Expected JSON, got: ${preview || "empty response"}`
+    )
+  }
+}
+
+const resolveEmailJsConfig = () => {
+  const serviceId =
+    process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ||
+    process.env.NEXT_PUBLIC_SERVICE_ID ||
+    (typeof window !== "undefined" ? localStorage.getItem("NEXT_PUBLIC_EMAILJS_SERVICE_ID") : null) ||
+    (typeof window !== "undefined" ? localStorage.getItem("EMAILJS_SERVICE_ID") : null)
+
+  const templateId =
+    process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ||
+    process.env.NEXT_PUBLIC_TEMPLATE_ID ||
+    (typeof window !== "undefined" ? localStorage.getItem("NEXT_PUBLIC_EMAILJS_TEMPLATE_ID") : null) ||
+    (typeof window !== "undefined" ? localStorage.getItem("EMAILJS_TEMPLATE_ID") : null)
+
+  const publicKey =
+    process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ||
+    process.env.NEXT_PUBLIC_EMAILJS_KEY ||
+    process.env.NEXT_PUBLIC_PUBLIC_KEY ||
+    (typeof window !== "undefined" ? localStorage.getItem("NEXT_PUBLIC_EMAILJS_PUBLIC_KEY") : null) ||
+    (typeof window !== "undefined" ? localStorage.getItem("EMAILJS_PUBLIC_KEY") : null)
+
+  return {
+    serviceId: serviceId?.trim() || "",
+    templateId: templateId?.trim() || "",
+    publicKey: publicKey?.trim() || "",
+  }
+}
 
 // ✅ CONDITIONAL SHIPPING CONFIGURATION
 const SHIPPING_THRESHOLD = 1000  // Free shipping above ₹999
@@ -29,7 +83,7 @@ const SHIPPING_FEE = 50         // ₹50 if below threshold
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, getCartTotal, clearCart } = useCart()
+  const { items, clearCart } = useCart()
   const { isAuthenticated, user } = useAuth()
   const { toast } = useToast()
 
@@ -38,6 +92,8 @@ export default function CheckoutPage() {
   const [earnedPoints, setEarnedPoints] = useState<number>(0)
   const [loadingPoints, setLoadingPoints] = useState(true)
   const [useCoins, setUseCoins] = useState(false)
+  const [quote, setQuote] = useState<OrderQuote | null>(null)
+  const [loadingQuote, setLoadingQuote] = useState(false)
 
   // Form & UI state
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -59,37 +115,80 @@ export default function CheckoutPage() {
     landmark: "",
   })
 
-  /* ================= FETCH USER COINS ================= */
+  const quoteItemsPayload = items.map((item) => ({
+    productId: item.product.id,
+    name: item.product.name,
+    quantity: item.quantity,
+    price: typeof item.product.flavors === "string"
+      ? item.product.price
+      : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price,
+    selectedFlavor: item.selectedFlavor,
+    selectedWeight: item.selectedWeight,
+  }))
+
+  /* ================= FETCH COINS + ORDER QUOTE FROM BACKEND ================= */
   useEffect(() => {
+    if (items.length === 0) {
+      setLoadingPoints(false)
+      setLoadingQuote(false)
+      setQuote(null)
+      return
+    }
+
     if (!isAuthenticated) {
       setLoadingPoints(false)
+      setLoadingQuote(false)
+      setQuote(null)
       return
     }
 
     const token = localStorage.getItem("token") || localStorage.getItem("access")
     if (!token) {
       setLoadingPoints(false)
+      setLoadingQuote(false)
+      setQuote(null)
       return
     }
 
-    fetch(`${API_URL}/api/profile/`, {
-      headers: { Authorization: `Bearer ${token}` },
+    setLoadingQuote(true)
+    fetch(`${API_URL}/api/orders/quote/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        items: quoteItemsPayload,
+        use_coins: useCoins,
+      }),
     })
-      .then(res => res.json())
-      .then(data => setPoints(data.points || 0))
-      .catch(() => {
+      .then(async (res) => {
+        const payload = await parseJsonSafe(res)
+        if (!res.ok || !payload?.success) {
+          throw new Error(payload?.error || "Failed to calculate checkout summary")
+        }
+
+        const backendQuote = payload.data as OrderQuote
+        setQuote(backendQuote)
+        setPoints(backendQuote.points || 0)
+      })
+      .catch((error) => {
+        setQuote(null)
         toast({
           title: "Error",
-          description: "Failed to load reward coins",
+          description: error?.message || "Failed to load reward coins",
           variant: "destructive",
         })
       })
-      .finally(() => setLoadingPoints(false))
-  }, [isAuthenticated, toast])
+      .finally(() => {
+        setLoadingPoints(false)
+        setLoadingQuote(false)
+      })
+  }, [isAuthenticated, toast, useCoins, items])
 
   /* ================= ✅ CONDITIONAL SHIPPING CALCULATION ================= */
   // Items subtotal only (no shipping included)
-  const itemsSubtotal = items.reduce((total, item) => {
+  const localItemsSubtotal = items.reduce((total, item) => {
     const price = typeof item.product.flavors === "string"
       ? item.product.price
       : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
@@ -97,23 +196,25 @@ export default function CheckoutPage() {
   }, 0)
 
   // ✅ DYNAMIC SHIPPING based on itemsSubtotal
-  const isFreeShipping = itemsSubtotal >= SHIPPING_THRESHOLD
-  const shippingFee = isFreeShipping ? 0 : SHIPPING_FEE
+  const localIsFreeShipping = localItemsSubtotal >= SHIPPING_THRESHOLD
+  const localShippingFee = localIsFreeShipping ? 0 : SHIPPING_FEE
 
   // ✅ Cart total WITH shipping (for 4% coin calculation)
-  const cartTotalWithShipping = itemsSubtotal + shippingFee
+  const localCartTotalWithShipping = localItemsSubtotal + localShippingFee
 
   // ✅ Backend payload fields
-  const COIN_PERCENT = 0.04      // MAX 4% of cartTotalWithShipping
-  const COIN_VALUE = 0.2         // 1 coin = ₹0.2
+  const COIN_VALUE = quote?.coin_value ?? 0.2
 
-  const maxCoinDiscountValue = cartTotalWithShipping * COIN_PERCENT
-  const maxCoinsAllowed = Math.floor(maxCoinDiscountValue / COIN_VALUE)
-  const coinsToUse = useCoins ? Math.min(points, maxCoinsAllowed) : 0
+  const itemsSubtotal = quote?.items_subtotal ?? localItemsSubtotal
+  const isFreeShipping = quote?.is_free_shipping ?? localIsFreeShipping
+  const shippingFee = quote?.shipping_fee ?? localShippingFee
+  const cartTotalWithShipping = quote?.cart_total_with_shipping ?? localCartTotalWithShipping
+  const maxCoinsAllowed = quote?.max_coins_allowed ?? 0
+  const coinsToUse = quote?.coins_used ?? 0
 
   // ✅ Final payment = itemsSubtotal + shipping - coin discount
-  const coinDiscount = coinsToUse * COIN_VALUE
-  const finalTotal = Number((itemsSubtotal + shippingFee - coinDiscount).toFixed(2))
+  const coinDiscount = quote?.coin_discount ?? (coinsToUse * COIN_VALUE)
+  const finalTotal = Number((quote?.final_total ?? (itemsSubtotal + shippingFee - coinDiscount)).toFixed(2))
 
   const hasEnoughForMax = points >= maxCoinsAllowed
 
@@ -191,9 +292,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
   const generateOtpCode = () => Math.floor(100000 + Math.random() * 900000).toString()
 
   const sendOtpEmail = async (email: string, otpCode: string) => {
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+    const { serviceId, templateId, publicKey } = resolveEmailJsConfig()
 
     if (!serviceId || !templateId || !publicKey) {
       throw new Error("Email service is not configured. Missing EmailJS environment variables.")
@@ -214,6 +313,14 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
   /* ================= FORM VALIDATION ================= */
   const handleProceedToPayment = () => {
+    if (loadingQuote || !quote) {
+      toast({
+        title: "Please wait",
+        description: "Calculating latest totals from backend...",
+      })
+      return
+    }
+
     if (
       !formData.fullName ||
       !formData.phone ||
@@ -253,7 +360,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     try {
       const token = localStorage.getItem("token") || localStorage.getItem("access")
       
-      console.log("✅ CONDITIONAL SHIPPING DEBUG:", {
+      console.log("✅ BACKEND QUOTE DEBUG:", {
         items_subtotal: Number(itemsSubtotal.toFixed(2)),
         shipping_fee: shippingFee,
         is_free_shipping: isFreeShipping,
@@ -270,23 +377,8 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          items: items.map((item) => ({
-            productId: item.product.id,
-            name: item.product.name,
-            quantity: item.quantity,
-            price: typeof item.product.flavors === "string"
-              ? item.product.price
-              : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price,
-            selectedFlavor: item.selectedFlavor,
-            selectedWeight: item.selectedWeight,
-          })),
-          // ✅ Backend expects THESE exact fields:
-          items_subtotal: Number(itemsSubtotal.toFixed(2)),
-          shipping_fee: shippingFee,                    // 50 or 0
-          display_subtotal: Number(cartTotalWithShipping.toFixed(2)), // for 4% coins
-          total: Number(finalTotal.toFixed(2)),
-          coins_used: coinsToUse,
-          is_free_shipping: isFreeShipping,
+          items: quoteItemsPayload,
+          use_coins: useCoins,
           payment_method: paymentMethod,
           utr_number: paymentMethod === "upi" ? utrNumber : null,
           address: formData,
@@ -312,7 +404,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
 
       type ApiResponse = ApiError | ApiSuccess
 
-      const orderData = await orderRes.json() as ApiResponse
+      const orderData = await parseJsonSafe(orderRes) as ApiResponse
       
       if (!orderRes.ok) {
         const error = orderData as ApiError
@@ -329,12 +421,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
       const earnedPointsFromBackend = successData.order?.earnedPoints || successData.earnedPoints || 0
       setEarnedPoints(earnedPointsFromBackend)
 
-      // ✅ REFRESH COINS
-      const profileRes = await fetch(`${API_URL}/api/profile/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const profileData = await profileRes.json()
-      const newTotalPoints = profileData.points || 0
+      const newTotalPoints = successData.user?.points ?? points
       setPoints(newTotalPoints)
 
       setOrderId(successData.order?.id || "SUCCESS")
@@ -752,7 +839,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                     <Checkbox
                       checked={useCoins}
                       onCheckedChange={setUseCoins}
-                      disabled={loadingPoints || points === 0}
+                      disabled={loadingPoints || loadingQuote || points === 0}
                     />
                   </div>
 
@@ -827,7 +914,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   onClick={handleProceedToPayment}
                   className="w-full h-12 text-lg"
                   size="lg"
-                  disabled={isSubmitting || loadingPoints}
+                  disabled={isSubmitting || loadingPoints || loadingQuote}
                 >
                   {paymentMethod === "upi" 
                     ? `Proceed to UPI (₹${finalTotal.toLocaleString()})` 

@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import type { Product } from "@/app/types/product"
-import { products as defaultProducts } from "@/lib/products"
 
 interface ProductVariant {
   id: string
@@ -29,16 +28,9 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined)
 
 
 const buildImagesArray = (p: Product): string[] =>
-  [p.image, p.image1, p.image2, p.image3].filter(Boolean) as string[]
+  [p.image, p.image1, p.image2, p.image3, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean) as string[]
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
-
-const buildDefaultProducts = (): Product[] =>
-  defaultProducts.map((p) => ({
-    ...p,
-    images: buildImagesArray(p),
-    flavors: Array.isArray(p.flavors) ? p.flavors : [],
-  }))
 
 const cleanQuotedString = (value: unknown): string => {
   if (typeof value !== "string") return ""
@@ -53,8 +45,18 @@ const cleanQuotedString = (value: unknown): string => {
 }
 
 const toStringArray = (value: unknown): string[] | undefined => {
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean)
+  }
+
   if (!Array.isArray(value)) return undefined
-  return value.filter((v): v is string => typeof v === "string")
+  return value
+    .filter((v): v is string => typeof v === "string")
+    .map((v) => v.trim())
+    .filter(Boolean)
 }
 
 const toFlavorArray = (
@@ -66,10 +68,16 @@ const toFlavorArray = (
     const normalized = value
       .map((item) => {
         if (item && typeof item === "object") {
-          const name = typeof (item as { name?: unknown }).name === "string" ? (item as { name: string }).name : ""
-          const price = typeof (item as { price?: unknown }).price === "number" ? (item as { price: number }).price : fallbackPrice
+          const name = typeof (item as { name?: unknown }).name === "string" ? (item as { name: string }).name.trim() : ""
+          const price =
+            typeof (item as { price?: unknown }).price === "number"
+              ? (item as { price: number }).price
+              : fallbackPrice
           if (!name) return null
           return { name, price }
+        }
+        if (typeof item === "string" && item.trim()) {
+          return { name: item.trim(), price: fallbackPrice }
         }
         return null
       })
@@ -80,67 +88,75 @@ const toFlavorArray = (
   if (typeof fallbackFlavor === "string" && fallbackFlavor.trim()) {
     return [{ name: fallbackFlavor.trim(), price: fallbackPrice }]
   }
-  return []
+  return [{ name: "Default", price: fallbackPrice }]
 }
 
-const mergeProductsById = (baseProducts: Product[], remoteRaw: unknown[]): Product[] => {
-  const remoteById = new Map<string, Partial<Product>>()
+const toNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : fallback
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : fallback
+  }
+  return fallback
+}
 
-  for (const raw of remoteRaw) {
-    if (!raw || typeof raw !== "object") continue
-    const row = raw as Record<string, unknown>
-    const id = String(row.id ?? "").trim()
-    if (!id) continue
+const normalizeProduct = (raw: unknown): Product | null => {
+  if (!raw || typeof raw !== "object") return null
+  const row = raw as Record<string, unknown>
 
-    const remotePrice = typeof row.price === "number" ? row.price : 0
-    const patch: Partial<Product> = {
-      id,
-      name: typeof row.name === "string" ? row.name : undefined,
-      brand: typeof row.brand === "string" ? row.brand : undefined,
-      category: typeof row.category === "string" ? row.category : undefined,
-      price: typeof row.price === "number" ? row.price : undefined,
-      originalPrice: typeof row.originalPrice === "number" ? row.originalPrice : undefined,
-      discount: typeof row.discount === "number" ? row.discount : undefined,
-      rating: typeof row.rating === "number" ? row.rating : undefined,
-      reviews: typeof row.reviews === "number" ? row.reviews : undefined,
-      image: cleanQuotedString(row.image) || undefined,
-      image1: cleanQuotedString(row.image1) || undefined,
-      image2: cleanQuotedString(row.image2) || undefined,
-      image3: cleanQuotedString(row.image3) || undefined,
-      weight: typeof row.weight === "string" ? row.weight : undefined,
-      weights: toStringArray(row.weights),
-      description: typeof row.description === "string" ? row.description : undefined,
-      keyBenefits: toStringArray(row.keyBenefits),
-      nutritionalInfo: typeof row.nutritionalInfo === "string" ? row.nutritionalInfo : undefined,
-      inStock: typeof row.inStock === "boolean" ? row.inStock : undefined,
-      flavors: toFlavorArray(row.flavors, row.flavor, remotePrice),
-    }
+  const id = String(row.id ?? row._id ?? "").trim()
+  if (!id) return null
 
-    if (!patch.flavors || patch.flavors.length === 0) delete patch.flavors
-    if (!patch.weights || patch.weights.length === 0) delete patch.weights
-    if (!patch.keyBenefits || patch.keyBenefits.length === 0) delete patch.keyBenefits
+  const price = toNumber(row.price)
+  const originalPrice = toNumber(row.originalPrice, price)
+  const computedDiscount =
+    originalPrice > 0 ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0
 
-    remoteById.set(id, patch)
+  const weightsFromField = toStringArray(row.weights)
+  const weightFromField = typeof row.weight === "string" ? row.weight.trim() : ""
+  const weights = weightsFromField && weightsFromField.length > 0
+    ? weightsFromField
+    : (weightFromField ? [weightFromField] : [])
+
+  const keyBenefits =
+    toStringArray(row.keyBenefits) ??
+    (typeof row.keyBenefits === "string"
+      ? row.keyBenefits
+          .split(/\r?\n|,/)
+          .map((b) => b.trim())
+          .filter(Boolean)
+      : [])
+
+  const product: Product = {
+    id,
+    name: typeof row.name === "string" ? row.name : "",
+    brand: typeof row.brand === "string" ? row.brand : "",
+    category: typeof row.category === "string" ? row.category : "",
+    price,
+    originalPrice,
+    discount: toNumber(row.discount, computedDiscount),
+    rating: toNumber(row.rating),
+    reviews: Math.max(0, Math.round(toNumber(row.reviews))),
+    image: cleanQuotedString(row.image),
+    image1: cleanQuotedString(row.image1) || undefined,
+    image2: cleanQuotedString(row.image2) || undefined,
+    image3: cleanQuotedString(row.image3) || undefined,
+    images: [],
+    flavors: toFlavorArray(row.flavors, row.flavor, price),
+    weight: weightFromField || undefined,
+    weights,
+    description: typeof row.description === "string" ? row.description : "",
+    keyBenefits,
+    nutritionalInfo: typeof row.nutritionalInfo === "string" ? row.nutritionalInfo : "",
+    inStock: typeof row.inStock === "boolean" ? row.inStock : true,
   }
 
-  const merged = baseProducts.map((base) => {
-    const remote = remoteById.get(base.id)
-    if (!remote) return base
-    const next = { ...base, ...remote, id: base.id } as Product
-    return {
-      ...next,
-      images: buildImagesArray(next),
-      flavors: Array.isArray(next.flavors) ? next.flavors : base.flavors,
-      weights: Array.isArray(next.weights) ? next.weights : base.weights,
-      keyBenefits: Array.isArray(next.keyBenefits) ? next.keyBenefits : base.keyBenefits,
-    }
-  })
-
-  return merged
+  product.images = buildImagesArray(product)
+  return product
 }
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(buildDefaultProducts())
+  const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
     let mounted = true
@@ -155,12 +171,18 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         if (!response.ok) throw new Error(`Failed with status ${response.status}`)
         const payload = await response.json()
         const remoteRows = Array.isArray(payload?.data) ? payload.data : []
-        if (!mounted || remoteRows.length === 0) return
+        if (!mounted) return
 
-        setProducts((base) => mergeProductsById(base, remoteRows))
+        const normalized = remoteRows
+          .map((row) => normalizeProduct(row))
+          .filter((row): row is Product => Boolean(row))
+
+        setProducts(normalized)
       } catch (error) {
-        // Keep local products.tsx as fallback when backend is unavailable
-        console.warn("Using local product fallback:", error)
+        console.warn("Failed to load products from backend:", error)
+        if (mounted) {
+          setProducts([])
+        }
       }
     }
 
@@ -171,24 +193,15 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const addProduct = (product: Product) => {
-    setProducts((prev) => [
-      ...prev,
-      { ...product, images: buildImagesArray(product) },
-    ])
+    console.warn("addProduct is disabled in storefront. Use admin backend.", product.id)
   }
 
   const updateProduct = (id: string, data: Partial<Product>) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, ...data, images: buildImagesArray({ ...p, ...data } as Product) }
-          : p
-      )
-    )
+    console.warn("updateProduct is disabled in storefront. Use admin backend.", id, data)
   }
 
   const deleteProduct = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id))
+    console.warn("deleteProduct is disabled in storefront. Use admin backend.", id)
   }
 
   const getProductsByCategory = (category: string) =>

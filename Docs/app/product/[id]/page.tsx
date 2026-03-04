@@ -180,9 +180,18 @@ export default function ProductPage() {
   const dataImages = product.images?.filter((img): img is string => Boolean(img)) ?? []
   const productImages = [...new Set(dataImages.length > 0 ? dataImages : baseImages)]
   const galleryImages = productImages.length > 0 ? productImages : ["/placeholder.svg"]
+  const isOutOfStock = !product.inStock
 
   // ✅ FIXED: Uses selectedWeight (user's choice)
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      toast({
+        title: "Out of stock",
+        description: `${product.name} is currently unavailable.`,
+      })
+      return
+    }
+
     addToCart(product, selectedFlavor, selectedWeight, quantity)
     toast({
       title: "Added to cart",
@@ -191,6 +200,14 @@ export default function ProductPage() {
   }
 
   const handleBuyNow = () => {
+    if (isOutOfStock) {
+      toast({
+        title: "Out of stock",
+        description: `${product.name} is currently unavailable.`,
+      })
+      return
+    }
+
     addToCart(product, selectedFlavor, selectedWeight, quantity)
     router.push("/cart")
   }
@@ -426,6 +443,9 @@ export default function ProductPage() {
               <Badge variant="secondary" className="bg-success/20 text-success">
                 {product.discount}% off
               </Badge>
+              <Badge variant={product.inStock ? "secondary" : "destructive"}>
+                {product.inStock ? "In Stock" : "Out of Stock"}
+              </Badge>
             </div>
             <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
 
@@ -499,11 +519,21 @@ export default function ProductPage() {
             <div>
               <h3 className="font-semibold text-foreground mb-3">Quantity</h3>
               <div className="flex items-center gap-3">
-                <Button variant="outline" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={isOutOfStock}
+                >
                   <Minus className="h-4 w-4" />
                 </Button>
                 <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
-                <Button variant="outline" size="icon" onClick={() => setQuantity(quantity + 1)}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(quantity + 1)}
+                  disabled={isOutOfStock}
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
@@ -511,11 +541,16 @@ export default function ProductPage() {
 
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <Button size="lg" className="flex-1" variant="outline" onClick={handleAddToCart}>
+              <Button size="lg" className="flex-1" variant="outline" onClick={handleAddToCart} disabled={isOutOfStock}>
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
               </Button>
-              <Button size="lg" className="flex-1 bg-primary hover:bg-primary/90" onClick={handleBuyNow}>
+              <Button
+                size="lg"
+                className="flex-1 bg-primary hover:bg-primary/90"
+                onClick={handleBuyNow}
+                disabled={isOutOfStock}
+              >
                 Buy Now
               </Button>
             </div>

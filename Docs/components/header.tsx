@@ -39,7 +39,7 @@ export function Header() {
   const { getCartCount } = useCart()
   const { getWishlistCount } = useWishlist()
   const { user, isAuthenticated, logout } = useAuth()
-  const apiBase = process.env.NEXT_PUBLIC_API_URL
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 
   useEffect(() => {
     let active = true
@@ -50,7 +50,7 @@ export function Header() {
         return
       }
 
-      const token = localStorage.getItem("access")
+      const token = localStorage.getItem("access") || localStorage.getItem("token")
       if (!token) {
         if (active) setReferralCoins(0)
         return
@@ -65,7 +65,8 @@ export function Header() {
 
         if (!res.ok) throw new Error("Failed to fetch profile")
 
-        const data = await res.json()
+        const raw = await res.text()
+        const data = raw ? JSON.parse(raw) : {}
         if (active) {
           setReferralCoins(typeof data.points === "number" ? data.points : 0)
         }

@@ -8,7 +8,17 @@ import {
   type ReactNode,
 } from "react"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+
+async function parseJsonSafe(res: Response) {
+  const raw = await res.text()
+  try {
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    const preview = raw.slice(0, 120).replace(/\s+/g, " ").trim()
+    throw new Error(`Invalid server response (${res.status}): ${preview || "empty"}`)
+  }
+}
 
 // ================= TYPES =================
 interface User {
@@ -87,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!res.ok) throw new Error("Unauthorized")
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
 
       setUser({
         id: data.id,
@@ -117,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ phone, password }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
 
       if (!res.ok) {
         return { success: false, message: data.detail || "Login failed...." }
@@ -148,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ phone, password }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
 
       if (!res.ok) {
         return { success: false, message: data.detail || "Admin login failed" }
@@ -195,7 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(body),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
 
       if (!res.ok) {
         return { success: false, message: JSON.stringify(data) }
@@ -235,7 +245,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ phone, email }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
       console.log("🔥 forgotPassword response:", data)
 
       if (!res.ok) {
@@ -277,7 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ phone, email, otp }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
       console.log("🔥 verifyOTP response:", data)
 
       if (!res.ok) {
@@ -320,7 +330,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
       console.log("🔥 resetPassword response:", data)
 
       if (!res.ok) {
