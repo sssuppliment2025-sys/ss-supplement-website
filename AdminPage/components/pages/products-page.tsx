@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useData } from "@/lib/data-store"
 import type { Product } from "@/lib/types"
 import { DataTable } from "@/components/ui/data-table"
@@ -66,14 +66,75 @@ const CATEGORY_WEIGHT_OPTIONS: Record<string, string[]> = {
 
 const FALLBACK_WEIGHT_OPTIONS = ["100g", "200g", "300g","400g", "500g", "600g","700g", "800g", "900g", "1KG", "2KG", "3KG","4KG", "5KG", "6KG",]
 
-function ProductForm({ product, onSave, onCancel }: { product?: Product | null; onSave: (data: Partial<Product>) => void; onCancel: () => void }) {
-  const [formData, setFormData] = useState({
+function normalizeWeightValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item).trim())
+      .filter(Boolean)
+      .join(",")
+  }
+
+  if (typeof value === "string") {
+    return value
+  }
+
+  if (value == null) {
+    return ""
+  }
+
+  return String(value)
+}
+
+function parseWeightParts(value: string): { amount: string; unit: "gm" | "kg" } {
+  const normalized = value.trim()
+  const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(kg|kgs|g|gm|grams?)?$/i)
+
+  if (!match) {
+    return { amount: normalized, unit: "gm" }
+  }
+
+  const rawUnit = (match[2] || "gm").toLowerCase()
+  const unit: "gm" | "kg" = rawUnit.startsWith("k") ? "kg" : "gm"
+
+  return {
+    amount: match[1] || "",
+    unit,
+  }
+}
+
+function buildWeightValue(amount: string, unit: "gm" | "kg"): string {
+  const trimmedAmount = amount.trim()
+  if (!trimmedAmount) return ""
+  return `${trimmedAmount}${unit}`
+}
+
+function normalizeWeightToken(value: string): string {
+  const parts = parseWeightParts(value)
+  return buildWeightValue(parts.amount, parts.unit)
+}
+
+function getWeightList(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => normalizeWeightToken(item))
+    .filter(Boolean)
+    .filter((item, index, array) => array.indexOf(item) === index)
+}
+
+function formatWeightLabel(value: string): string {
+  const { amount, unit } = parseWeightParts(value)
+  if (!amount) return value
+  return `${amount} ${unit}`
+}
+
+function getInitialFormData(product?: Product | null) {
+  return {
     name: product?.name || "",
     brand: product?.brand || "",
     category: product?.category || "",
     flavor: product?.flavor || "",
-    weight: product?.weight || "",
-    weights: product?.weights || "",
+    weight: normalizeWeightValue(product?.weight),
+    weights: normalizeWeightValue(product?.weights),
     price: product?.price || 0,
     originalPrice: product?.originalPrice || 0,
     discount: product?.discount || 0,
@@ -88,18 +149,27 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
     image1: product?.image1 || "",
     image2: product?.image2 || "",
     image3: product?.image3 || "",
-  })
-  const [weightToAdd, setWeightToAdd] = useState("")
+  }
+}
+
+function ProductForm({ product, onSave, onCancel }: { product?: Product | null; onSave: (data: Partial<Product>) => void; onCancel: () => void }) {
+  const [formData, setFormData] = useState(() => getInitialFormData(product))
+  const [weightToAddAmount, setWeightToAddAmount] = useState("")
+  const [weightToAddUnit, setWeightToAddUnit] = useState<"gm" | "kg">("gm")
+
+  useEffect(() => {
+    setFormData(getInitialFormData(product))
+    setWeightToAddAmount("")
+    setWeightToAddUnit("gm")
+  }, [product])
 
   const update = (key: string, value: unknown) => setFormData(prev => ({ ...prev, [key]: value }))
   const weightOptions = CATEGORY_WEIGHT_OPTIONS[formData.category] || FALLBACK_WEIGHT_OPTIONS
-  const selectedWeights = formData.weights
-    .split(",")
-    .map((w) => w.trim())
-    .filter(Boolean)
+  const primaryWeightParts = parseWeightParts(formData.weight)
+  const selectedWeights = getWeightList(formData.weights)
 
   const addWeight = () => {
-    const nextWeight = weightToAdd.trim()
+    const nextWeight = buildWeightValue(weightToAddAmount, weightToAddUnit)
     if (!nextWeight) return
     if (selectedWeights.includes(nextWeight)) return
     const next = [...selectedWeights, nextWeight]
@@ -107,7 +177,8 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
     if (!formData.weight) {
       update("weight", nextWeight)
     }
-    setWeightToAdd("")
+    setWeightToAddAmount("")
+    setWeightToAddUnit("gm")
   }
 
   const removeWeight = (weight: string) => {
@@ -140,7 +211,8 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
               update("category", value)
               update("weight", "")
               update("weights", "")
-              setWeightToAdd("")
+              setWeightToAddAmount("")
+              setWeightToAddUnit("gm")
             }}
           >
             <SelectTrigger className="bg-secondary border-border text-foreground">
@@ -156,62 +228,89 @@ function ProductForm({ product, onSave, onCancel }: { product?: Product | null; 
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <div className="flex flex-col gap-2">
           <Label className="text-foreground">Flavor</Label>
           <Input value={formData.flavor} onChange={e => update("flavor", e.target.value)} className="bg-secondary border-border text-foreground" />
         </div>
         <div className="flex flex-col gap-2">
           <Label className="text-foreground">Primary Weight</Label>
-          <Select value={formData.weight} onValueChange={(value) => update("weight", value)}>
-            <SelectTrigger className="bg-secondary border-border text-foreground">
-              <SelectValue placeholder="Select Weight" />
-            </SelectTrigger>
-            <SelectContent>
-              {weightOptions.map((w) => (
-                <SelectItem key={w} value={w}>
-                  {w}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label className="text-foreground">Add Available Weights</Label>
           <div className="flex gap-2">
-            <Select value={weightToAdd} onValueChange={setWeightToAdd}>
-              <SelectTrigger className="bg-secondary border-border text-foreground">
-                <SelectValue placeholder="Select Weight" />
+            <Input
+              type="number"
+              min="0"
+              step="0.1"
+              value={primaryWeightParts.amount}
+              onChange={e => update("weight", buildWeightValue(e.target.value, primaryWeightParts.unit))}
+              className="bg-secondary border-border text-foreground"
+              placeholder="Amount"
+            />
+            <Select
+              value={primaryWeightParts.unit}
+              onValueChange={(value: "gm" | "kg") => update("weight", buildWeightValue(primaryWeightParts.amount, value))}
+            >
+              <SelectTrigger className="w-28 bg-secondary border-border text-foreground">
+                <SelectValue placeholder="Unit" />
               </SelectTrigger>
               <SelectContent>
-                {weightOptions
-                  .filter((w) => !selectedWeights.includes(w))
-                  .map((w) => (
-                    <SelectItem key={w} value={w}>
-                      {w}
-                    </SelectItem>
-                  ))}
+                <SelectItem value="gm">gm</SelectItem>
+                <SelectItem value="kg">kg</SelectItem>
               </SelectContent>
             </Select>
-            <Button type="button" variant="outline" onClick={addWeight} className="border-border">
-              Add
-            </Button>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 md:col-span-2">
+          <Label className="text-foreground">Add Available Weights</Label>
+          <div className="rounded-lg border border-border bg-secondary/40 p-3">
+            <div className="grid gap-3 sm:grid-cols-[minmax(140px,1fr)_120px_auto] sm:items-center">
+              <Input
+                type="number"
+                min="0"
+                step="0.1"
+                value={weightToAddAmount}
+                onChange={e => setWeightToAddAmount(e.target.value)}
+                className="min-w-0 bg-background border-border text-foreground"
+                placeholder="Amount"
+              />
+              <Select value={weightToAddUnit} onValueChange={(value: "gm" | "kg") => setWeightToAddUnit(value)}>
+                <SelectTrigger className="w-full bg-background border-border text-foreground">
+                  <SelectValue placeholder="Unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gm">gm</SelectItem>
+                  <SelectItem value="kg">kg</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button type="button" onClick={addWeight} className="w-full sm:w-auto sm:min-w-28">
+                Add Weight
+              </Button>
+            </div>
+            {weightOptions.length > 0 && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Examples: {weightOptions.slice(0, 6).map(formatWeightLabel).join(", ")}
+              </p>
+            )}
           </div>
         </div>
       </div>
       {selectedWeights.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="rounded-lg border border-border bg-secondary/30 p-3">
+          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Available Weights
+          </p>
+          <div className="flex flex-wrap gap-2">
           {selectedWeights.map((w) => (
             <button
               key={w}
               type="button"
               onClick={() => removeWeight(w)}
-              className="rounded-full border border-border bg-secondary px-3 py-1 text-xs text-foreground hover:bg-secondary/80"
+              className="rounded-full border border-border bg-background px-3 py-1 text-sm text-foreground hover:bg-background/80"
               title="Remove weight"
             >
-              {w} x
+              {formatWeightLabel(w)} x
             </button>
           ))}
+          </div>
         </div>
       )}
       <div className="grid grid-cols-3 gap-4">
@@ -478,7 +577,15 @@ export function ProductsPage() {
         searchPlaceholder="Search products..."
       />
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open)
+          if (!open) {
+            setSelectedProduct(null)
+          }
+        }}
+      >
         <DialogContent className="bg-card border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle>{selectedProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
