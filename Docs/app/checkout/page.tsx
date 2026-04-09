@@ -113,6 +113,7 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
     landmark: "",
+    uniqueCode: "",
   })
 
   const quoteItemsPayload = items.map((item) => ({
@@ -265,6 +266,7 @@ ${paymentInfo}
 Name: ${formData.fullName}
 Phone: ${formData.phone}
 Email: ${formData.email || "N/A"}
+Unique Code: ${formData.uniqueCode || "N/A"}
 
 📍 *Delivery Address:*
 ${formData.address}, ${formData.landmark ? `Landmark: ${formData.landmark}` : ""}
@@ -724,6 +726,22 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                 <div>
                   <Label htmlFor="landmark">Landmark (Optional)</Label>
                   <Input id="landmark" name="landmark" value={formData.landmark} onChange={handleInputChange} className="bg-secondary border-border" placeholder="Near temple, opposite school, etc." />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border">
+              <CardContent className="pt-6">
+                <div>
+                  <Label htmlFor="uniqueCode">Unique Code (Optional)</Label>
+                  <Input
+                    id="uniqueCode"
+                    name="uniqueCode"
+                    value={formData.uniqueCode}
+                    onChange={handleInputChange}
+                    className="bg-secondary border-border"
+                    placeholder="Enter your unique code"
+                  />
                 </div>
               </CardContent>
             </Card>
