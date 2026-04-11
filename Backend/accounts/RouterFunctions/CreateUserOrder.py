@@ -112,6 +112,9 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
 
         order_id = str(uuid.uuid4())[:8].upper()
 
+        payment_method = data.get("payment_method", "cod")
+        order_status = "paid" if payment_method == "online" else "pending"
+
         orders_collection.insert_one(
             {
                 "_id": ObjectId(),
@@ -125,10 +128,13 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
                 "cash_paid": quote["final_total"],
                 "earned_points": earned_points,
                 "order_items": quote["normalized_items"],
-                "payment_method": data.get("payment_method", "cod"),
+                "payment_method": payment_method,
                 "utr_number": data.get("utr_number"),
+                "razorpay_order_id": data.get("razorpay_order_id"),
+                "razorpay_payment_id": data.get("razorpay_payment_id"),
+                "razorpay_signature": data.get("razorpay_signature"),
                 "address": data.get("address", {}),
-                "status": "pending",
+                "status": order_status,
                 "created_at": datetime.utcnow(),
             }
         )

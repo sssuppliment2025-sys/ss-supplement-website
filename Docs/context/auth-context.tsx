@@ -24,6 +24,7 @@ async function parseJsonSafe(res: Response) {
 interface User {
   id: number
   username: string
+  phone: string
   email: string
   isAdmin: boolean
 }
@@ -102,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({
         id: data.id,
         username: data.name || data.phone,
+        phone: data.phone || "",
         email: data.email,
         isAdmin: data.is_staff || false,
       })
@@ -139,6 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({
         id: data.user.id,
         username: data.user.name || data.user.phone,
+        phone: data.user.phone || "",
         email: data.user.email,
         isAdmin: data.user.is_staff || false,
       })
@@ -170,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({
         id: data.user.id,
         username: data.user.name || data.user.phone,
+        phone: data.user.phone || "",
         email: data.user.email,
         isAdmin: data.user.is_staff || true,
       })
@@ -217,6 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({
         id: data.user.id,
         username: data.user.name || data.user.phone,
+        phone: data.user.phone || "",
         email: data.user.email,
         isAdmin: false,
       })

@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { MapPin, CreditCard, Banknote, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Truck } from "lucide-react"
+import { MapPin, CreditCard, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Truck } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
@@ -20,7 +19,6 @@ import { useToast } from "@/hooks/use-toast"
 import emailjs from "@emailjs/browser"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
-const ADMIN_WHATSAPP = "919547899170"
 const ADMIN_UPI_ID = "8001101055-5@ybl"
 
 interface OrderQuote {
@@ -50,6 +48,12 @@ async function parseJsonSafe(res: Response) {
   }
 }
 
+const normalizePhoneForRazorpay = (value: string) => {
+  const digits = (value || "").replace(/\D/g, "")
+  if (digits.length >= 10) return digits.slice(-10)
+  return digits
+}
+
 const resolveEmailJsConfig = () => {
   const serviceId =
     process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ||
@@ -77,9 +81,9 @@ const resolveEmailJsConfig = () => {
   }
 }
 
-// ✅ CONDITIONAL SHIPPING CONFIGURATION
-const SHIPPING_THRESHOLD = 1000  // Free shipping above ₹999
-const SHIPPING_FEE = 50         // ₹50 if below threshold
+// Shipping configuration
+const SHIPPING_THRESHOLD = 1000
+const SHIPPING_FEE = 50
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -97,7 +101,7 @@ export default function CheckoutPage() {
 
   // Form & UI state
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "upi">("cod")
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "upi" | "online">("online")
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [showQRCode, setShowQRCode] = useState(false)
   const [utrNumber, setUtrNumber] = useState("")
@@ -115,6 +119,16 @@ export default function CheckoutPage() {
     landmark: "",
     uniqueCode: "",
   })
+
+  useEffect(() => {
+    if (!user) return
+    setFormData((prev) => ({
+      ...prev,
+      fullName: prev.fullName || user.username || "",
+      email: prev.email || user.email || "",
+      phone: prev.phone || user.phone || "",
+    }))
+  }, [user])
 
   const quoteItemsPayload = items.map((item) => ({
     productId: item.product.id,
@@ -196,9 +210,9 @@ export default function CheckoutPage() {
     return total + (price * item.quantity)
   }, 0)
 
-  // ✅ DYNAMIC SHIPPING based on itemsSubtotal
-  const localIsFreeShipping = localItemsSubtotal >= SHIPPING_THRESHOLD
-  const localShippingFee = localIsFreeShipping ? 0 : SHIPPING_FEE
+  // Shipping is free for all orders
+  const localIsFreeShipping = true
+  const localShippingFee = SHIPPING_FEE
 
   // ✅ Cart total WITH shipping (for 4% coin calculation)
   const localCartTotalWithShipping = localItemsSubtotal + localShippingFee
@@ -218,66 +232,6 @@ export default function CheckoutPage() {
   const finalTotal = Number((quote?.final_total ?? (itemsSubtotal + shippingFee - coinDiscount)).toFixed(2))
 
   const hasEnoughForMax = points >= maxCoinsAllowed
-
-  /* ================= WHATSAPP MESSAGE ================= */
-  const generateWhatsAppMessage = (backendCoins: number, backendEarned: number) => {
-    const orderItems = items
-      .map((item) => {
-        const price = typeof item.product.flavors === "string"
-          ? item.product.price
-          : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
-        return `• ${item.product.name} (${item.selectedFlavor}, ${item.selectedWeight}) x${item.quantity} = ₹${(price * item.quantity).toLocaleString()}`
-      })
-      .join("\\n")
-
-    const paymentInfo = paymentMethod === "upi" 
-      ? `💳 *Payment:* UPI\\n📱 UTR: ${utrNumber}\\n👛 UPI ID: ${ADMIN_UPI_ID}`
-      : "💰 *Payment:* Cash on Delivery"
-
-    const shippingInfo = isFreeShipping 
-      ? "🚚 *FREE Shipping* (Order > ₹999)"
-      : `🚚 *Shipping:* ₹${shippingFee.toLocaleString()}`
-
-    const coinsInfo = coinsToUse > 0 
-      ? `🪙 Coins Used: ${coinsToUse} (${((coinsToUse * COIN_VALUE / cartTotalWithShipping) * 100).toFixed(1)}% of total)`
-      : "🪙 No coins used"
-
-    const message = `
-🛒 *NEW ORDER #${orderId || "TEMP"} - SS Supplement*
-
-📦 *Order Items:*
-${orderItems}
-
-💰 *Billing Breakdown:*
-Items: ₹${itemsSubtotal.toLocaleString()}
-${shippingInfo}
-Cart Total: ₹${cartTotalWithShipping.toLocaleString()}
-${coinsInfo}
-💳 Cash Paid: ₹${finalTotal.toLocaleString()}
-Total: *₹${finalTotal.toLocaleString()}*
-
-👛 *COINS UPDATE:*
-🎉 *Earned:* +${backendEarned} coins
-💰 *New Balance:* ${backendCoins} coins
-
-${paymentInfo}
-
-👤 *Customer Details:*
-Name: ${formData.fullName}
-Phone: ${formData.phone}
-Email: ${formData.email || "N/A"}
-Unique Code: ${formData.uniqueCode || "N/A"}
-
-📍 *Delivery Address:*
-${formData.address}, ${formData.landmark ? `Landmark: ${formData.landmark}` : ""}
-${formData.city}, ${formData.state} - ${formData.pincode}
-
-⏰ *Order Time:* ${new Date().toLocaleString("en-IN")}
-    `.trim()
-
-    return `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(message)}`
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
@@ -289,6 +243,199 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     navigator.clipboard.writeText(ADMIN_UPI_ID)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const loadRazorpayScript = async () => {
+    if (typeof window === "undefined") return false
+
+    if (document.getElementById("razorpay-script")) {
+      return true
+    }
+
+    return new Promise((resolve) => {
+      const script = document.createElement("script")
+      script.id = "razorpay-script"
+      script.src = "https://checkout.razorpay.com/v1/checkout.js"
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
+      document.body.appendChild(script)
+    })
+  }
+
+  const verifyRazorpayPayment = async (paymentData: {
+    razorpay_payment_id: string
+    razorpay_order_id: string
+    razorpay_signature: string
+  }) => {
+    const token = localStorage.getItem("token") || localStorage.getItem("access")
+    if (!token) throw new Error("Authentication token is missing.")
+
+    const response = await fetch(`${API_URL}/api/orders/razorpay/verify/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...paymentData,
+        items: quoteItemsPayload,
+        use_coins: useCoins,
+        address: formData,
+      }),
+    })
+
+    const result = await parseJsonSafe(response)
+    if (!response.ok || !result?.success) {
+      throw new Error(result?.error || "Payment verification failed.")
+    }
+
+    return result
+  }
+
+  const handleOnlinePayment = async () => {
+    if (!quote) {
+      toast({
+        title: "Please wait",
+        description: "Calculating latest totals from backend...",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("access")
+      if (!token) {
+        throw new Error("Please log in before continuing to payment.")
+      }
+
+      const createResponse = await fetch(`${API_URL}/api/orders/razorpay/create/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: quoteItemsPayload,
+          use_coins: useCoins,
+        }),
+      })
+
+      const createData = await parseJsonSafe(createResponse)
+      if (!createResponse.ok || !createData?.success) {
+        throw new Error(createData?.error || "Failed to create Razorpay payment order.")
+      }
+
+      const scriptLoaded = await loadRazorpayScript()
+      if (!scriptLoaded) {
+        throw new Error("Unable to load Razorpay payment script.")
+      }
+
+      const options = {
+        key: createData.keyId,
+        amount: createData.amount,
+        currency: createData.currency,
+        name: "SS Supplement",
+        description: "Online payment via Razorpay",
+        order_id: createData.razorpayOrderId,
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: normalizePhoneForRazorpay(user?.phone || formData.phone),
+        },
+        theme: {
+          color: "#2563eb",
+        },
+        handler: async (response: any) => {
+          try {
+            const verifyData = await verifyRazorpayPayment(response)
+            const earnedPointsFromBackend = verifyData.order?.earnedPoints || verifyData.earnedPoints || 0
+            setEarnedPoints(earnedPointsFromBackend)
+
+            const newTotalPoints = verifyData.user?.points ?? points
+            setPoints(newTotalPoints)
+            setOrderId(verifyData.order?.id || "SUCCESS")
+
+            if (formData.email.trim()) {
+              const otpCode = generateOtpCode()
+              try {
+                await sendOtpEmail(formData.email.trim(), otpCode)
+                toast({
+                  title: "OTP Sent",
+                  description: "OTP sent to your email. It is valid for 10 minutes.",
+                })
+              } catch (mailError: unknown) {
+                console.error("Email OTP error:", mailError)
+                toast({
+                  title: "Email Error",
+                  description: "Order paid, but OTP email could not be sent.",
+                  variant: "destructive",
+                })
+              }
+            }
+
+            const savedOrderId = verifyData.order?.id || `ORD-${Date.now()}`
+            const localOrder = {
+              id: savedOrderId,
+              items: items.map((item) => {
+                const price = typeof item.product.flavors === "string"
+                  ? item.product.price
+                  : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+                return {
+                  product: item.product.name,
+                  flavor: item.selectedFlavor || "",
+                  weight: item.selectedWeight || "",
+                  quantity: item.quantity,
+                  price,
+                }
+              }),
+              total: Number(finalTotal.toFixed(2)),
+              address: formData,
+              paymentMethod,
+              status: "paid",
+              createdAt: new Date().toISOString(),
+              userId: user?.id,
+            }
+            const existingOrders = JSON.parse(localStorage.getItem("ss_orders") || "[]")
+            existingOrders.push(localOrder)
+            localStorage.setItem("ss_orders", JSON.stringify(existingOrders))
+
+            toast({
+              title: "✅ Payment Successful!",
+              description: `Order #${verifyData.order?.id || savedOrderId} placed successfully. Pay ₹${finalTotal.toLocaleString()}`,
+            })
+
+            clearCart()
+            setOrderPlaced(true)
+          } catch (error: any) {
+            console.error("Razorpay verification error:", error)
+            toast({
+              title: "Payment Failed",
+              description: error?.message || "Unable to verify payment.",
+              variant: "destructive",
+            })
+          } finally {
+            setIsSubmitting(false)
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsSubmitting(false)
+          },
+        },
+      }
+
+      const paymentObject = new (window as any).Razorpay(options)
+      paymentObject.open()
+    } catch (err: any) {
+      console.error("Online payment error:", err)
+      toast({
+        title: "Payment Error",
+        description: err.message || "Unable to start online payment.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+    }
   }
 
   const generateOtpCode = () => Math.floor(100000 + Math.random() * 900000).toString()
@@ -314,7 +461,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
   }
 
   /* ================= FORM VALIDATION ================= */
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     if (loadingQuote || !quote) {
       toast({
         title: "Please wait",
@@ -339,11 +486,16 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
       return
     }
 
-    if (paymentMethod === "upi") {
-      setShowQRCode(true)
-    } else {
-      handleSubmit()
+    if (paymentMethod !== "online") {
+      setPaymentMethod("online")
+      toast({
+        title: "Online Payment Required",
+        description: "Please pay with Razorpay to place your order.",
+      })
+      return
     }
+
+    await handleOnlinePayment()
   }
 
   /* ================= ✅ BACKEND PAYLOAD WITH CONDITIONAL SHIPPING ================= */
@@ -427,7 +579,6 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
       setPoints(newTotalPoints)
 
       setOrderId(successData.order?.id || "SUCCESS")
-      window.open(generateWhatsAppMessage(newTotalPoints, earnedPointsFromBackend), '_blank')
 
       if (formData.email.trim()) {
         const otpCode = generateOtpCode()
@@ -517,7 +668,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed Successfully!</h1>
             <p className="text-muted-foreground mb-6">
-              Order details sent to WhatsApp. Please pay ₹{finalTotal.toLocaleString()}.
+              Your order has been saved in our system.
             </p>
             
             <div className="bg-gradient-to-r from-yellow-500/10 to-success/10 border border-yellow-200/50 rounded-2xl p-6 mb-8 space-y-4">
@@ -551,17 +702,6 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
             </div>
 
             <div className="space-y-3">
-              <a
-                href={`https://wa.me/919547899170?text=${encodeURIComponent(`Hi! I just placed an order (Order ID: ${orderId}). I'd like to receive updates on my order status. 🙏`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1ebe57] text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Get Order Updates on WhatsApp
-              </a>
               <Button onClick={() => router.push("/orders")} className="w-full bg-primary">
                 View My Orders
               </Button>
@@ -655,13 +795,13 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                         Confirming...
                       </>
                     ) : (
-                      "Confirm & Send to WhatsApp"
+                      "Confirm Order"
                     )}
                   </Button>
                 </div>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  After payment, enter UTR and confirm to send order to WhatsApp
+                  After payment, enter UTR and confirm your order
                 </p>
               </CardContent>
             </Card>
@@ -746,56 +886,21 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
               </CardContent>
             </Card>
 
-            {/* Payment Method */}
+            {/* Payment */}
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
                   <CreditCard className="h-5 w-5 text-primary" />
-                  Payment Method
+                  Payment
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup value={paymentMethod} onValueChange={(value: "cod" | "upi") => setPaymentMethod(value)} className="space-y-3">
-                  <div className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-all ${
-                    paymentMethod === "cod" 
-                      ? "border-primary bg-primary/5 shadow-sm" 
-                      : "border-border hover:border-border hover:bg-accent"
-                  }`}>
-                    <RadioGroupItem value="cod" id="cod" />
-                    <Label htmlFor="cod" className="flex items-center gap-3 flex-1 p-0 m-0 h-auto">
-                      <Banknote className="h-5 w-5 text-success" />
-                      <div>
-                        <p className="font-medium text-foreground">Cash on Delivery</p>
-                        <p className="text-sm text-muted-foreground">
-                          Pay ₹{finalTotal.toLocaleString()} when you receive order 
-                          <span className={isFreeShipping ? "text-success font-semibold" : "text-muted-foreground"}>
-                            ({isFreeShipping ? "FREE" : "₹50"} shipping)
-                          </span>
-                        </p>
-                      </div>
-                    </Label>
-                  </div>
-
-                  <div className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-all ${
-                    paymentMethod === "upi" 
-                      ? "border-primary bg-primary/5 shadow-sm" 
-                      : "border-border hover:border-border hover:bg-accent"
-                  }`}>
-                    <RadioGroupItem value="upi" id="upi" />
-                    <Label htmlFor="upi" className="flex items-center gap-3 flex-1 p-0 m-0 h-auto">
-                      <QrCode className="h-5 w-5 text-primary" />
-                      <div>
-                        <p className="font-medium text-foreground">UPI Payment</p>
-                        <p className="text-sm text-muted-foreground">
-                          Pay ₹{finalTotal.toLocaleString()} via QR/PhonePe/GPay 
-                          <span className={isFreeShipping ? "text-success font-semibold" : "text-muted-foreground"}>
-                            ({isFreeShipping ? "FREE" : "₹50"} shipping)
-                          </span>
-                        </p>
-                      </div>
-                    </Label>
-                  </div>
-                </RadioGroup>
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <p className="font-medium text-foreground">Razorpay Secure Payment</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Payment mode is fixed to online payment via Razorpay.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -934,10 +1039,7 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
                   size="lg"
                   disabled={isSubmitting || loadingPoints || loadingQuote}
                 >
-                  {paymentMethod === "upi" 
-                    ? `Proceed to UPI (₹${finalTotal.toLocaleString()})` 
-                    : `Place Order - Pay ₹${finalTotal.toLocaleString()} (COD)`
-                  }
+                  {`Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
@@ -952,4 +1054,5 @@ ${formData.city}, ${formData.state} - ${formData.pincode}
     </div>
   )
 }
+
 
