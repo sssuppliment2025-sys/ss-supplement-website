@@ -153,8 +153,42 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    overflow-x: hidden;
+  }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+}
+
+#razorpay-affordability-widget {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  min-height: 92px;
+  scrollbar-width: none;
+}
+
+#razorpay-affordability-widget::-webkit-scrollbar {
+  display: none;
+}
+
+#razorpay-affordability-widget > * {
+  max-width: 100% !important;
+}
+
+#razorpay-affordability-widget iframe {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 92px !important;
+  height: 92px !important;
+}
+
+@media (max-width: 767px) {
+  #razorpay-affordability-widget {
+    min-height: 92px;
   }
 }
 

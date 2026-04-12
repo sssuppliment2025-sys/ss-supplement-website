@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
+import Script from "next/script"
 import {
   Star,
   Minus,
@@ -16,6 +17,7 @@ import {
   Shield,
   RefreshCw,
   ZoomIn,
+  CreditCard,
 } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -29,6 +31,33 @@ import { useProducts } from "@/context/product-context"
 import { useCart } from "@/context/cart-context"
 import { useWishlist } from "@/context/wishlist-context"
 import { useToast } from "@/hooks/use-toast"
+
+type RazorpayAffordabilityConfig = {
+  key: string
+  amount: number
+}
+
+type RazorpayAffordabilityInstance = {
+  render: () => void
+}
+
+type RazorpayAffordabilityWindow = Window & {
+  RazorpayAffordabilitySuite?: new (
+    config: RazorpayAffordabilityConfig,
+  ) => RazorpayAffordabilityInstance
+}
+
+const RAZORPAY_AFFORDABILITY_WIDGET_ID = "razorpay-affordability-widget"
+const getRazorpayAffordabilityKey = () => {
+  const publicKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.trim() || ""
+  const affordabilityEnvKey = process.env.NEXT_PUBLIC_RAZORPAY_AFFORDABILITY_KEY?.trim() || ""
+
+  if (publicKeyId.startsWith("rzp_")) return publicKeyId
+  if (affordabilityEnvKey.startsWith("rzp_")) return affordabilityEnvKey
+  return ""
+}
+
+const razorpayAffordabilityKey = getRazorpayAffordabilityKey()
 
 export default function ProductPage() {
   const params = useParams()
@@ -47,6 +76,10 @@ export default function ProductPage() {
   const [showMagnifier, setShowMagnifier] = useState(false)
   const [carouselApi, setCarouselApi] = useState<CarouselApi>()
   const [wishlistPulse, setWishlistPulse] = useState(false)
+  const [isAffordabilityScriptReady, setIsAffordabilityScriptReady] = useState(false)
+  const [affordabilityMessage, setAffordabilityMessage] = useState("")
+  const [showMobileStickyActions, setShowMobileStickyActions] = useState(false)
+  const actionButtonsRef = useRef<HTMLDivElement | null>(null)
 
   // ✅ FIXED: Initialize with CURRENT product weight
   useEffect(() => {
@@ -97,6 +130,63 @@ export default function ProductPage() {
     const timer = window.setTimeout(() => setWishlistPulse(false), 180)
     return () => window.clearTimeout(timer)
   }, [wishlistPulse])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const affordabilityWindow = window as RazorpayAffordabilityWindow
+    if (affordabilityWindow.RazorpayAffordabilitySuite) {
+      setIsAffordabilityScriptReady(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const media = window.matchMedia("(max-width: 767px)")
+    const target = actionButtonsRef.current
+
+    const syncForViewport = () => {
+      if (!media.matches) {
+        setShowMobileStickyActions(false)
+        return
+      }
+
+      const rect = target?.getBoundingClientRect()
+      if (!rect) {
+        setShowMobileStickyActions(true)
+        return
+      }
+
+      const isVisible = rect.top < window.innerHeight && rect.bottom > 0
+      setShowMobileStickyActions(!isVisible)
+    }
+
+    syncForViewport()
+
+    if (!target) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!media.matches) return
+        setShowMobileStickyActions(!entry.isIntersecting)
+      },
+      {
+        threshold: 0.2,
+      },
+    )
+
+    observer.observe(target)
+    media.addEventListener("change", syncForViewport)
+    window.addEventListener("resize", syncForViewport)
+
+    return () => {
+      observer.disconnect()
+      media.removeEventListener("change", syncForViewport)
+      window.removeEventListener("resize", syncForViewport)
+    }
+  }, [product?.id])
 
   // Get all variants of this product
   const productVariants = product ? getProductVariants(product.name, product.brand) : []
@@ -172,6 +262,8 @@ export default function ProductPage() {
   }
 
   const currentPrice = getCurrentPrice()
+  const affordabilityTotal = currentPrice * quantity
+  const affordabilityAmount = Math.round(affordabilityTotal * 100)
 
   // Get all product images
   const baseImages = [product.image, product.image1, product.image2, product.image3].filter(
@@ -268,12 +360,68 @@ export default function ProductPage() {
     .slice(0, 8)
   const isWishlisted = isInWishlist(product?.id ?? "")
 
+  useEffect(() => {
+    if (!razorpayAffordabilityKey) {
+      setAffordabilityMessage(
+        "Add a valid Razorpay API Key ID like rzp_test_... or rzp_live_... in NEXT_PUBLIC_RAZORPAY_KEY_ID.",
+      )
+      return
+    }
+
+    if (!isAffordabilityScriptReady || typeof window === "undefined") {
+      return
+    }
+
+    const affordabilityWindow = window as RazorpayAffordabilityWindow
+    const Widget = affordabilityWindow.RazorpayAffordabilitySuite
+    const widgetHost = document.getElementById(RAZORPAY_AFFORDABILITY_WIDGET_ID)
+
+    if (!Widget || !widgetHost || affordabilityAmount <= 0) {
+      return
+    }
+
+    widgetHost.innerHTML = ""
+
+    try {
+      const widget = new Widget({
+        key: razorpayAffordabilityKey,
+        amount: affordabilityAmount,
+      })
+
+      widget.render()
+      setAffordabilityMessage("")
+    } catch (error) {
+      console.error("Failed to render Razorpay affordability widget", error)
+      setAffordabilityMessage(
+        "Affordability plans are temporarily unavailable. The product price is still ready for checkout.",
+      )
+    }
+
+    return () => {
+      widgetHost.innerHTML = ""
+    }
+  }, [affordabilityAmount, isAffordabilityScriptReady, product?.id, quantity, selectedFlavor, selectedWeight])
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
+      {razorpayAffordabilityKey ? (
+        <Script
+          src="https://cdn.razorpay.com/widgets/affordability/affordability.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            setIsAffordabilityScriptReady(true)
+            setAffordabilityMessage("")
+          }}
+          onError={() => {
+            setIsAffordabilityScriptReady(false)
+            setAffordabilityMessage("We could not load Razorpay affordability options right now.")
+          }}
+        />
+      ) : null}
       <Header />
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto overflow-x-hidden px-4 pt-5 pb-28 md:py-6">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <nav className="mb-6 hidden flex-wrap items-center gap-2 text-sm text-muted-foreground md:flex">
           <a href="/" className="hover:text-primary">Home</a>
           <ChevronRight className="h-4 w-4" />
           <a href={`/category/${product.category}`} className="hover:text-primary">
@@ -283,11 +431,11 @@ export default function ProductPage() {
           <span className="text-foreground">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
           {/* Product Images */}
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <div className="md:hidden">
-              <div className="relative rounded-xl overflow-hidden border border-border bg-card">
+              <div className="relative w-full rounded-xl overflow-hidden border border-border bg-card">
                 <div className="absolute top-2.5 right-2.5 z-20">
                   <div className="flex items-center gap-0.5">
                     <Button
@@ -424,7 +572,7 @@ export default function ProductPage() {
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <div>
               <p className="text-sm text-muted-foreground mb-1">{product.brand}</p>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{product.name}</h1>
@@ -437,7 +585,7 @@ export default function ProductPage() {
               </div>
             </div>
 
-            <div className="flex items-baseline gap-3">
+            <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
               <span className="text-3xl font-bold text-foreground">₹{currentPrice}</span>
               <span className="text-xl text-muted-foreground line-through">₹{product.originalPrice}</span>
               <Badge variant="secondary" className="bg-success/20 text-success">
@@ -448,6 +596,43 @@ export default function ProductPage() {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
+            <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/8 via-background to-primary/5 p-3 shadow-sm sm:p-4">
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-[13px] font-semibold text-foreground sm:text-sm">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 sm:h-8 sm:w-8">
+                      <CreditCard className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" />
+                    </span>
+                    Easy monthly payment options
+                  </div>
+                  <p className="text-xs text-muted-foreground sm:text-sm">
+                    Check EMI, Pay Later and eligible offers.
+                  </p>
+                </div>
+                <div className="w-fit rounded-full border border-primary/15 bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm sm:px-4 sm:py-2 sm:text-sm">
+                  Total: Rs. {affordabilityTotal.toLocaleString("en-IN")}
+                </div>
+              </div>
+              <div className="mt-3 hidden flex-wrap gap-2 text-xs font-medium text-muted-foreground sm:flex">
+                <span className="rounded-full border border-border/80 bg-background px-3 py-1.5">EMI</span>
+                <span className="rounded-full border border-border/80 bg-background px-3 py-1.5">Pay Later</span>
+                <span className="rounded-full border border-border/80 bg-background px-3 py-1.5">Offers</span>
+              </div>
+              <div
+                id={RAZORPAY_AFFORDABILITY_WIDGET_ID}
+                className="mt-3 min-h-12 w-full max-w-full overflow-hidden rounded-xl bg-background/70 sm:mt-4"
+                aria-live="polite"
+                aria-label="Razorpay affordability plans"
+              />
+              {affordabilityTotal < 500 ? (
+                <p className="mt-2.5 text-xs text-muted-foreground sm:mt-3">
+                  Some plans may appear only for higher order values.
+                </p>
+              ) : null}
+              {affordabilityMessage ? (
+                <p className="mt-2.5 text-sm text-muted-foreground sm:mt-3">{affordabilityMessage}</p>
+              ) : null}
+            </div>
 
             {/* ✅ FIXED: Flavor Selection - Uses selectedFlavor state */}
             {availableFlavors.length > 0 && (
@@ -540,7 +725,7 @@ export default function ProductPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3">
+            <div ref={actionButtonsRef} className="flex gap-3">
               <Button size="lg" className="flex-1" variant="outline" onClick={handleAddToCart} disabled={isOutOfStock}>
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
@@ -627,6 +812,30 @@ export default function ProductPage() {
           />
         )}
       </main>
+      {showMobileStickyActions ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-3 py-3 shadow-[0_-10px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
+          <div className="mx-auto flex w-full max-w-md gap-2">
+            <Button
+              size="lg"
+              className="h-12 flex-1"
+              variant="outline"
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+            >
+              <ShoppingCart className="mr-2 h-5 w-5" />
+              Add to Cart
+            </Button>
+            <Button
+              size="lg"
+              className="h-12 flex-1 bg-primary hover:bg-primary/90"
+              onClick={handleBuyNow}
+              disabled={isOutOfStock}
+            >
+              Buy Now
+            </Button>
+          </div>
+        </div>
+      ) : null}
       <Footer />
     </div>
   )

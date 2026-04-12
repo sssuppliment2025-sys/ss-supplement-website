@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, User, Menu, X, ChevronDown, Phone, MessageCircle, Gift, Coins, Heart } from "lucide-react"
+import { ShoppingCart, User, Menu, X, ChevronDown, Phone, MessageCircle, Gift, Coins, Heart, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SearchResults } from "@/components/search-results"
 import { useCart } from "@/context/cart-context"
@@ -33,6 +34,8 @@ const categories = [
 const stores = ["Haldia", "Kolkata", "Raipur"]
 
 export function Header() {
+  const router = useRouter()
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [referralCoins, setReferralCoins] = useState(0)
@@ -40,6 +43,7 @@ export function Header() {
   const { getWishlistCount } = useWishlist()
   const { user, isAuthenticated, logout } = useAuth()
   const apiBase = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
+  const showMobileBackButton = pathname !== "/"
 
   useEffect(() => {
     let active = true
@@ -112,7 +116,25 @@ export function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {showMobileBackButton ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 w-10 rounded-full p-0 md:hidden"
+                aria-label="Go back"
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.history.length > 1) {
+                    router.back()
+                    return
+                  }
+                  router.push("/")
+                }}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            ) : null}
+            <Link href="/" className="flex items-center gap-2">
             <Image
               src="/ss-supplements-logo.jpeg"
               alt="SS Supplement logo"
@@ -125,7 +147,8 @@ export function Header() {
               <h1 className="font-bold text-lg text-foreground">SS Supplements</h1>
               <p className="text-xs text-muted-foreground">Your Fitness Partner</p>
             </div>
-          </Link>
+            </Link>
+          </div>
 
           <div className="flex-1 max-w-xl hidden md:block">
             <SearchResults />
