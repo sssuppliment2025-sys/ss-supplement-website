@@ -1,246 +1,182 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { FileText, ShoppingCart, AlertTriangle, Scale, RefreshCw, Ban } from "lucide-react"
+import { AlertTriangle, CreditCard, FileText, Scale, ShieldCheck, UserRound } from "lucide-react"
 
 export const metadata = {
-  title: "Terms of Service | SS Supplement",
+  title: "Terms and Conditions | SS Supplements",
   description:
-    "Read the terms and conditions governing the use of SS Supplement's website and purchase of products.",
+    "Read the terms and conditions for using SS Supplements and placing orders on our website in India.",
 }
 
-export default function TermsOfServicePage() {
+export default function TermsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main>
-        {/* Hero */}
         <section className="bg-gradient-to-r from-primary to-accent py-20">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Terms of Service</h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Please read these terms carefully before using our website or services.
+            <h1 className="text-4xl font-bold text-white md:text-5xl">Terms and Conditions</h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-white/85 md:text-xl">
+              Please read these terms carefully before using the SS Supplements website or placing an order.
             </p>
           </div>
         </section>
 
-        {/* Content */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto space-y-10">
-              <p className="text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Effective Date:</strong> January 1, 2026
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Welcome to SS Supplement. By accessing or using our website{" "}
-                <span className="text-primary font-medium">sssupplement.com</span>, you agree to be bound by these
-                Terms of Service. If you do not agree with any part of these terms, please do not use our website.
+            <div className="mx-auto max-w-3xl space-y-10">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                <strong className="text-foreground">Effective Date:</strong> April 12, 2026
               </p>
 
-              {/* Section 1 */}
+              <p className="leading-relaxed text-muted-foreground">
+                These Terms and Conditions govern your access to and use of the SS Supplements website and the
+                purchase of products sold through our platform. By browsing this website, creating an account, or
+                placing an order, you agree to be bound by these terms, our published policies, and applicable laws of
+                India.
+              </p>
+
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                     <FileText className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">1. General Terms</h2>
+                  <h2 className="text-2xl font-bold text-foreground">1. Website Use</h2>
                 </div>
-                <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-2">
-                  <li>You must be at least 18 years of age to use this website or make purchases.</li>
-                  <li>
-                    By placing an order, you confirm that all information provided is accurate and complete.
-                  </li>
-                  <li>
-                    We reserve the right to refuse service, terminate accounts, or cancel orders at our sole
-                    discretion.
-                  </li>
-                  <li>
-                    All content on this website, including text, images, logos, and graphics, is the property of SS
-                    Supplement and is protected by copyright laws.
-                  </li>
+                <ul className="ml-2 list-disc space-y-2 pl-4 text-muted-foreground">
+                  <li>You agree to use this website only for lawful purposes.</li>
+                  <li>You must provide accurate, current, and complete information while creating an account or placing an order.</li>
+                  <li>You shall not misuse the website, attempt unauthorized access, or interfere with site security or performance.</li>
+                  <li>We may suspend or refuse service if we reasonably believe an account or transaction is fraudulent, abusive, or unlawful.</li>
                 </ul>
               </div>
 
-              {/* Section 2 */}
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <ShoppingCart className="h-5 w-5 text-primary" />
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <UserRound className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">2. Orders & Payments</h2>
+                  <h2 className="text-2xl font-bold text-foreground">2. Account Responsibility</h2>
                 </div>
-                <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-2">
-                  <li>
-                    All prices are listed in Indian Rupees (INR) and are inclusive of applicable taxes unless stated
-                    otherwise.
-                  </li>
-                  <li>
-                    We accept payments via UPI, credit/debit cards, net banking, wallets, and Cash on Delivery (COD)
-                    where available.
-                  </li>
-                  <li>
-                    An order is confirmed only after successful payment verification. We reserve the right to cancel
-                    orders due to pricing errors, stock unavailability, or suspected fraud.
-                  </li>
-                  <li>
-                    COD orders may require additional verification. A nominal COD fee may apply.
-                  </li>
-                  <li>
-                    Promotional discounts and coupon codes cannot be combined unless explicitly stated.
-                  </li>
+                <ul className="ml-2 list-disc space-y-2 pl-4 text-muted-foreground">
+                  <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+                  <li>All activity carried out through your account is deemed to be authorized by you unless reported otherwise.</li>
+                  <li>Please notify us immediately if you suspect unauthorized access to your account or order history.</li>
                 </ul>
               </div>
 
-              {/* Section 3 */}
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-foreground">3. Orders, Pricing, and Payments</h2>
+                </div>
+                <ul className="ml-2 list-disc space-y-2 pl-4 text-muted-foreground">
+                  <li>All prices are displayed in INR and are inclusive or exclusive of taxes as shown at checkout.</li>
+                  <li>Orders are confirmed only after successful payment authorization and acceptance by SS Supplements.</li>
+                  <li>We reserve the right to cancel or limit any order in cases of stock unavailability, pricing errors, failed verification, or suspected fraud.</li>
+                  <li>Available payment methods may include UPI, credit cards, debit cards, netbanking, EMI, No Cost EMI, and Pay Later through Razorpay, subject to availability.</li>
+                </ul>
+              </div>
+
+              <div className="rounded-xl border border-border bg-secondary/40 p-6">
+                <h2 className="mb-3 text-xl font-bold text-foreground">EMI, No Cost EMI, and Pay Later</h2>
+                <p className="leading-relaxed text-muted-foreground">
+                  EMI, No Cost EMI, and Pay Later options are provided entirely by third-party banks and lending
+                  partners through Razorpay. SS Supplements is not liable for any interest charges, late payment fees,
+                  processing fees, credit decisions, or EMI rejections by your bank or lending partner. All questions,
+                  disputes, or claims relating to loan approval, repayment schedules, foreclosure, or lending terms
+                  must be raised directly with the issuing bank or lending partner.
+                </p>
+              </div>
+
+              <div>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-foreground">4. Product Information and Authenticity</h2>
+                </div>
+                <ul className="ml-2 list-disc space-y-2 pl-4 text-muted-foreground">
+                  <li>We aim to keep product descriptions, pricing, labels, and images accurate, but packaging may change from time to time based on manufacturer updates.</li>
+                  <li>SS Supplements sells products represented as genuine and sourced through authorized channels to the best of our knowledge and supply chain controls.</li>
+                  <li>Supplements should be used only as directed on the product label or as advised by a qualified healthcare professional.</li>
+                  <li>Product statements on the website are for general information and are not a substitute for medical advice, diagnosis, or treatment.</li>
+                </ul>
+              </div>
+
+              <div>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                     <AlertTriangle className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">3. Product Information & Disclaimer</h2>
+                  <h2 className="text-2xl font-bold text-foreground">5. Prohibited Conduct</h2>
                 </div>
-                <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-2">
-                  <li>
-                    We strive to display accurate product descriptions, images, and nutritional information. However,
-                    actual products may vary slightly due to packaging updates by manufacturers.
-                  </li>
-                  <li>
-                    Supplements sold on our website are not intended to diagnose, treat, cure, or prevent any disease.
-                    Please consult a healthcare professional before starting any supplement regimen.
-                  </li>
-                  <li>
-                    Results from supplement use may vary from person to person. SS Supplement is not responsible for
-                    individual results.
-                  </li>
-                  <li>
-                    All products are 100% authentic and sourced from authorized distributors. We guarantee the
-                    genuineness of every item sold on our platform.
-                  </li>
+                <ul className="ml-2 list-disc space-y-2 pl-4 text-muted-foreground">
+                  <li>Using false identities, stolen payment instruments, or misleading information.</li>
+                  <li>Copying, scraping, reproducing, or distributing site content without prior written consent.</li>
+                  <li>Uploading viruses, malicious code, or engaging in any activity that may disrupt the platform.</li>
+                  <li>Misusing coupon codes, referral programs, promotional offers, or return and refund processes.</li>
                 </ul>
               </div>
 
-              {/* Section 4 */}
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <RefreshCw className="h-5 w-5 text-primary" />
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <FileText className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">4. Returns & Refunds</h2>
+                  <h2 className="text-2xl font-bold text-foreground">6. Intellectual Property</h2>
                 </div>
-                <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-2">
-                  <li>
-                    Returns are accepted within <strong className="text-foreground">7 days</strong> of delivery for
-                    unopened and unused products in original packaging.
-                  </li>
-                  <li>
-                    Damaged or defective items must be reported within{" "}
-                    <strong className="text-foreground">48 hours</strong> of delivery with photographic evidence.
-                  </li>
-                  <li>
-                    Refunds will be processed within 7-10 business days to the original payment method after the
-                    returned item is inspected.
-                  </li>
-                  <li>
-                    Opened supplements, perishable items, and personalized products are not eligible for return unless
-                    defective.
-                  </li>
-                  <li>
-                    Shipping charges for returns are borne by the customer unless the return is due to our error.
-                  </li>
-                </ul>
-              </div>
-
-              {/* Section 5 */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Ban className="h-5 w-5 text-primary" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-foreground">5. Prohibited Activities</h2>
-                </div>
-                <p className="text-muted-foreground leading-relaxed mb-3">
-                  You agree not to:
+                <p className="leading-relaxed text-muted-foreground">
+                  All content on this website, including text, graphics, logos, product listings, images, icons,
+                  layout, and design elements, is owned by or licensed to SS Supplements and is protected under
+                  applicable intellectual property laws. No content may be copied, reused, republished, or exploited
+                  commercially without prior written permission.
                 </p>
-                <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-2">
-                  <li>Use the website for any unlawful purpose</li>
-                  <li>Attempt to gain unauthorized access to our systems or user accounts</li>
-                  <li>Submit false or misleading information</li>
-                  <li>Engage in fraudulent transactions or misuse promotional offers</li>
-                  <li>Reproduce, distribute, or modify any content from this website without prior consent</li>
-                </ul>
               </div>
 
-              {/* Section 6 */}
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                     <Scale className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">6. Limitation of Liability</h2>
+                  <h2 className="text-2xl font-bold text-foreground">7. Limitation of Liability</h2>
                 </div>
-                <p className="text-muted-foreground leading-relaxed">
-                  SS Supplement shall not be liable for any indirect, incidental, special, or consequential damages
-                  arising from the use of our website or products. Our total liability for any claim shall not exceed
-                  the amount paid by you for the specific product giving rise to the claim.
+                <p className="leading-relaxed text-muted-foreground">
+                  To the maximum extent permitted by law, SS Supplements shall not be liable for indirect, incidental,
+                  punitive, or consequential losses arising from your use of the website, payment failures caused by
+                  third parties, courier delays, or misuse of products. Our aggregate liability in relation to any
+                  order shall not exceed the amount paid by you for that specific order.
                 </p>
               </div>
 
-              {/* Section 7 */}
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">7. Account Responsibility</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  You are responsible for maintaining the confidentiality of your account credentials. Any activity
-                  that occurs under your account is your responsibility. Notify us immediately at{" "}
-                  <a href="mailto:info.sssupplements@gmail.com" className="text-primary hover:underline">
+                <h2 className="mb-4 text-2xl font-bold text-foreground">8. Governing Law and Jurisdiction</h2>
+                <p className="leading-relaxed text-muted-foreground">
+                  These Terms and Conditions shall be governed by the laws of India. Subject to applicable consumer
+                  protection laws, disputes arising from the use of this website or any purchase transaction shall be
+                  subject to the courts having jurisdiction in Haldia, West Bengal.
+                </p>
+              </div>
+
+              <div>
+                <h2 className="mb-4 text-2xl font-bold text-foreground">9. Updates to These Terms</h2>
+                <p className="leading-relaxed text-muted-foreground">
+                  We may update these Terms and Conditions from time to time to reflect business, legal, or operational
+                  changes. The revised version will be posted on this page with the updated effective date.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-border bg-secondary/50 p-6">
+                <h2 className="mb-3 text-xl font-bold text-foreground">Contact</h2>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  For questions regarding these Terms and Conditions, please contact SS Supplements at
+                  <a href="mailto:info.sssupplements@gmail.com" className="ml-1 text-primary hover:underline">
                     info.sssupplements@gmail.com
-                  </a>{" "}
-                  if you suspect unauthorized use of your account.
+                  </a>
+                  <span> or +91 95478 99170.</span>
                 </p>
-              </div>
-
-              {/* Section 8 */}
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">8. Governing Law</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  These Terms of Service are governed by and construed in accordance with the laws of India. Any
-                  disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts in
-                  Gurgaon, Haryana.
-                </p>
-              </div>
-
-              {/* Section 9 */}
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">9. Changes to Terms</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We reserve the right to modify these Terms of Service at any time. Updated terms will be posted on
-                  this page with a revised date. Continued use of the website after changes constitutes acceptance of
-                  the updated terms.
-                </p>
-              </div>
-
-              {/* Contact */}
-              <div className="bg-secondary/50 rounded-xl p-6 border border-border">
-                <h2 className="text-xl font-bold text-foreground mb-3">Questions?</h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  If you have any questions about these Terms of Service, please contact us:
-                </p>
-                <ul className="text-sm text-muted-foreground mt-3 space-y-1">
-                  <li>
-                    <strong className="text-foreground">Email:</strong>{" "}
-                    <a href="mailto:info.sssupplements@gmail.com" className="text-primary hover:underline">
-                      info.sssupplements@gmail.com
-                    </a>
-                  </li>
-                  <li>
-                    <strong className="text-foreground">Phone:</strong> +91 95478 99170
-                  </li>
-                  <li>
-                    <strong className="text-foreground">Address:</strong> Haldia, Bhabanipur ,Babajibasa, 721657
-                    <br />
-                    Near Ambuja City centre Mall
-                    <br />
-                    Opposite Meghnath Saha institute of technology
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
