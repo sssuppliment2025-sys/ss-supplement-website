@@ -60,8 +60,8 @@ Message: ${formData.message}
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+        <main className="container mx-auto px-4 py-12">
+        <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Briefcase className="h-8 w-8 text-primary" />
@@ -72,8 +72,8 @@ Message: ${formData.message}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+            <div className="lg:col-span-3">
               <Card className="bg-card border-border">
                 <CardHeader>
                   <CardTitle className="text-foreground">Send us your enquiry</CardTitle>
@@ -150,7 +150,7 @@ Message: ${formData.message}
               </Card>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 lg:col-span-2">
               <Card className="bg-card border-border">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-3 min-w-0">

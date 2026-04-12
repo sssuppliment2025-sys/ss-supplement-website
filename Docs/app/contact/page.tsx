@@ -45,21 +45,27 @@ export default function ContactPage() {
                     <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <p className="font-medium text-foreground">Email</p>
-                      <p>[support@sssupplements.com]</p>
+                      <p>info.sssupplements@gmail.com</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <Phone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <p className="font-medium text-foreground">Phone Number</p>
-                      <p>[+91-XXXXXXXXXX]</p>
+                      <p>+91 95478 99170</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <p className="font-medium text-foreground">Office Address</p>
-                      <p>[Your registered office or business address in India]</p>
+                      <p>
+                        Haldia, Bhabanipur, Babajibasa, 721657
+                        <br />
+                        Near Ambuja City Centre Mall
+                        <br />
+                        Opposite Meghnath Saha Institute of Technology
+                      </p>
                     </div>
                   </div>
                 </div>
