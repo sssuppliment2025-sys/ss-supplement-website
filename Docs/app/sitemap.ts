@@ -38,6 +38,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: "https://www.sssupplement.com/consumer-policy",
+      lastModified: new Date(),
+      priority: 0.7,
+    },
+    {
       url: "https://www.sssupplement.com/faq",
       lastModified: new Date(),
       priority: 0.7,

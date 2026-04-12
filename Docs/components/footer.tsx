@@ -54,6 +54,7 @@ export function Footer() {
               <li><Link href="/about" className="text-muted-foreground hover:text-primary">About Us</Link></li>
               <li><Link href="/contact" className="text-muted-foreground hover:text-primary">Contact Us</Link></li>
               <li><Link href="/track-order" className="text-muted-foreground hover:text-primary">Track Order</Link></li>
+              <li><Link href="/consumer-policy" className="text-muted-foreground hover:text-primary">Consumer Policy</Link></li>
               <li><Link href="/returns" className="text-muted-foreground hover:text-primary">Cancellation & Refunds</Link></li>
               <li><Link href="/faq" className="text-muted-foreground hover:text-primary">FAQs</Link></li>
             </ul>
