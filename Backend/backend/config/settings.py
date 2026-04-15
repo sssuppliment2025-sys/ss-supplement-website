@@ -5,10 +5,8 @@ Django settings for the Referral Coin System backend.
 import os
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR.parent / ".env")
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
@@ -124,7 +122,7 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://192.168.1.102:3000,https://supliment-project.vercel.app,https://ss-supplement-website.onrender.com,https://ss-supplement-website.vercel.app"
+    "http://localhost:3000,http://192.168.1.102:3000,https://supliment-project.vercel.app"
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
@@ -152,11 +150,17 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
 MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
 
-RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
-RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 

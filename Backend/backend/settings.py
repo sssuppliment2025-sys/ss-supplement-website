@@ -5,10 +5,8 @@ Django settings for the Referral Coin Backend.
 import os
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
 
 # ---------------------------------------------------------------------------
 # Core
@@ -197,10 +195,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
 MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
-RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
-RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
