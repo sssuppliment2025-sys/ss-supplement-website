@@ -17,8 +17,7 @@ import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import emailjs from "@emailjs/browser"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
+import { API_BASE } from "@/lib/api"
 const ADMIN_UPI_ID = "8001101055-5@ybl"
 
 interface OrderQuote {
@@ -166,7 +165,7 @@ export default function CheckoutPage() {
     }
 
     setLoadingQuote(true)
-    fetch(`${API_URL}/api/orders/quote/`, {
+    fetch(`${API_BASE}/api/orders/quote/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -270,7 +269,7 @@ export default function CheckoutPage() {
     const token = localStorage.getItem("token") || localStorage.getItem("access")
     if (!token) throw new Error("Authentication token is missing.")
 
-    const response = await fetch(`${API_URL}/api/orders/razorpay/verify/`, {
+    const response = await fetch(`${API_BASE}/api/orders/razorpay/verify/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -309,7 +308,7 @@ export default function CheckoutPage() {
         throw new Error("Please log in before continuing to payment.")
       }
 
-      const createResponse = await fetch(`${API_URL}/api/orders/razorpay/create/`, {
+      const createResponse = await fetch(`${API_BASE}/api/orders/razorpay/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -524,7 +523,7 @@ export default function CheckoutPage() {
         final_total: Number(finalTotal.toFixed(2))
       })
 
-      const orderRes = await fetch(`${API_URL}/api/orders/`, {
+      const orderRes = await fetch(`${API_BASE}/api/orders/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

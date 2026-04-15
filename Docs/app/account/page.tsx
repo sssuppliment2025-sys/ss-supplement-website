@@ -17,8 +17,7 @@ import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+import { API_BASE } from "@/lib/api"
 
 const INDIAN_STATES = [
   "WEST BENGAL"
@@ -67,7 +66,7 @@ export default function AccountPage() {
       return
     }
 
-    fetch(`${API_URL}/api/profileForAccount/`, {
+    fetch(`${API_BASE}/api/profileForAccount/`, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -138,7 +137,7 @@ export default function AccountPage() {
       const token = localStorage.getItem("access")
       const formattedAddress = getFormattedAddress()
       
-      const response = await fetch(`${API_URL}/api/profileForAccount/`, {
+      const response = await fetch(`${API_BASE}/api/profileForAccount/`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -241,7 +240,7 @@ export default function AccountPage() {
         confirm_password: confirmPassword,
       }
 
-      const response = await fetch(`${API_URL}/api/auth/change-password/`, {
+      const response = await fetch(`${API_BASE}/api/auth/change-password/`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

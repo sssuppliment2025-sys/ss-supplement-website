@@ -1,8 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-
-const API_BASE = "https://ss-supplement-website.onrender.com" // process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+import { API_BASE } from "@/lib/api"
 
 interface WishlistContextType {
   wishlistIds: string[]

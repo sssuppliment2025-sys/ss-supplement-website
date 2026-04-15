@@ -13,8 +13,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
+import { API_BASE } from "@/lib/api"
 
 export default function CartPage() {
   const router = useRouter()
@@ -47,7 +46,7 @@ export default function CartPage() {
       return
     }
 
-    fetch(`${API_URL}/api/profile/`, {
+    fetch(`${API_BASE}/api/profile/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
