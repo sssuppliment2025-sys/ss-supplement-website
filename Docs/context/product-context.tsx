@@ -30,7 +30,43 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined)
 const buildImagesArray = (p: Product): string[] =>
   [p.image, p.image1, p.image2, p.image3, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean) as string[]
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+
+// ✅ Fallback: Load products from CSV when backend is unavailable
+const loadProductsFromCSV = async (): Promise<Product[]> => {
+  try {
+    const response = await fetch('/products_full_export_backend_live.csv')
+    if (!response.ok) throw new Error('CSV file not found')
+    
+    const csvText = await response.text()
+    const lines = csvText.split('\n').filter(line => line.trim())
+    if (lines.length < 2) return []
+    
+    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim())
+    
+    const products: Product[] = []
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim())
+      if (values.length < headers.length) continue
+      
+      const row: Record<string, unknown> = {}
+      headers.forEach((header, index) => {
+        row[header] = values[index] || ''
+      })
+      
+      const product = normalizeProduct(row)
+      if (product) {
+        products.push(product)
+      }
+    }
+    
+    console.log(`✅ Loaded ${products.length} products from CSV fallback`)
+    return products
+  } catch (error) {
+    console.error('❌ Failed to load products from CSV:', error)
+    return []
+  }
+}
 
 const cleanQuotedString = (value: unknown): string => {
   if (typeof value !== "string") return ""
@@ -177,11 +213,19 @@ export function ProductProvider({ children }: { children: ReactNode }) {
           .map((row) => normalizeProduct(row))
           .filter((row): row is Product => Boolean(row))
 
-        setProducts(normalized)
+        if (normalized.length > 0) {
+          setProducts(normalized)
+          console.log(`✅ Loaded ${normalized.length} products from backend`)
+        } else {
+          throw new Error('No products returned from backend')
+        }
       } catch (error) {
-        console.warn("Failed to load products from backend:", error)
+        console.warn("❌ Failed to load products from backend, trying CSV fallback:", error)
+        
+        // ✅ Fallback to CSV loading
         if (mounted) {
-          setProducts([])
+          const csvProducts = await loadProductsFromCSV()
+          setProducts(csvProducts)
         }
       }
     }

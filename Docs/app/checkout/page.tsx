@@ -17,7 +17,8 @@ import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import emailjs from "@emailjs/browser"
-import { API_BASE } from "@/lib/api"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 const ADMIN_UPI_ID = "8001101055-5@ybl"
 
 interface OrderQuote {
@@ -35,6 +36,48 @@ interface OrderQuote {
   earned_points: number
 }
 
+// ✅ HELPER: Extract price with proper error handling
+function extractPrice(product: any, selectedFlavor: string): number {
+  try {
+    if (!product) {
+      console.warn("⚠️ Product is null/undefined, returning 0")
+      return 0
+    }
+
+    // If flavors is a string (legacy format), use product.price
+    if (typeof product.flavors === "string") {
+      const price = parseFloat(product.price)
+      if (isNaN(price)) {
+        console.warn(`⚠️ Invalid price for product ${product.name}: ${product.price}`)
+        return 0
+      }
+      return price
+    }
+
+    // If flavors is an array, find matching flavor
+    if (Array.isArray(product.flavors) && selectedFlavor) {
+      const flavor = product.flavors.find((f: any) => f.name === selectedFlavor)
+      if (flavor && flavor.price) {
+        const price = parseFloat(flavor.price)
+        if (!isNaN(price)) {
+          return price
+        }
+      }
+    }
+
+    // Fallback to product.price
+    const price = parseFloat(product.price)
+    if (isNaN(price)) {
+      console.warn(`⚠️ Invalid price for product ${product.name}: ${product.price}`)
+      return 0
+    }
+    return price
+  } catch (error) {
+    console.error(`❌ Error extracting price for product ${product?.name}:`, error)
+    return 0
+  }
+}
+
 async function parseJsonSafe(res: Response) {
   const raw = await res.text()
   try {
@@ -44,6 +87,28 @@ async function parseJsonSafe(res: Response) {
     throw new Error(
       `Invalid server response (${res.status}). Expected JSON, got: ${preview || "empty response"}`
     )
+  }
+}
+
+// ✅ HELPER: Enhanced fetch with better error handling
+async function fetchWithErrorContext(url: string, options: RequestInit, contextLabel: string) {
+  try {
+    console.log(`🔄 Fetching ${contextLabel}: ${url}`)
+    const response = await fetch(url, {
+      ...options,
+      signal: AbortSignal.timeout(15000), // 15s timeout
+    })
+    return response
+  } catch (error: any) {
+    if (error.name === "AbortError") {
+      throw new Error(`${contextLabel} timed out (15s). Backend may be down or slow.`)
+    }
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw new Error(
+        `${contextLabel} failed: Network error. Check if backend is running at ${API_URL} and CORS is enabled. Try refreshing the page or contact support if the issue persists.`
+      )
+    }
+    throw error
   }
 }
 
@@ -133,9 +198,7 @@ export default function CheckoutPage() {
     productId: item.product.id,
     name: item.product.name,
     quantity: item.quantity,
-    price: typeof item.product.flavors === "string"
-      ? item.product.price
-      : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price,
+    price: extractPrice(item.product, item.selectedFlavor),
     selectedFlavor: item.selectedFlavor,
     selectedWeight: item.selectedWeight,
   }))
@@ -165,32 +228,41 @@ export default function CheckoutPage() {
     }
 
     setLoadingQuote(true)
-    fetch(`${API_BASE}/api/orders/quote/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    fetchWithErrorContext(
+      `${API_URL}/api/orders/quote/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: quoteItemsPayload,
+          use_coins: useCoins,
+        }),
       },
-      body: JSON.stringify({
-        items: quoteItemsPayload,
-        use_coins: useCoins,
-      }),
-    })
+      "Order quote calculation"
+    )
       .then(async (res) => {
         const payload = await parseJsonSafe(res)
         if (!res.ok || !payload?.success) {
-          throw new Error(payload?.error || "Failed to calculate checkout summary")
+          const errorMsg = payload?.error || "Failed to calculate checkout summary"
+          console.error(`❌ Quote API Error (${res.status}):`, errorMsg)
+          throw new Error(errorMsg)
         }
 
+        console.log("✅ Quote fetched successfully:", payload.data)
         const backendQuote = payload.data as OrderQuote
         setQuote(backendQuote)
         setPoints(backendQuote.points || 0)
       })
       .catch((error) => {
+        console.error("❌ Quote fetch error:", error)
         setQuote(null)
+        const errorMessage = error?.message || "Failed to load checkout summary"
         toast({
-          title: "Error",
-          description: error?.message || "Failed to load reward coins",
+          title: "Failed to Load Prices",
+          description: errorMessage,
           variant: "destructive",
         })
       })
@@ -203,15 +275,13 @@ export default function CheckoutPage() {
   /* ================= ✅ CONDITIONAL SHIPPING CALCULATION ================= */
   // Items subtotal only (no shipping included)
   const localItemsSubtotal = items.reduce((total, item) => {
-    const price = typeof item.product.flavors === "string"
-      ? item.product.price
-      : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+    const price = extractPrice(item.product, item.selectedFlavor)
     return total + (price * item.quantity)
   }, 0)
 
-  // Shipping is free for all orders
-  const localIsFreeShipping = true
-  const localShippingFee = SHIPPING_FEE
+  // ✅ Shipping fee: FREE if subtotal >= ₹1000, else ₹50
+  const localIsFreeShipping = localItemsSubtotal >= SHIPPING_THRESHOLD
+  const localShippingFee = localIsFreeShipping ? 0 : SHIPPING_FEE
 
   // ✅ Cart total WITH shipping (for 4% coin calculation)
   const localCartTotalWithShipping = localItemsSubtotal + localShippingFee
@@ -269,25 +339,32 @@ export default function CheckoutPage() {
     const token = localStorage.getItem("token") || localStorage.getItem("access")
     if (!token) throw new Error("Authentication token is missing.")
 
-    const response = await fetch(`${API_BASE}/api/orders/razorpay/verify/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const response = await fetchWithErrorContext(
+      `${API_URL}/api/orders/razorpay/verify/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...paymentData,
+          items: quoteItemsPayload,
+          use_coins: useCoins,
+          address: formData,
+        }),
       },
-      body: JSON.stringify({
-        ...paymentData,
-        items: quoteItemsPayload,
-        use_coins: useCoins,
-        address: formData,
-      }),
-    })
+      "Payment verification"
+    )
 
     const result = await parseJsonSafe(response)
     if (!response.ok || !result?.success) {
-      throw new Error(result?.error || "Payment verification failed.")
+      const errorMsg = result?.error || "Payment verification failed."
+      console.error(`❌ Payment verification error (${response.status}):`, errorMsg)
+      throw new Error(errorMsg)
     }
 
+    console.log("✅ Payment verified successfully:", result)
     return result
   }
 
@@ -308,22 +385,30 @@ export default function CheckoutPage() {
         throw new Error("Please log in before continuing to payment.")
       }
 
-      const createResponse = await fetch(`${API_BASE}/api/orders/razorpay/create/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const createResponse = await fetchWithErrorContext(
+        `${API_URL}/api/orders/razorpay/create/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            items: quoteItemsPayload,
+            use_coins: useCoins,
+          }),
         },
-        body: JSON.stringify({
-          items: quoteItemsPayload,
-          use_coins: useCoins,
-        }),
-      })
+        "Razorpay order creation"
+      )
 
       const createData = await parseJsonSafe(createResponse)
       if (!createResponse.ok || !createData?.success) {
-        throw new Error(createData?.error || "Failed to create Razorpay payment order.")
+        const errorMsg = createData?.error || "Failed to create Razorpay payment order."
+        console.error(`❌ Razorpay create error (${createResponse.status}):`, errorMsg)
+        throw new Error(errorMsg)
       }
+
+      console.log("✅ Razorpay order created:", createData)
 
       const scriptLoaded = await loadRazorpayScript()
       if (!scriptLoaded) {
@@ -377,9 +462,7 @@ export default function CheckoutPage() {
             const localOrder = {
               id: savedOrderId,
               items: items.map((item) => {
-                const price = typeof item.product.flavors === "string"
-                  ? item.product.price
-                  : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+                const price = extractPrice(item.product, item.selectedFlavor)
                 return {
                   product: item.product.name,
                   flavor: item.selectedFlavor || "",
@@ -523,20 +606,24 @@ export default function CheckoutPage() {
         final_total: Number(finalTotal.toFixed(2))
       })
 
-      const orderRes = await fetch(`${API_BASE}/api/orders/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const orderRes = await fetchWithErrorContext(
+        `${API_URL}/api/orders/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            items: quoteItemsPayload,
+            use_coins: useCoins,
+            payment_method: paymentMethod,
+            utr_number: paymentMethod === "upi" ? utrNumber : null,
+            address: formData,
+          }),
         },
-        body: JSON.stringify({
-          items: quoteItemsPayload,
-          use_coins: useCoins,
-          payment_method: paymentMethod,
-          utr_number: paymentMethod === "upi" ? utrNumber : null,
-          address: formData,
-        }),
-      })
+        "Order creation"
+      )
 
       interface ApiError {
         error?: string
@@ -561,15 +648,15 @@ export default function CheckoutPage() {
       
       if (!orderRes.ok) {
         const error = orderData as ApiError
-        console.error("Order error:", error)
-        throw new Error(
-          error.error || 
+        const errorMsg = error.error || 
           error.detail || 
           error.message || 
           "Failed to create order"
-        )
+        console.error(`❌ Order creation error (${orderRes.status}):`, errorMsg)
+        throw new Error(errorMsg)
       }
 
+      console.log("✅ Order created successfully:", orderData)
       const successData = orderData as ApiSuccess
       const earnedPointsFromBackend = successData.order?.earnedPoints || successData.earnedPoints || 0
       setEarnedPoints(earnedPointsFromBackend)
@@ -602,9 +689,7 @@ export default function CheckoutPage() {
       const localOrder = {
         id: savedOrderId,
         items: items.map((item) => {
-          const price = typeof item.product.flavors === "string"
-            ? item.product.price
-            : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+          const price = extractPrice(item.product, item.selectedFlavor)
           return {
             product: item.product.name,
             flavor: item.selectedFlavor || "",
@@ -914,9 +999,7 @@ export default function CheckoutPage() {
                 {/* Cart Items */}
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {items.map((item) => {
-                    const price = typeof item.product.flavors === "string"
-                      ? item.product.price
-                      : item.product.flavors.find((f) => f.name === item.selectedFlavor)?.price || item.product.price
+                    const price = extractPrice(item.product, item.selectedFlavor)
 
                     return (
                       <div key={`${item.product.id}-${item.selectedFlavor}-${item.selectedWeight}`} className="flex gap-3 p-2 rounded-lg hover:bg-accent">

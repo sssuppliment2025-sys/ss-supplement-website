@@ -7,7 +7,8 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { API_BASE } from "@/lib/api"
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 
 async function parseJsonSafe(res: Response) {
   const raw = await res.text()

@@ -13,7 +13,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
-import { API_BASE } from "@/lib/api"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 
 export default function CartPage() {
   const router = useRouter()
@@ -46,20 +47,22 @@ export default function CartPage() {
       return
     }
 
-    fetch(`${API_BASE}/api/profile/`, {
+    fetch(`${API_URL}/api/profile/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to load profile: ${res.status}`)
+        }
+        return res.json()
+      })
       .then(data => {
         setPoints(data.points || 0)
       })
       .catch(() => {
-        toast({
-          title: "Error",
-          description: "Failed to load reward coins",
-        })
+        setPoints(0)
       })
       .finally(() => setLoadingPoints(false))
   }, [isAuthenticated, toast])
