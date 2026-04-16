@@ -1191,7 +1191,7 @@ export default function CheckoutPage() {
                 >
                   {paymentMethod === "online"
                     ? `Place Order - EMI (Rs.${finalTotal.toLocaleString()})`
-                    : `Place Order - Pay on Delivery (Rs.${finalTotal.toLocaleString()})`}
+                    : `Place Order - Pay on Delivery `}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
