@@ -1149,8 +1149,8 @@ export default function CheckoutPage() {
                   disabled={isSubmitting || loadingPoints || loadingQuote}
                 >
                   {paymentMethod === "online"
-                    ? `Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`
-                    : `Place Order - Pay on Delivery (Rs.${finalTotal.toLocaleString()})`}
+                    ? `Pay Now with Razorpay`
+                    : `Place Order - Pay on Delivery`}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
