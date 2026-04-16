@@ -37,14 +37,69 @@ def serialize_doc(doc):
     """Convert MongoDB document to JSON-serializable dict."""
     if doc is None:
         return None
-    if '_id' in doc:
-        doc['_id'] = str(doc['_id'])
+    if isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    if isinstance(doc, dict):
+        serialized = {}
+        for key, value in doc.items():
+            if key == '_id':
+                serialized[key] = str(value)
+            else:
+                serialized[key] = serialize_doc(value)
+        return serialized
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    if isinstance(doc, datetime):
+        return doc.isoformat()
     return doc
 
 
 def serialize_docs(docs):
     """Convert list of MongoDB documents."""
     return [serialize_doc(doc) for doc in docs]
+
+
+ORDER_STATUS_SEQUENCE = ['pending', 'confirmed', 'packed_and_ready', 'shipped', 'out_for_delivery', 'delivered', 'cancelled']
+ORDER_TIMELINE_KEYS = ['pending', 'confirmed', 'packed_and_ready', 'shipped', 'out_for_delivery', 'delivered', 'cancelled']
+
+
+def _normalize_order_status(value, preserve_shipped=False):
+    if value == 'paid':
+        return 'confirmed'
+    valid_statuses = ORDER_TIMELINE_KEYS if preserve_shipped else ORDER_STATUS_SEQUENCE
+    return value if value in valid_statuses else 'pending'
+
+
+def _parse_iso_datetime(value):
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value.astimezone(timezone.utc) if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    if isinstance(value, str):
+        normalized = value.replace('Z', '+00:00')
+        try:
+            parsed = datetime.fromisoformat(normalized)
+            return parsed.astimezone(timezone.utc) if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+        except ValueError:
+            return None
+    return None
+
+
+def _get_order_status_timeline(order):
+    timeline = {}
+    raw_timeline = order.get('status_timeline') or {}
+
+    if isinstance(raw_timeline, dict):
+        for status_key, value in raw_timeline.items():
+            normalized_key = _normalize_order_status(status_key, preserve_shipped=True)
+            parsed_value = _parse_iso_datetime(value)
+            if parsed_value:
+                timeline[normalized_key] = parsed_value
+
+    created_at = _parse_iso_datetime(order.get('created_at')) or datetime.now(timezone.utc)
+    current_status = _normalize_order_status(order.get('status'))
+    timeline.setdefault(current_status, created_at)
+    return timeline
 
 
 # ─── Auth Views ──────────────────────────────────────────────────────
@@ -165,7 +220,7 @@ class DashboardView(APIView):
 
         # Calculate total revenue from delivered orders
         pipeline = [
-            {'$match': {'status': {'$in': ['confirmed', 'shipped', 'delivered']}}},
+            {'$match': {'status': {'$in': ['confirmed', 'packed_and_ready', 'shipped', 'out_for_delivery', 'delivered']}}},
             {'$group': {'_id': None, 'total': {'$sum': '$cash_paid'}}}
         ]
         revenue_result = list(orders.aggregate(pipeline))
@@ -631,24 +686,51 @@ class OrderStatusView(APIView):
     authentication_classes = [AdminJWTAuthentication]
 
     def patch(self, request, pk):
-        new_status = request.data.get('status')
-        valid_statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
-        if new_status not in valid_statuses:
+        new_status = _normalize_order_status(request.data.get('status'))
+        if new_status not in ORDER_STATUS_SEQUENCE:
             return Response(
-                {'success': False, 'error': f'Invalid status. Must be one of: {valid_statuses}'},
+                {'success': False, 'error': f'Invalid status. Must be one of: {ORDER_STATUS_SEQUENCE}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         collection = get_orders_collection()
         try:
-            result = collection.update_one(
-                {'_id': ObjectId(pk)},
-                {'$set': {'status': new_status}}
-            )
+            order = collection.find_one({'_id': ObjectId(pk)})
         except InvalidId:
             return Response(
                 {'success': False, 'error': 'Invalid order ID.'},
                 status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not order:
+            return Response(
+                {'success': False, 'error': 'Order not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        status_changed_at = _parse_iso_datetime(request.data.get('status_changed_at')) or datetime.now(timezone.utc)
+        status_timeline = _get_order_status_timeline(order)
+        if new_status == 'shipped' and 'packed_and_ready' not in status_timeline:
+            status_timeline['packed_and_ready'] = status_changed_at
+        if new_status == 'out_for_delivery' and 'shipped' not in status_timeline:
+            status_timeline['shipped'] = status_changed_at
+        status_timeline[new_status] = status_changed_at
+
+        try:
+            result = collection.update_one(
+                {'_id': ObjectId(pk)},
+                {
+                    '$set': {
+                        'status': new_status,
+                        'status_timeline': status_timeline,
+                        'updated_at': datetime.now(timezone.utc),
+                    }
+                }
+            )
+        except PyMongoError as exc:
+            return Response(
+                {'success': False, 'error': str(exc)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
         if result.matched_count == 0:

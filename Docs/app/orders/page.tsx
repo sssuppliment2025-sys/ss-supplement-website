@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   CalendarDays,
@@ -29,13 +28,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { useAuth } from "@/context/auth-context"
 import { useProducts } from "@/context/product-context"
 import { cn } from "@/lib/utils"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 
-type CanonicalStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled"
+type CanonicalStatus = "pending" | "confirmed" | "packed_and_ready" | "shipped" | "out_for_delivery" | "delivered" | "cancelled"
+type CurrentStatus = "pending" | "confirmed" | "packed_and_ready" | "shipped" | "out_for_delivery" | "delivered" | "cancelled"
 type StepState = "complete" | "current" | "upcoming" | "cancelled"
 
 interface OrderItem {
@@ -61,6 +67,7 @@ interface Order {
   paymentMethod: string
   status: string
   createdAt: string
+  statusTimeline?: Partial<Record<CanonicalStatus, string>>
   userId?: string | number
   shippingFee?: number
   coinsUsed?: number
@@ -78,7 +85,7 @@ interface TimelineStep {
   key: string
   title: string
   detail: string
-  timeLabel: string
+  timeLabel?: string
   icon: LucideIcon
   state: StepState
 }
@@ -86,18 +93,22 @@ interface TimelineStep {
 const STATUS_RANK: Record<Exclude<CanonicalStatus, "cancelled">, number> = {
   pending: 0,
   confirmed: 1,
-  shipped: 2,
-  delivered: 3,
+  packed_and_ready: 2,
+  shipped: 3,
+  out_for_delivery: 4,
+  delivered: 5,
 }
 
 const PREVIEW_BLUEPRINT: Array<{ key: Exclude<CanonicalStatus, "cancelled">; label: string; icon: LucideIcon }> = [
   { key: "pending", label: "Placed", icon: ShoppingBag },
   { key: "confirmed", label: "Confirmed", icon: CheckCheck },
+  { key: "packed_and_ready", label: "Packed", icon: Package },
   { key: "shipped", label: "Shipped", icon: Truck },
+  { key: "out_for_delivery", label: "Out for delivery", icon: MapPin },
   { key: "delivered", label: "Delivered", icon: PackageCheck },
 ]
 
-function normalizeStatus(status: string): CanonicalStatus {
+function normalizeStatus(status: string): CurrentStatus {
   switch (status) {
     case "paid":
       return "confirmed"
@@ -106,7 +117,9 @@ function normalizeStatus(status: string): CanonicalStatus {
     case "cancelled":
       return "cancelled"
     case "confirmed":
+    case "packed_and_ready":
     case "shipped":
+    case "out_for_delivery":
     case "delivered":
       return status
     default:
@@ -117,18 +130,6 @@ function normalizeStatus(status: string): CanonicalStatus {
 function parseDate(value: string) {
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? new Date() : date
-}
-
-function addHours(value: Date, hours: number) {
-  const date = new Date(value)
-  date.setHours(date.getHours() + hours)
-  return date
-}
-
-function addDays(value: Date, days: number) {
-  const date = new Date(value)
-  date.setDate(date.getDate() + days)
-  return date
 }
 
 function formatDate(value: string) {
@@ -144,11 +145,15 @@ function formatDate(value: string) {
 
 function formatDateTime(value: Date) {
   return value.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
     day: "numeric",
     month: "short",
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
   })
 }
 
@@ -187,11 +192,27 @@ function getStatusMeta(status: string) {
         badgeClass: "border-sky-200 bg-sky-50 text-sky-700",
         dotClass: "bg-sky-500",
       }
+    case "packed_and_ready":
+      return {
+        label: "Packed and ready",
+        title: "Packed and ready",
+        note: "Your items have been packed and are ready for courier handoff.",
+        badgeClass: "border-amber-200 bg-amber-50 text-amber-700",
+        dotClass: "bg-amber-500",
+      }
     case "shipped":
       return {
         label: "Shipped",
-        title: "On the way",
+        title: "Shipped",
         note: "Your package has been handed to the courier partner.",
+        badgeClass: "border-sky-200 bg-sky-50 text-sky-700",
+        dotClass: "bg-sky-500",
+      }
+    case "out_for_delivery":
+      return {
+        label: "Out for delivery",
+        title: "Out for delivery",
+        note: "Your package is on the final delivery run to your address.",
         badgeClass: "border-indigo-200 bg-indigo-50 text-indigo-700",
         dotClass: "bg-indigo-500",
       }
@@ -261,6 +282,10 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
   const baseDate = parseDate(order.createdAt)
   const paymentLabel = getPaymentLabel(order.paymentMethod)
   const canonicalStatus = normalizeStatus(order.status)
+  const getTimelineTime = (status: CanonicalStatus) => {
+    const value = order.statusTimeline?.[status]
+    return value ? formatDateTime(parseDate(value)) : undefined
+  }
 
   if (canonicalStatus === "cancelled") {
     return [
@@ -276,20 +301,20 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
         key: "cancelled",
         title: "Order cancelled",
         detail: "This order was cancelled before delivery. Please contact support if you need help.",
-        timeLabel: formatDateTime(addHours(baseDate, 6)),
+        timeLabel: getTimelineTime("cancelled"),
         icon: XCircle,
         state: "cancelled",
       },
     ]
   }
 
-  const timelineStateByStatus: Record<Exclude<CanonicalStatus, "cancelled">, Record<string, StepState>> = {
+  const timelineStateByStatus: Record<Exclude<CurrentStatus, "cancelled">, Record<string, StepState>> = {
     pending: {
       placed: "current",
       confirmed: "upcoming",
       packed: "upcoming",
       shipped: "upcoming",
-      out: "upcoming",
+      out_for_delivery: "upcoming",
       delivered: "upcoming",
     },
     confirmed: {
@@ -297,7 +322,15 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
       confirmed: "current",
       packed: "upcoming",
       shipped: "upcoming",
-      out: "upcoming",
+      out_for_delivery: "upcoming",
+      delivered: "upcoming",
+    },
+    packed_and_ready: {
+      placed: "complete",
+      confirmed: "complete",
+      packed: "current",
+      shipped: "upcoming",
+      out_for_delivery: "upcoming",
       delivered: "upcoming",
     },
     shipped: {
@@ -305,7 +338,15 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
       confirmed: "complete",
       packed: "complete",
       shipped: "current",
-      out: "upcoming",
+      out_for_delivery: "upcoming",
+      delivered: "upcoming",
+    },
+    out_for_delivery: {
+      placed: "complete",
+      confirmed: "complete",
+      packed: "complete",
+      shipped: "complete",
+      out_for_delivery: "current",
       delivered: "upcoming",
     },
     delivered: {
@@ -313,7 +354,7 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
       confirmed: "complete",
       packed: "complete",
       shipped: "complete",
-      out: "complete",
+      out_for_delivery: "complete",
       delivered: "current",
     },
   }
@@ -333,7 +374,7 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
       key: "confirmed",
       title: "Order confirmed",
       detail: "Our team has reviewed the order and started processing it.",
-      timeLabel: formatDateTime(addHours(baseDate, 2)),
+      timeLabel: getTimelineTime("confirmed"),
       icon: CheckCheck,
       state: states.confirmed,
     },
@@ -341,7 +382,7 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
       key: "packed",
       title: "Packed and ready",
       detail: "Your items have been packed and prepared for handoff.",
-      timeLabel: formatDateTime(addHours(baseDate, 8)),
+      timeLabel: getTimelineTime("packed_and_ready"),
       icon: Package,
       state: states.packed,
     },
@@ -349,23 +390,23 @@ function buildTimelineSteps(order: Order): TimelineStep[] {
       key: "shipped",
       title: "Shipped",
       detail: "The courier partner has picked up your package.",
-      timeLabel: formatDateTime(addDays(baseDate, 1)),
+      timeLabel: getTimelineTime("shipped"),
       icon: Truck,
       state: states.shipped,
     },
     {
-      key: "out",
+      key: "out_for_delivery",
       title: "Out for delivery",
       detail: "The package is on the final delivery run to your address.",
-      timeLabel: formatDateTime(addDays(baseDate, 3)),
+      timeLabel: getTimelineTime("out_for_delivery"),
       icon: MapPin,
-      state: states.out,
+      state: states.out_for_delivery,
     },
     {
       key: "delivered",
       title: "Delivered",
       detail: "Your order has been delivered successfully.",
-      timeLabel: formatDateTime(addDays(baseDate, 3)),
+      timeLabel: getTimelineTime("delivered"),
       icon: PackageCheck,
       state: states.delivered,
     },
@@ -423,86 +464,85 @@ function OrderRoadmapDialog({
   const primaryItem = getPrimaryItem(order)
   const statusMeta = getStatusMeta(order.status)
   const timeline = buildTimelineSteps(order)
+  const detailsContent = (
+    <div className="space-y-4 text-sm">
+      <div className="flex items-start gap-4">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-border bg-white">
+          <Image
+            src={imageSrc}
+            alt={primaryItem.product}
+            fill
+            sizes="80px"
+            className="object-contain p-2"
+          />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground sm:line-clamp-2">{primaryItem.product}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{getItemSubtitle(primaryItem)}</p>
+          <p className="mt-3 text-lg font-semibold text-foreground">{formatCurrency(order.total)}</p>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</p>
+        <div
+          className={cn(
+            "mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium",
+            statusMeta.badgeClass,
+          )}
+        >
+          <span className={cn("h-2.5 w-2.5 rounded-full", statusMeta.dotClass)} />
+          {statusMeta.label}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Address</p>
+        <p className="mt-2 text-sm leading-6 text-foreground">
+          {order.address.fullName}
+          <br />
+          {order.address.address}, {order.address.city}, {order.address.state} - {order.address.pincode}
+          <br />
+          {order.address.phone}
+        </p>
+      </div>
+
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Payment</p>
+        <p className="mt-2 text-foreground">{getPaymentLabel(order.paymentMethod)}</p>
+      </div>
+
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Items</p>
+        <div className="mt-2 space-y-2">
+          {order.items.map((item, index) => (
+            <div key={`${order.id}-${index}`} className="rounded-md border border-border/80 px-3 py-2">
+              <p className="text-sm font-medium text-foreground">{item.product}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {getItemSubtitle(item)} x{item.quantity}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button className="bg-[#2874f0] text-white hover:bg-[#1f63cf]">View more</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl gap-0 overflow-hidden border-border p-0">
-        <DialogHeader className="border-b border-border bg-muted/20 px-6 py-5">
+      <DialogContent className="max-h-[calc(100dvh-1rem)] grid-rows-[auto_minmax(0,1fr)] max-w-[calc(100vw-1rem)] gap-0 overflow-hidden border-border p-0 sm:max-h-[calc(100dvh-2rem)] sm:max-w-4xl lg:max-w-6xl">
+        <DialogHeader className="border-b border-border bg-muted/20 px-4 py-4 sm:px-6 sm:py-5">
           <DialogTitle className="text-xl text-foreground">Order Roadmap</DialogTitle>
           <DialogDescription>
             Order #{order.id} . {statusMeta.title}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid max-h-[80vh] gap-0 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <div className="border-b border-border bg-card p-6 lg:border-r lg:border-b-0">
-            <div className="flex items-start gap-4">
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-border bg-white">
-                <Image
-                  src={imageSrc}
-                  alt={primaryItem.product}
-                  fill
-                  sizes="80px"
-                  className="object-contain p-2"
-                />
-              </div>
-              <div className="min-w-0">
-                <p className="line-clamp-2 text-sm font-semibold text-foreground">{primaryItem.product}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{getItemSubtitle(primaryItem)}</p>
-                <p className="mt-3 text-lg font-semibold text-foreground">{formatCurrency(order.total)}</p>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-4 text-sm">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</p>
-                <div
-                  className={cn(
-                    "mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium",
-                    statusMeta.badgeClass,
-                  )}
-                >
-                  <span className={cn("h-2.5 w-2.5 rounded-full", statusMeta.dotClass)} />
-                  {statusMeta.label}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Address</p>
-                <p className="mt-2 text-sm leading-6 text-foreground">
-                  {order.address.fullName}
-                  <br />
-                  {order.address.address}, {order.address.city}, {order.address.state} - {order.address.pincode}
-                  <br />
-                  {order.address.phone}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Payment</p>
-                <p className="mt-2 text-foreground">{getPaymentLabel(order.paymentMethod)}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Items</p>
-                <div className="mt-2 space-y-2">
-                  {order.items.map((item, index) => (
-                    <div key={`${order.id}-${index}`} className="rounded-md border border-border/80 px-3 py-2">
-                      <p className="text-sm font-medium text-foreground">{item.product}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {getItemSubtitle(item)} x{item.quantity}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="overflow-y-auto px-6 py-6">
+        <div className="grid min-h-0 overflow-y-auto overscroll-contain lg:overflow-hidden lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="order-1 min-w-0 px-4 py-5 sm:px-6 sm:py-6 lg:overflow-y-auto">
             <div className="relative pl-2">
               <div className="absolute bottom-0 left-3 top-3 w-px bg-border" />
               <div className="space-y-6">
@@ -522,12 +562,33 @@ function OrderRoadmapDialog({
                       <div className="space-y-1 pb-2">
                         <p className="text-sm font-semibold text-foreground">{step.title}</p>
                         <p className="text-sm leading-6 text-muted-foreground">{step.detail}</p>
-                        <p className="text-xs font-medium text-muted-foreground">{step.timeLabel}</p>
+                        {step.timeLabel ? (
+                          <p className="text-xs font-medium text-muted-foreground">{step.timeLabel}</p>
+                        ) : null}
                       </div>
                     </div>
                   )
                 })}
               </div>
+            </div>
+          </div>
+
+          <div className="order-2 min-h-0 border-t border-border bg-card lg:border-l lg:border-t-0">
+            <div className="lg:hidden">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="details" className="border-b-0">
+                  <AccordionTrigger className="px-4 py-4 text-left text-sm font-semibold text-foreground hover:no-underline">
+                    Order details
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-5">
+                    {detailsContent}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+
+            <div className="hidden h-full overflow-y-auto p-6 lg:block">
+              {detailsContent}
             </div>
           </div>
         </div>
@@ -740,9 +801,6 @@ export default function OrdersPage() {
 
                       <div className="mt-4 flex flex-wrap gap-3">
                         <OrderRoadmapDialog order={order} imageSrc={productImage} />
-                        <Button asChild variant="outline">
-                          <Link href={`/track-order?orderId=${encodeURIComponent(order.id)}`}>Track This Order</Link>
-                        </Button>
                       </div>
 
                       <Button

@@ -63,6 +63,9 @@ export default function TrackOrderPage() {
     switch (status) {
       case "confirmed":
         return <Check className="h-4 w-4" />
+      case "packed_and_ready":
+        return <Package className="h-4 w-4" />
+      case "out_for_delivery":
       case "shipped":
         return <Truck className="h-4 w-4" />
       case "delivered":
@@ -77,6 +80,9 @@ export default function TrackOrderPage() {
     switch (status) {
       case "confirmed":
         return "bg-primary/20 text-primary"
+      case "packed_and_ready":
+        return "bg-warning/20 text-warning"
+      case "out_for_delivery":
       case "shipped":
         return "bg-accent/20 text-accent"
       case "delivered":
@@ -167,7 +173,7 @@ export default function TrackOrderPage() {
                     </div>
                     <Badge className={`${getStatusColor(matchedOrder.status)} flex items-center gap-1`}>
                       {getStatusIcon(matchedOrder.status)}
-                      {matchedOrder.status.charAt(0).toUpperCase() + matchedOrder.status.slice(1)}
+                      {matchedOrder.status.replaceAll("_", " ").replace(/^\w/, (char) => char.toUpperCase())}
                     </Badge>
                   </div>
 

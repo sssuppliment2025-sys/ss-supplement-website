@@ -530,6 +530,16 @@ def _serialize_customer_order(order):
     if hasattr(created_at, "isoformat"):
         created_at = created_at.isoformat()
 
+    raw_status_timeline = order.get("status_timeline") or {}
+    status_timeline = {}
+    if isinstance(raw_status_timeline, dict):
+        for key, value in raw_status_timeline.items():
+            normalized_key = "confirmed" if key == "paid" else key
+            if hasattr(value, "isoformat"):
+                status_timeline[normalized_key] = value.isoformat()
+            elif isinstance(value, str):
+                status_timeline[normalized_key] = value
+
     return {
         "id": order.get("order_id") or str(order.get("_id", "")),
         "_id": str(order.get("_id", "")),
@@ -546,8 +556,9 @@ def _serialize_customer_order(order):
         "total": order.get("cash_paid", 0),
         "address": order.get("address", {}),
         "paymentMethod": order.get("payment_method", ""),
-        "status": order.get("status", "pending"),
+        "status": "confirmed" if order.get("status") == "paid" else order.get("status", "pending"),
         "createdAt": created_at,
+        "statusTimeline": status_timeline,
         "shippingFee": order.get("shipping_fee", 0),
         "coinsUsed": order.get("coins_used", 0),
         "earnedPoints": order.get("earned_points", 0),

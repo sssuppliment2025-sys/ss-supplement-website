@@ -81,7 +81,10 @@ function DashboardOverview() {
         <div className="rounded-xl border border-border bg-card p-5">
           <h3 className="font-semibold text-foreground mb-4">Recent Orders</h3>
           <div className="flex flex-col gap-3">
-            {orders.slice(0, 5).map(order => (
+            {orders.slice(0, 5).map(order => {
+              const normalizedStatus = order.status
+
+              return (
               <div key={order._id} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-medium text-foreground">#{order.order_id}</span>
@@ -91,17 +94,20 @@ function DashboardOverview() {
                   <span className="text-sm font-semibold text-foreground">₹{order.cash_paid.toLocaleString()}</span>
                   <span className={cn(
                     "rounded-full px-2.5 py-0.5 text-xs font-medium",
-                    order.status === "pending" && "bg-warning/20 text-warning",
-                    order.status === "confirmed" && "bg-primary/20 text-primary",
-                    order.status === "shipped" && "bg-chart-2/20 text-chart-2",
-                    order.status === "delivered" && "bg-primary/20 text-primary",
-                    order.status === "cancelled" && "bg-destructive/20 text-destructive",
+                    normalizedStatus === "pending" && "bg-warning/20 text-warning",
+                    normalizedStatus === "confirmed" && "bg-primary/20 text-primary",
+                    normalizedStatus === "packed_and_ready" && "bg-amber-100 text-amber-800",
+                    normalizedStatus === "shipped" && "bg-sky-100 text-sky-800",
+                    normalizedStatus === "out_for_delivery" && "bg-chart-2/20 text-chart-2",
+                    normalizedStatus === "delivered" && "bg-primary/20 text-primary",
+                    normalizedStatus === "cancelled" && "bg-destructive/20 text-destructive",
                   )}>
-                    {order.status}
+                    {normalizedStatus.replaceAll("_", " ")}
                   </span>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
