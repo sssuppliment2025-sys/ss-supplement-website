@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { MapPin, CreditCard, Check, Loader2, QrCode, Copy, CheckCircle, Coins, Truck } from "lucide-react"
@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useIsMobile } from "@/components/ui/use-mobile"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
@@ -154,6 +155,7 @@ const SHIPPING_FEE = 50
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const isMobile = useIsMobile()
   const { items, clearCart } = useCart()
   const { isAuthenticated, user } = useAuth()
   const { toast } = useToast()
@@ -174,6 +176,8 @@ export default function CheckoutPage() {
   const [utrNumber, setUtrNumber] = useState("")
   const [copied, setCopied] = useState(false)
   const [orderId, setOrderId] = useState("")
+  const [showPaymentStep, setShowPaymentStep] = useState(false)
+  const paymentSectionRef = useRef<HTMLDivElement | null>(null)
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -308,6 +312,20 @@ export default function CheckoutPage() {
     quote?.payment_surcharge ??
     (paymentMethod === "online" ? Number((subtotalAfterDiscount * paymentSurchargeRate).toFixed(2)) : 0)
   const finalTotal = Number((quote?.final_total ?? (subtotalAfterDiscount + paymentSurcharge)).toFixed(2))
+  const isAddressComplete = Boolean(
+    formData.fullName.trim() &&
+      formData.phone.trim() &&
+      formData.address.trim() &&
+      formData.city.trim() &&
+      formData.state.trim() &&
+      formData.pincode.trim()
+  )
+
+  useEffect(() => {
+    if (!isAddressComplete) {
+      setShowPaymentStep(false)
+    }
+  }, [isAddressComplete])
 
   const hasEnoughForMax = points >= maxCoinsAllowed
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -554,14 +572,6 @@ export default function CheckoutPage() {
 
   /* ================= FORM VALIDATION ================= */
   const handleProceedToPayment = async () => {
-    if (loadingQuote || !quote) {
-      toast({
-        title: "Please wait",
-        description: "Calculating latest totals from backend...",
-      })
-      return
-    }
-
     if (
       !formData.fullName ||
       !formData.phone ||
@@ -574,6 +584,22 @@ export default function CheckoutPage() {
         title: "Missing Information",
         description: "Please fill in all required fields.",
         variant: "destructive",
+      })
+      return
+    }
+
+    if (!showPaymentStep) {
+      setShowPaymentStep(true)
+      setTimeout(() => {
+        paymentSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+      }, 50)
+      return
+    }
+
+    if (loadingQuote || !quote) {
+      toast({
+        title: "Please wait",
+        description: "Calculating latest totals from backend...",
       })
       return
     }
@@ -922,6 +948,7 @@ export default function CheckoutPage() {
           {/* Left Column - Forms */}
           <div className="lg:col-span-2 space-y-6">
             {/* Delivery Address form */}
+            {(!isMobile || !showPaymentStep) ? (
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
@@ -966,27 +993,21 @@ export default function CheckoutPage() {
                   <Label htmlFor="landmark">Landmark (Optional)</Label>
                   <Input id="landmark" name="landmark" value={formData.landmark} onChange={handleInputChange} className="bg-secondary border-border" placeholder="Near temple, opposite school, etc." />
                 </div>
+                <Button
+                  type="button"
+                  onClick={handleProceedToPayment}
+                  className="w-full"
+                  disabled={!isAddressComplete}
+                >
+                  Continue to Payment
+                </Button>
               </CardContent>
             </Card>
-
-            <Card className="bg-card border-border">
-              <CardContent className="pt-6">
-                <div>
-                  <Label htmlFor="uniqueCode">Unique Code (Optional)</Label>
-                  <Input
-                    id="uniqueCode"
-                    name="uniqueCode"
-                    value={formData.uniqueCode}
-                    onChange={handleInputChange}
-                    className="bg-secondary border-border"
-                    placeholder="Enter your unique code"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            ) : null}
 
             {/* Payment */}
-            <Card className="bg-card border-border">
+            {showPaymentStep ? (
+            <Card ref={paymentSectionRef} className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
                   <CreditCard className="h-5 w-5 text-primary" />
@@ -994,65 +1015,109 @@ export default function CheckoutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={(value) => setPaymentMethod(value as "cod" | "upi" | "online")}
-                  className="gap-3"
-                >
-                  <div
-                    onClick={() => setPaymentMethod("online")}
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
-                      paymentMethod === "online"
-                        ? "border-primary bg-primary/5"
-                        : "border-border bg-secondary/40 hover:bg-secondary"
-                    }`}
-                  >
-                    <RadioGroupItem id="payment-online" value="online" className="mt-1" />
-                    <CreditCard className="mt-0.5 h-5 w-5 text-primary" />
-                    <span className="space-y-1">
-                      <Label htmlFor="payment-online" className="block cursor-pointer font-medium text-foreground">
-                        Razorpay Secure Payment
-                      </Label>
-                      <span className="block text-sm text-muted-foreground">
-                        Pay online using UPI, cards, netbanking, EMI, or Pay Later through Razorpay.
-                      </span>
-                      <span className="block text-xs font-medium text-amber-700">
-                        A 1.5% Razorpay convenience charge applies to online payments.
-                      </span>
-                    </span>
+                <div className="space-y-5">
+                  {isMobile ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowPaymentStep(false)}
+                      className="w-full"
+                    >
+                      Back to Address
+                    </Button>
+                  ) : null}
+                  {!isAddressComplete ? (
+                    <div className="rounded-lg border border-dashed border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+                      Fill in your delivery address first to unlock payment options.
+                    </div>
+                  ) : null}
+
+                  <div>
+                    <Label htmlFor="uniqueCode">Coupne Code (Optional)</Label>
+                    <Input
+                      id="uniqueCode"
+                      name="uniqueCode"
+                      value={formData.uniqueCode}
+                      onChange={handleInputChange}
+                      className="mt-2 bg-secondary border-border"
+                      placeholder="Enter your unique code"
+                      disabled={!isAddressComplete}
+                    />
                   </div>
 
-                  <div
-                    onClick={() => setPaymentMethod("cod")}
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
-                      paymentMethod === "cod"
-                        ? "border-primary bg-primary/5"
-                        : "border-border bg-secondary/40 hover:bg-secondary"
-                    }`}
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(value) => setPaymentMethod(value as "cod" | "upi" | "online")}
+                    className="gap-3"
+                    disabled={!isAddressComplete}
                   >
-                    <RadioGroupItem id="payment-cod" value="cod" className="mt-1" />
-                    <Truck className="mt-0.5 h-5 w-5 text-primary" />
-                    <span className="space-y-1">
-                      <Label htmlFor="payment-cod" className="block cursor-pointer font-medium text-foreground">
-                        Pay on Delivery
-                      </Label>
-                      <span className="block text-sm text-muted-foreground">
-                        Place your order now and pay Rs.{finalTotal.toLocaleString()} when it is delivered.
+                    <div
+                      onClick={() => {
+                        if (!isAddressComplete) return
+                        setPaymentMethod("online")
+                      }}
+                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                        !isAddressComplete
+                          ? "cursor-not-allowed border-border bg-secondary/20 opacity-60"
+                          : paymentMethod === "online"
+                            ? "border-primary bg-primary/5"
+                            : "border-border bg-secondary/40 hover:bg-secondary"
+                      }`}
+                    >
+                      <RadioGroupItem id="payment-online" value="online" className="mt-1" />
+                      <CreditCard className="mt-0.5 h-5 w-5 text-primary" />
+                      <span className="space-y-1">
+                        <Label htmlFor="payment-online" className="block cursor-pointer font-medium text-foreground">
+                          Razorpay Secure Payment
+                        </Label>
+                        <span className="block text-sm text-muted-foreground">
+                          Pay online using UPI, cards, netbanking, EMI, or Pay Later through Razorpay.
+                        </span>
+                        <span className="block text-xs font-medium text-amber-700">
+                          A 1.5% Razorpay convenience charge applies to online payments.
+                        </span>
                       </span>
-                    </span>
-                  </div>
-                </RadioGroup>
+                    </div>
+
+                    <div
+                      onClick={() => {
+                        if (!isAddressComplete) return
+                        setPaymentMethod("cod")
+                      }}
+                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                        !isAddressComplete
+                          ? "cursor-not-allowed border-border bg-secondary/20 opacity-60"
+                          : paymentMethod === "cod"
+                            ? "border-primary bg-primary/5"
+                            : "border-border bg-secondary/40 hover:bg-secondary"
+                      }`}
+                    >
+                      <RadioGroupItem id="payment-cod" value="cod" className="mt-1" />
+                      <Truck className="mt-0.5 h-5 w-5 text-primary" />
+                      <span className="space-y-1">
+                        <Label htmlFor="payment-cod" className="block cursor-pointer font-medium text-foreground">
+                          Pay on Delivery
+                        </Label>
+                        <span className="block text-sm text-muted-foreground">
+                          Place your order now and pay Rs.{finalTotal.toLocaleString()} when it is delivered.
+                        </span>
+                      </span>
+                    </div>
+                  </RadioGroup>
+                </div>
               </CardContent>
             </Card>
+            ) : null}
           </div>
 
           {/* Right Column - Order Summary WITH CONDITIONAL SHIPPING */}
+          {(!isMobile || showPaymentStep) ? (
           <div className="lg:col-span-1">
-            <Card className="bg-card border-border sticky top-24">
+            <Card className="bg-card border-border lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)]">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 lg:max-h-[calc(100vh-11rem)] lg:overflow-y-auto">
                 {/* Cart Items */}
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {items.map((item) => {
@@ -1187,12 +1252,25 @@ export default function CheckoutPage() {
                   onClick={handleProceedToPayment}
                   className="w-full h-12 text-lg"
                   size="lg"
-                  disabled={isSubmitting || loadingPoints || loadingQuote}
+                  disabled={isSubmitting || (!showPaymentStep && !isAddressComplete) || (showPaymentStep && (loadingPoints || loadingQuote))}
                 >
-                  {paymentMethod === "online"
-                    ? `Place Order - EMI (Rs.${finalTotal.toLocaleString()})`
-                    : `Place Order - Pay on Delivery `}
+                  {!showPaymentStep
+                    ? "Continue to Payment"
+                    : paymentMethod === "online"
+                      ? `Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`
+                      : `Place Order - Pay on Delivery (Rs.${finalTotal.toLocaleString()})`}
                 </Button>
+                {isMobile && showPaymentStep ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowPaymentStep(false)}
+                    disabled={isSubmitting}
+                  >
+                    Back to Address
+                  </Button>
+                ) : null}
 
                 <p className="text-xs text-center text-muted-foreground">
                   By placing order, you agree to our Terms & Conditions
@@ -1200,6 +1278,7 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
           </div>
+          ) : null}
         </div>
       </main>
       <Footer />

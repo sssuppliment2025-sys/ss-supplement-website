@@ -96,7 +96,7 @@ export function Header() {
               <Phone className="h-3 w-3" />
               +91 95478 99170
             </span>
-            <span className="hidden md:block">Free Shipping on orders above ₹999</span>
+            <span className="hidden md:block">Free Shipping in Haldia</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/referral" className="flex items-center gap-1.5 hover:underline">
