@@ -14,7 +14,10 @@ urlpatterns = [
     path("referrals/", views.MyReferralsView.as_view(), name="my_referrals"),
     path("leaderboard/", views.LeaderboardView.as_view(), name="leaderboard"),
     path('profileForOrderPlaced/', views.profile_view, name='profile'),
+    path('orders/quote/', views.order_quote, name='order_quote'),
     path('orders/', views.create_order, name='create_order'),
+    path('orders/razorpay/create/', views.razorpay_create_order, name='razorpay_create_order'),
+    path('orders/razorpay/verify/', views.razorpay_verify_payment, name='razorpay_verify_payment'),
 
     path('auth/forgot-password/', views.forgot_password, name='forgot_password'),
     path('auth/verify-otp/', views.verify_otp, name='verify_otp'),
