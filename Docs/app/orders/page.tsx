@@ -1,33 +1,54 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useMemo, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
-import { Package, Clock, Check, Truck, Loader2, XCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import {
+  CalendarDays,
+  Check,
+  CheckCheck,
+  CircleDashed,
+  Loader2,
+  MapPin,
+  Package,
+  PackageCheck,
+  ShoppingBag,
+  Truck,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { useAuth } from "@/context/auth-context"
+import { useProducts } from "@/context/product-context"
+import { cn } from "@/lib/utils"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 
-const ORDER_STEPS = [
-  { key: "pending", label: "Pending", icon: Clock },
-  { key: "confirmed", label: "Confirmed", icon: Check },
-  { key: "shipped", label: "Shipped", icon: Truck },
-  { key: "delivered", label: "Delivered", icon: Package },
-]
+type CanonicalStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled"
+type StepState = "complete" | "current" | "upcoming" | "cancelled"
+
+interface OrderItem {
+  product: string
+  flavor: string
+  weight: string
+  quantity: number
+  price: number
+}
 
 interface Order {
   id: string
-  items: {
-    product: string
-    flavor: string
-    weight: string
-    quantity: number
-    price: number
-  }[]
+  items: OrderItem[]
   total: number
   address: {
     fullName: string
@@ -46,9 +67,479 @@ interface Order {
   earnedPoints?: number
 }
 
+interface PreviewStep {
+  key: string
+  label: string
+  icon: LucideIcon
+  state: StepState
+}
+
+interface TimelineStep {
+  key: string
+  title: string
+  detail: string
+  timeLabel: string
+  icon: LucideIcon
+  state: StepState
+}
+
+const STATUS_RANK: Record<Exclude<CanonicalStatus, "cancelled">, number> = {
+  pending: 0,
+  confirmed: 1,
+  shipped: 2,
+  delivered: 3,
+}
+
+const PREVIEW_BLUEPRINT: Array<{ key: Exclude<CanonicalStatus, "cancelled">; label: string; icon: LucideIcon }> = [
+  { key: "pending", label: "Placed", icon: ShoppingBag },
+  { key: "confirmed", label: "Confirmed", icon: CheckCheck },
+  { key: "shipped", label: "Shipped", icon: Truck },
+  { key: "delivered", label: "Delivered", icon: PackageCheck },
+]
+
+function normalizeStatus(status: string): CanonicalStatus {
+  switch (status) {
+    case "paid":
+      return "confirmed"
+    case "cod":
+      return "pending"
+    case "cancelled":
+      return "cancelled"
+    case "confirmed":
+    case "shipped":
+    case "delivered":
+      return status
+    default:
+      return "pending"
+  }
+}
+
+function parseDate(value: string) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? new Date() : date
+}
+
+function addHours(value: Date, hours: number) {
+  const date = new Date(value)
+  date.setHours(date.getHours() + hours)
+  return date
+}
+
+function addDays(value: Date, days: number) {
+  const date = new Date(value)
+  date.setDate(date.getDate() + days)
+  return date
+}
+
+function formatDate(value: string) {
+  if (!value) return "Not available"
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "Not available"
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })
+}
+
+function formatDateTime(value: Date) {
+  return value.toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  })
+}
+
+function formatCurrency(value: number) {
+  return `Rs. ${Number(value || 0).toLocaleString("en-IN")}`
+}
+
+function getPaymentLabel(paymentMethod: string) {
+  switch (paymentMethod) {
+    case "cod":
+      return "Pay on Delivery"
+    case "upi":
+      return "UPI"
+    case "online":
+      return "Online Payment"
+    default:
+      return paymentMethod || "Not available"
+  }
+}
+
+function getStatusMeta(status: string) {
+  switch (normalizeStatus(status)) {
+    case "cancelled":
+      return {
+        label: "Cancelled",
+        title: "Order cancelled",
+        note: "This order is no longer being processed.",
+        badgeClass: "border-red-200 bg-red-50 text-red-700",
+        dotClass: "bg-red-500",
+      }
+    case "confirmed":
+      return {
+        label: "Confirmed",
+        title: "Order confirmed",
+        note: "We have confirmed your order and started processing it.",
+        badgeClass: "border-sky-200 bg-sky-50 text-sky-700",
+        dotClass: "bg-sky-500",
+      }
+    case "shipped":
+      return {
+        label: "Shipped",
+        title: "On the way",
+        note: "Your package has been handed to the courier partner.",
+        badgeClass: "border-indigo-200 bg-indigo-50 text-indigo-700",
+        dotClass: "bg-indigo-500",
+      }
+    case "delivered":
+      return {
+        label: "Delivered",
+        title: "Delivered successfully",
+        note: "Your order has reached the delivery address.",
+        badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        dotClass: "bg-emerald-500",
+      }
+    case "pending":
+    default:
+      return {
+        label: "Pending",
+        title: "Awaiting confirmation",
+        note: "We have received your order and will confirm it shortly.",
+        badgeClass: "border-amber-200 bg-amber-50 text-amber-700",
+        dotClass: "bg-amber-500",
+      }
+  }
+}
+
+function getPrimaryItem(order: Order): OrderItem {
+  return (
+    order.items[0] || {
+      product: "Order item",
+      flavor: "",
+      weight: "",
+      quantity: 1,
+      price: order.total,
+    }
+  )
+}
+
+function getItemSubtitle(item: OrderItem) {
+  return [item.flavor, item.weight].filter(Boolean).join(" / ") || "Standard variant"
+}
+
+function getPreviewSteps(status: string): PreviewStep[] {
+  const canonicalStatus = normalizeStatus(status)
+
+  if (canonicalStatus === "cancelled") {
+    return [
+      { key: "pending", label: "Placed", icon: ShoppingBag, state: "complete" },
+      { key: "cancelled", label: "Cancelled", icon: XCircle, state: "cancelled" },
+    ]
+  }
+
+  const rank = STATUS_RANK[canonicalStatus]
+
+  return PREVIEW_BLUEPRINT.map((step) => {
+    const stepRank = STATUS_RANK[step.key]
+    let state: StepState = "upcoming"
+
+    if (step.key === canonicalStatus) {
+      state = "current"
+    } else if (stepRank < rank) {
+      state = "complete"
+    }
+
+    return { ...step, state }
+  })
+}
+
+function buildTimelineSteps(order: Order): TimelineStep[] {
+  const baseDate = parseDate(order.createdAt)
+  const paymentLabel = getPaymentLabel(order.paymentMethod)
+  const canonicalStatus = normalizeStatus(order.status)
+
+  if (canonicalStatus === "cancelled") {
+    return [
+      {
+        key: "placed",
+        title: "Order placed",
+        detail: `Your order was created with ${paymentLabel}.`,
+        timeLabel: formatDateTime(baseDate),
+        icon: ShoppingBag,
+        state: "complete",
+      },
+      {
+        key: "cancelled",
+        title: "Order cancelled",
+        detail: "This order was cancelled before delivery. Please contact support if you need help.",
+        timeLabel: formatDateTime(addHours(baseDate, 6)),
+        icon: XCircle,
+        state: "cancelled",
+      },
+    ]
+  }
+
+  const timelineStateByStatus: Record<Exclude<CanonicalStatus, "cancelled">, Record<string, StepState>> = {
+    pending: {
+      placed: "current",
+      confirmed: "upcoming",
+      packed: "upcoming",
+      shipped: "upcoming",
+      out: "upcoming",
+      delivered: "upcoming",
+    },
+    confirmed: {
+      placed: "complete",
+      confirmed: "current",
+      packed: "upcoming",
+      shipped: "upcoming",
+      out: "upcoming",
+      delivered: "upcoming",
+    },
+    shipped: {
+      placed: "complete",
+      confirmed: "complete",
+      packed: "complete",
+      shipped: "current",
+      out: "upcoming",
+      delivered: "upcoming",
+    },
+    delivered: {
+      placed: "complete",
+      confirmed: "complete",
+      packed: "complete",
+      shipped: "complete",
+      out: "complete",
+      delivered: "current",
+    },
+  }
+
+  const states = timelineStateByStatus[canonicalStatus]
+
+  return [
+    {
+      key: "placed",
+      title: "Order placed",
+      detail: `Order received with ${paymentLabel}.`,
+      timeLabel: formatDateTime(baseDate),
+      icon: ShoppingBag,
+      state: states.placed,
+    },
+    {
+      key: "confirmed",
+      title: "Order confirmed",
+      detail: "Our team has reviewed the order and started processing it.",
+      timeLabel: formatDateTime(addHours(baseDate, 2)),
+      icon: CheckCheck,
+      state: states.confirmed,
+    },
+    {
+      key: "packed",
+      title: "Packed and ready",
+      detail: "Your items have been packed and prepared for handoff.",
+      timeLabel: formatDateTime(addHours(baseDate, 8)),
+      icon: Package,
+      state: states.packed,
+    },
+    {
+      key: "shipped",
+      title: "Shipped",
+      detail: "The courier partner has picked up your package.",
+      timeLabel: formatDateTime(addDays(baseDate, 1)),
+      icon: Truck,
+      state: states.shipped,
+    },
+    {
+      key: "out",
+      title: "Out for delivery",
+      detail: "The package is on the final delivery run to your address.",
+      timeLabel: formatDateTime(addDays(baseDate, 3)),
+      icon: MapPin,
+      state: states.out,
+    },
+    {
+      key: "delivered",
+      title: "Delivered",
+      detail: "Your order has been delivered successfully.",
+      timeLabel: formatDateTime(addDays(baseDate, 3)),
+      icon: PackageCheck,
+      state: states.delivered,
+    },
+  ]
+}
+
+function getTimelineDotClasses(state: StepState) {
+  switch (state) {
+    case "complete":
+      return "border-emerald-500 bg-emerald-500 text-white"
+    case "current":
+      return "border-primary bg-primary text-primary-foreground"
+    case "cancelled":
+      return "border-red-500 bg-red-500 text-white"
+    case "upcoming":
+    default:
+      return "border-border bg-background text-muted-foreground"
+  }
+}
+
+function getPreviewDotClasses(state: StepState) {
+  switch (state) {
+    case "complete":
+      return "border-emerald-500 bg-emerald-500 text-white"
+    case "current":
+      return "border-primary bg-primary text-primary-foreground"
+    case "cancelled":
+      return "border-red-500 bg-red-500 text-white"
+    case "upcoming":
+    default:
+      return "border-border bg-background text-muted-foreground"
+  }
+}
+
+function getPreviewConnectorClasses(current: StepState, next: StepState) {
+  if (current === "cancelled" || next === "cancelled") {
+    return "bg-red-200"
+  }
+  if (current === "complete" && (next === "complete" || next === "current")) {
+    return "bg-emerald-400"
+  }
+  if (current === "current") {
+    return "bg-primary/30"
+  }
+  return "bg-border"
+}
+
+function OrderRoadmapDialog({
+  order,
+  imageSrc,
+}: {
+  order: Order
+  imageSrc: string
+}) {
+  const primaryItem = getPrimaryItem(order)
+  const statusMeta = getStatusMeta(order.status)
+  const timeline = buildTimelineSteps(order)
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="bg-[#2874f0] text-white hover:bg-[#1f63cf]">View more</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl gap-0 overflow-hidden border-border p-0">
+        <DialogHeader className="border-b border-border bg-muted/20 px-6 py-5">
+          <DialogTitle className="text-xl text-foreground">Order Roadmap</DialogTitle>
+          <DialogDescription>
+            Order #{order.id} . {statusMeta.title}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid max-h-[80vh] gap-0 lg:grid-cols-[300px_minmax(0,1fr)]">
+          <div className="border-b border-border bg-card p-6 lg:border-r lg:border-b-0">
+            <div className="flex items-start gap-4">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-border bg-white">
+                <Image
+                  src={imageSrc}
+                  alt={primaryItem.product}
+                  fill
+                  sizes="80px"
+                  className="object-contain p-2"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="line-clamp-2 text-sm font-semibold text-foreground">{primaryItem.product}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{getItemSubtitle(primaryItem)}</p>
+                <p className="mt-3 text-lg font-semibold text-foreground">{formatCurrency(order.total)}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-4 text-sm">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</p>
+                <div
+                  className={cn(
+                    "mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium",
+                    statusMeta.badgeClass,
+                  )}
+                >
+                  <span className={cn("h-2.5 w-2.5 rounded-full", statusMeta.dotClass)} />
+                  {statusMeta.label}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Address</p>
+                <p className="mt-2 text-sm leading-6 text-foreground">
+                  {order.address.fullName}
+                  <br />
+                  {order.address.address}, {order.address.city}, {order.address.state} - {order.address.pincode}
+                  <br />
+                  {order.address.phone}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Payment</p>
+                <p className="mt-2 text-foreground">{getPaymentLabel(order.paymentMethod)}</p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Items</p>
+                <div className="mt-2 space-y-2">
+                  {order.items.map((item, index) => (
+                    <div key={`${order.id}-${index}`} className="rounded-md border border-border/80 px-3 py-2">
+                      <p className="text-sm font-medium text-foreground">{item.product}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {getItemSubtitle(item)} x{item.quantity}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-y-auto px-6 py-6">
+            <div className="relative pl-2">
+              <div className="absolute bottom-0 left-3 top-3 w-px bg-border" />
+              <div className="space-y-6">
+                {timeline.map((step) => {
+                  const StepIcon = step.icon
+
+                  return (
+                    <div key={step.key} className="relative pl-10">
+                      <div
+                        className={cn(
+                          "absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border-2",
+                          getTimelineDotClasses(step.state),
+                        )}
+                      >
+                        <StepIcon className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="space-y-1 pb-2">
+                        <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                        <p className="text-sm leading-6 text-muted-foreground">{step.detail}</p>
+                        <p className="text-xs font-medium text-muted-foreground">{step.timeLabel}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function OrdersPage() {
   const router = useRouter()
   const { user, isAuthenticated } = useAuth()
+  const { products } = useProducts()
   const [orders, setOrders] = useState<Order[]>([])
   const [loadingOrders, setLoadingOrders] = useState(true)
   const [ordersError, setOrdersError] = useState("")
@@ -90,145 +581,37 @@ export default function OrdersPage() {
     }
 
     fetchOrders()
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, router, user])
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "cancelled":
-        return <XCircle className="h-4 w-4" />
-      case "confirmed":
-      case "paid":
-        return <Check className="h-4 w-4" />
-      case "shipped":
-        return <Truck className="h-4 w-4" />
-      case "delivered":
-        return <Package className="h-4 w-4" />
-      default:
-        return <Clock className="h-4 w-4" />
-    }
-  }
+  const normalizedProducts = useMemo(
+    () =>
+      products.map((product) => ({
+        product,
+        name: product.name.trim().toLowerCase(),
+        weight: (product.weight || "").trim().toLowerCase(),
+        flavors: product.flavors.map((flavor) => flavor.name.trim().toLowerCase()),
+      })),
+    [products],
+  )
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "cancelled":
-        return "bg-destructive/20 text-destructive"
-      case "paid":
-      case "confirmed":
-        return "bg-primary/20 text-primary"
-      case "shipped":
-        return "bg-accent/20 text-accent"
-      case "delivered":
-        return "bg-success/20 text-success"
-      default:
-        return "bg-muted text-muted-foreground"
-    }
-  }
+  const resolveProductImage = (item: OrderItem) => {
+    const normalizedName = item.product.trim().toLowerCase()
+    const normalizedWeight = item.weight.trim().toLowerCase()
+    const normalizedFlavor = item.flavor.trim().toLowerCase()
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "Paid"
-      case "cod":
-        return "Pending"
-      default:
-        return status.charAt(0).toUpperCase() + status.slice(1)
-    }
-  }
-
-  const getStepIndex = (status: string) => {
-    switch (status) {
-      case "delivered":
-        return 3
-      case "shipped":
-        return 2
-      case "confirmed":
-      case "paid":
-        return 1
-      case "pending":
-      default:
-        return 0
-    }
-  }
-
-  const formatDate = (value: string) => {
-    if (!value) return "Not available"
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return "Not available"
-    return date.toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    })
-  }
-
-  const getPaymentLabel = (paymentMethod: string) => {
-    switch (paymentMethod) {
-      case "cod":
-        return "Pay on Delivery"
-      case "upi":
-        return "UPI"
-      case "online":
-        return "Online Payment"
-      default:
-        return paymentMethod
-    }
-  }
-
-  const renderStatusHierarchy = (status: string) => {
-    if (status === "cancelled") {
-      return (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
-          <div className="flex items-center gap-2 font-medium text-destructive">
-            <XCircle className="h-5 w-5" />
-            Order Cancelled
-          </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            This order was cancelled from the admin panel.
-          </p>
-        </div>
-      )
-    }
-
-    const currentStep = getStepIndex(status)
-
-    return (
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {ORDER_STEPS.map((step, index) => {
-          const StepIcon = step.icon
-          const isComplete = index < currentStep
-          const isCurrent = index === currentStep
-
-          return (
-            <div
-              key={step.key}
-              className={`rounded-lg border p-3 ${
-                isCurrent
-                  ? "border-primary bg-primary/10"
-                  : isComplete
-                    ? "border-success/30 bg-success/10"
-                    : "border-border bg-secondary/30"
-              }`}
-            >
-              <div
-                className={`mb-2 flex h-8 w-8 items-center justify-center rounded-full ${
-                  isCurrent
-                    ? "bg-primary text-primary-foreground"
-                    : isComplete
-                      ? "bg-success text-white"
-                      : "bg-muted text-muted-foreground"
-                }`}
-              >
-                <StepIcon className="h-4 w-4" />
-              </div>
-              <p className="text-sm font-medium text-foreground">{step.label}</p>
-              <p className="text-xs text-muted-foreground">
-                {isCurrent ? "Current status" : isComplete ? "Completed" : "Waiting"}
-              </p>
-            </div>
-          )
-        })}
-      </div>
+    const exactVariant = normalizedProducts.find(
+      ({ name, weight, flavors }) =>
+        name === normalizedName &&
+        (!normalizedWeight || weight === normalizedWeight) &&
+        (!normalizedFlavor || flavors.includes(normalizedFlavor)),
     )
+
+    if (exactVariant?.product.image) return exactVariant.product.image
+
+    const sameNameProduct = normalizedProducts.find(({ name }) => name === normalizedName)
+    if (sameNameProduct?.product.image) return sameNameProduct.product.image
+
+    return "/placeholder.svg"
   }
 
   if (!isAuthenticated) {
@@ -236,112 +619,203 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f5f7fb]">
       <Header />
-      <main className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">My Orders</h1>
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">My Orders</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Recent purchases, live status, and delivery progress.</p>
+        </div>
 
         {ordersError && (
-          <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-muted-foreground">
-            Showing saved orders from this device because latest backend orders could not be loaded: {ordersError}
+          <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Showing saved orders from this device because the latest backend status could not be loaded: {ordersError}
           </div>
         )}
 
         {loadingOrders ? (
-          <Card className="bg-card border-border">
-            <CardContent className="p-12 text-center">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-foreground mb-2">Loading your orders</h2>
-              <p className="text-muted-foreground">Fetching the latest status from backend...</p>
-            </CardContent>
-          </Card>
+          <div className="rounded-lg border border-border bg-card px-6 py-16 text-center shadow-sm">
+            <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Loading your orders</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Fetching the latest status updates.</p>
+          </div>
         ) : orders.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="p-12 text-center">
-              <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-foreground mb-2">No orders yet</h2>
-              <p className="text-muted-foreground">Start shopping to see your orders here!</p>
-            </CardContent>
-          </Card>
+          <div className="rounded-lg border border-border bg-card px-6 py-16 text-center shadow-sm">
+            <Package className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
+            <h2 className="text-lg font-semibold text-foreground">No orders yet</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Once you place an order, it will appear here.</p>
+          </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
-              <Card key={order.id} className="bg-card border-border">
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Order ID</p>
-                      <p className="font-mono font-semibold text-foreground">{order.id}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Order Date</p>
-                      <p className="text-foreground">{formatDate(order.createdAt)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Amount</p>
-                      <p className="text-lg font-bold text-foreground">₹{order.total}</p>
-                    </div>
-                    <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
-                      {getStatusIcon(order.status)}
-                      {getStatusLabel(order.status)}
-                    </Badge>
-                  </div>
+            {orders.map((order) => {
+              const primaryItem = getPrimaryItem(order)
+              const productImage = resolveProductImage(primaryItem)
+              const statusMeta = getStatusMeta(order.status)
+              const previewSteps = getPreviewSteps(order.status)
+              const extraItems = Math.max(order.items.length - 1, 0)
 
-                  <div className="border-t border-border pt-4">
-                    <p className="text-sm text-muted-foreground mb-3">Order Status</p>
-                    {renderStatusHierarchy(order.status)}
-                  </div>
+              return (
+                <div
+                  key={order.id}
+                  className="overflow-hidden rounded-lg border border-border bg-card shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
+                >
+                  <div className="flex flex-col gap-6 p-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex min-w-0 flex-1 gap-4">
+                      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border border-border bg-white">
+                        <Image
+                          src={productImage}
+                          alt={primaryItem.product}
+                          fill
+                          sizes="96px"
+                          className="object-contain p-2"
+                        />
+                      </div>
 
-                  <div className="border-t border-border pt-4 mt-4">
-                    <p className="text-sm text-muted-foreground mb-2">Items</p>
-                    <div className="space-y-2">
-                      {order.items.map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm">
-                          <span className="text-foreground">
-                            {item.product} ({item.flavor}, {item.weight}) x{item.quantity}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <span className="rounded-full bg-primary/10 px-2.5 py-1 font-medium text-primary">
+                            Order #{order.id}
                           </span>
-                          <span className="text-foreground">₹{item.price * item.quantity}</span>
+                          <span className="inline-flex items-center gap-1">
+                            <CalendarDays className="h-3.5 w-3.5" />
+                            {formatDate(order.createdAt)}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <ShoppingBag className="h-3.5 w-3.5" />
+                            {order.items.length} item{order.items.length > 1 ? "s" : ""}
+                          </span>
                         </div>
-                      ))}
+
+                        <h2 className="mt-3 line-clamp-2 text-base font-semibold text-foreground sm:text-lg">
+                          {primaryItem.product}
+                        </h2>
+                        <p className="mt-1 text-sm text-muted-foreground">{getItemSubtitle(primaryItem)}</p>
+                        {extraItems > 0 && (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            + {extraItems} more item{extraItems > 1 ? "s" : ""} in this order
+                          </p>
+                        )}
+
+                        <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+                          <div>
+                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Amount</p>
+                            <p className="mt-1 font-semibold text-foreground">{formatCurrency(order.total)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Payment</p>
+                            <p className="mt-1 text-foreground">{getPaymentLabel(order.paymentMethod)}</p>
+                          </div>
+                          <div className="min-w-[180px]">
+                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                              Delivery address
+                            </p>
+                            <p className="mt-1 line-clamp-2 text-foreground">
+                              {order.address.city}, {order.address.state} - {order.address.pincode}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full border-t border-border pt-5 lg:w-[290px] lg:border-t-0 lg:border-l lg:pl-5 lg:pt-0">
+                      <div className="rounded-lg border border-border bg-muted/20 p-4">
+                        <div className="flex items-start gap-3">
+                          <span className={cn("mt-1 h-3 w-3 rounded-full", statusMeta.dotClass)} />
+                          <div>
+                            <p className="font-semibold text-foreground">{statusMeta.title}</p>
+                            <p className="mt-1 text-sm leading-6 text-muted-foreground">{statusMeta.note}</p>
+                          </div>
+                        </div>
+
+                        <div
+                          className={cn(
+                            "mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium",
+                            statusMeta.badgeClass,
+                          )}
+                        >
+                          <span className={cn("h-2.5 w-2.5 rounded-full", statusMeta.dotClass)} />
+                          {statusMeta.label}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <OrderRoadmapDialog order={order} imageSrc={productImage} />
+                        <Button asChild variant="outline">
+                          <Link href={`/track-order?orderId=${encodeURIComponent(order.id)}`}>Track This Order</Link>
+                        </Button>
+                      </div>
+
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="mt-2 h-auto px-0 text-[#25D366] hover:bg-transparent hover:text-[#1ebe57]"
+                      >
+                        <a
+                          href={`https://wa.me/919547899170?text=${encodeURIComponent(`Hi, I'd like to get updates on my order ${order.id}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Get Order Updates
+                        </a>
+                      </Button>
                     </div>
                   </div>
 
-                  <div className="border-t border-border pt-4 mt-4">
-                    <p className="text-sm text-muted-foreground mb-1">Delivery Address</p>
-                    <p className="text-foreground text-sm">
-                      {order.address.fullName}, {order.address.address}, {order.address.city}, {order.address.state} -{" "}
-                      {order.address.pincode}
-                    </p>
-                  </div>
+                  <div className="border-t border-border bg-muted/10 px-5 py-4">
+                    <div className="flex flex-wrap items-center gap-y-3 overflow-x-auto">
+                      {previewSteps.map((step, index) => {
+                        const StepIcon = step.icon
+                        const nextStep = previewSteps[index + 1]
 
-                  <div className="border-t border-border pt-4 mt-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Payment Method</p>
-                      <p className="text-foreground">{getPaymentLabel(order.paymentMethod)}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/track-order?orderId=${encodeURIComponent(order.id)}`}
-                        className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-                      >
-                        Track This Order
-                      </Link>
-                      <a
-                        href={`https://wa.me/919547899170?text=${encodeURIComponent(`Hi, I'd like to get updates on my order ${order.id}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe57] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                        </svg>
-                        Get Order Updates
-                      </a>
+                        return (
+                          <div key={step.key} className="flex items-center">
+                            <div className="flex min-w-[108px] items-center gap-3">
+                              <div
+                                className={cn(
+                                  "flex h-8 w-8 items-center justify-center rounded-full border text-xs",
+                                  getPreviewDotClasses(step.state),
+                                )}
+                              >
+                                {step.state === "upcoming" ? (
+                                  <CircleDashed className="h-4 w-4" />
+                                ) : step.state === "cancelled" ? (
+                                  <XCircle className="h-4 w-4" />
+                                ) : step.state === "complete" ? (
+                                  <Check className="h-4 w-4" />
+                                ) : (
+                                  <StepIcon className="h-4 w-4" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-foreground">{step.label}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {step.state === "complete"
+                                    ? "Done"
+                                    : step.state === "current"
+                                      ? "Current"
+                                      : step.state === "cancelled"
+                                        ? "Stopped"
+                                        : "Upcoming"}
+                                </p>
+                              </div>
+                            </div>
+
+                            {nextStep && (
+                              <div
+                                className={cn(
+                                  "mx-3 hidden h-[2px] w-10 rounded-full sm:block",
+                                  getPreviewConnectorClasses(step.state, nextStep.state),
+                                )}
+                              />
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              )
+            })}
           </div>
         )}
       </main>
