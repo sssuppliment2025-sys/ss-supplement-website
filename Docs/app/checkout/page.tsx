@@ -1081,7 +1081,7 @@ export default function CheckoutPage() {
                           Pay on Delivery
                         </Label>
                         <span className="block text-sm text-muted-foreground">
-                          Place your order now and pay Rs.{finalTotal.toLocaleString()} when it is delivered.
+                          Place your order now and pay when it is delivered.
                         </span>
                       </span>
                     </div>
