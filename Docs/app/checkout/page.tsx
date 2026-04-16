@@ -703,24 +703,6 @@ export default function CheckoutPage() {
 
       setOrderId(successData.order?.id || "SUCCESS")
 
-      if (formData.email.trim()) {
-        const otpCode = generateOtpCode()
-        try {
-          await sendOtpEmail(formData.email.trim(), otpCode)
-          toast({
-            title: "OTP Sent",
-            description: "OTP sent to your email. It is valid for 10 minutes.",
-          })
-        } catch (mailError: unknown) {
-          console.error("Email OTP error:", mailError)
-          toast({
-            title: "Email Error",
-            description: "Order placed, but OTP email could not be sent.",
-            variant: "destructive",
-          })
-        }
-      }
-
       // ✅ Save order to localStorage for "My Orders" page
       const savedOrderId = successData.order?.id || `ORD-${Date.now()}`
       const localOrder = {
