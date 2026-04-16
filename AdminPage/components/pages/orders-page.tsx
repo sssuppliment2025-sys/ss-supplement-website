@@ -69,19 +69,43 @@ function formatOrderDateTime(value?: string) {
 function toDateTimeLocalValue(value?: string) {
   const date = value ? new Date(value) : new Date()
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date
-  const pad = (part: number) => String(part).padStart(2, "0")
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+
+  const parts = formatter.formatToParts(safeDate)
+  const map = Object.fromEntries(parts.map(part => [part.type, part.value]))
+  const pad = (part: string) => part.padStart(2, "0")
 
   return [
-    safeDate.getFullYear(),
+    map.year,
     "-",
-    pad(safeDate.getMonth() + 1),
+    pad(map.month || "00"),
     "-",
-    pad(safeDate.getDate()),
+    pad(map.day || "00"),
     "T",
-    pad(safeDate.getHours()),
+    pad(map.hour || "00"),
     ":",
-    pad(safeDate.getMinutes()),
+    pad(map.minute || "00"),
   ].join("")
+}
+
+function parseKolkataDateTimeLocalToISOString(value: string) {
+  if (!value) {
+    return new Date().toISOString()
+  }
+
+  try {
+    return new Date(`${value}:00+05:30`).toISOString()
+  } catch {
+    return new Date().toISOString()
+  }
 }
 
 function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) {
@@ -172,7 +196,7 @@ function OrderStatusForm({ order, onSave, onCancel }: { order: Order; onSave: (d
   const normalizedStatus = normalizeOrderStatus(order.status)
   const [status, setStatus] = useState<Order["status"]>(normalizedStatus)
   const [statusChangedAt, setStatusChangedAt] = useState(
-    toDateTimeLocalValue(order.status_timeline?.[normalizedStatus] || order.updated_at || order.created_at),
+    toDateTimeLocalValue(order.status_timeline?.[normalizedStatus] || new Date().toISOString()),
   )
 
   const timelineEntries = [
@@ -192,7 +216,7 @@ function OrderStatusForm({ order, onSave, onCancel }: { order: Order; onSave: (d
         e.preventDefault()
         onSave({
           status,
-          status_changed_at: new Date(statusChangedAt).toISOString(),
+          status_changed_at: parseKolkataDateTimeLocalToISOString(statusChangedAt),
         })
       }}
     >
