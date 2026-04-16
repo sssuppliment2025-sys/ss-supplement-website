@@ -16,6 +16,7 @@ urlpatterns = [
     path('profileForOrderPlaced/', views.profile_view, name='profile'),
     path('orders/quote/', views.order_quote, name='order_quote'),
     path('orders/', views.create_order, name='create_order'),
+    path('orders/my/', views.my_orders, name='my_orders'),
     path('orders/razorpay/create/', views.razorpay_create_order, name='razorpay_create_order'),
     path('orders/razorpay/verify/', views.razorpay_verify_payment, name='razorpay_verify_payment'),
 

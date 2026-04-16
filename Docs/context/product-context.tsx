@@ -3,6 +3,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import type { Product } from "@/app/types/product"
 
+export type { Product } from "@/app/types/product"
+
 interface ProductVariant {
   id: string
   flavor: string
@@ -206,7 +208,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
         if (!response.ok) throw new Error(`Failed with status ${response.status}`)
         const payload = await response.json()
-        const remoteRows = Array.isArray(payload?.data) ? payload.data : []
+        const remoteRows: unknown[] = Array.isArray(payload?.data) ? payload.data : []
         if (!mounted) return
 
         const normalized = remoteRows

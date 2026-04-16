@@ -10,6 +10,10 @@ export interface CartItem {
   selectedWeight: string
 }
 
+type FlavorOption = string | { name: string; price?: number }
+type WeightOption = string | { weight?: string; name?: string; price?: number }
+type ProductWithLegacyWeights = Product & { weightVariants?: WeightOption[] }
+
 interface CartContextType {
   items: CartItem[]
   addToCart: (product: Product, flavor: string, weight: string, quantity?: number) => void
@@ -97,8 +101,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     let price = product.price 
 
     
-    if (Array.isArray(product.flavors) && product.flavors.length > 0) {
-      const flavorObj = product.flavors.find((f) => {
+    const flavors = product.flavors as FlavorOption[]
+    if (Array.isArray(flavors) && flavors.length > 0) {
+      const flavorObj = flavors.find((f) => {
         if (typeof f === "string") {
           return f === flavor
         }
@@ -112,9 +117,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     
-    if (weight && (product.weights || product.weightVariants)) {
-      const weightsArray = product.weights || product.weightVariants || []
-      const weightVariant = weightsArray.find((w: any) => 
+    const productWithLegacyWeights = product as ProductWithLegacyWeights
+    if (weight && (productWithLegacyWeights.weights || productWithLegacyWeights.weightVariants)) {
+      const weightsArray: WeightOption[] = productWithLegacyWeights.weightVariants || productWithLegacyWeights.weights || []
+      const weightVariant = weightsArray.find((w) => 
         (typeof w === "string" ? w : w.weight || w.name) === weight
       )
       if (weightVariant && typeof weightVariant !== "string" && weightVariant.price) {

@@ -200,7 +200,14 @@ export default function LoginPage() {
 
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => {
+              if (value === "login" || value === "signup" || value === "admin") {
+                setActiveTab(value)
+              }
+            }}
+          >
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>

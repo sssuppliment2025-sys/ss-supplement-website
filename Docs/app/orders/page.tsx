@@ -3,12 +3,21 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Package, Clock, Check, Truck } from "lucide-react"
+import { Package, Clock, Check, Truck, Loader2, XCircle } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/context/auth-context"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
+
+const ORDER_STEPS = [
+  { key: "pending", label: "Pending", icon: Clock },
+  { key: "confirmed", label: "Confirmed", icon: Check },
+  { key: "shipped", label: "Shipped", icon: Truck },
+  { key: "delivered", label: "Delivered", icon: Package },
+]
 
 interface Order {
   id: string
@@ -31,13 +40,18 @@ interface Order {
   paymentMethod: string
   status: string
   createdAt: string
-  userId: string
+  userId?: string | number
+  shippingFee?: number
+  coinsUsed?: number
+  earnedPoints?: number
 }
 
 export default function OrdersPage() {
   const router = useRouter()
   const { user, isAuthenticated } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
+  const [loadingOrders, setLoadingOrders] = useState(true)
+  const [ordersError, setOrdersError] = useState("")
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -45,14 +59,45 @@ export default function OrdersPage() {
       return
     }
 
-    const allOrders = JSON.parse(localStorage.getItem("ss_orders") || "[]")
-    const userOrders = allOrders.filter((order: Order) => order.userId === user?.id)
-    setOrders(userOrders.reverse())
+    const fetchOrders = async () => {
+      setLoadingOrders(true)
+      setOrdersError("")
+
+      try {
+        const token = localStorage.getItem("access") || localStorage.getItem("token")
+        if (!token) throw new Error("Please log in again to view your orders.")
+
+        const response = await fetch(`${API_URL}/api/orders/my/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+          throw new Error(data.error || data.detail || "Unable to load orders from backend.")
+        }
+
+        setOrders(Array.isArray(data.data) ? data.data : [])
+      } catch (error: any) {
+        const allOrders = JSON.parse(localStorage.getItem("ss_orders") || "[]")
+        const userOrders = allOrders.filter((order: Order) => String(order.userId) === String(user?.id))
+        setOrders(userOrders.reverse())
+        setOrdersError(error?.message || "Unable to load latest order status.")
+      } finally {
+        setLoadingOrders(false)
+      }
+    }
+
+    fetchOrders()
   }, [isAuthenticated, user, router])
 
   const getStatusIcon = (status: string) => {
     switch (status) {
+      case "cancelled":
+        return <XCircle className="h-4 w-4" />
       case "confirmed":
+      case "paid":
         return <Check className="h-4 w-4" />
       case "shipped":
         return <Truck className="h-4 w-4" />
@@ -65,6 +110,9 @@ export default function OrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "cancelled":
+        return "bg-destructive/20 text-destructive"
+      case "paid":
       case "confirmed":
         return "bg-primary/20 text-primary"
       case "shipped":
@@ -74,6 +122,113 @@ export default function OrdersPage() {
       default:
         return "bg-muted text-muted-foreground"
     }
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "Paid"
+      case "cod":
+        return "Pending"
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1)
+    }
+  }
+
+  const getStepIndex = (status: string) => {
+    switch (status) {
+      case "delivered":
+        return 3
+      case "shipped":
+        return 2
+      case "confirmed":
+      case "paid":
+        return 1
+      case "pending":
+      default:
+        return 0
+    }
+  }
+
+  const formatDate = (value: string) => {
+    if (!value) return "Not available"
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return "Not available"
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })
+  }
+
+  const getPaymentLabel = (paymentMethod: string) => {
+    switch (paymentMethod) {
+      case "cod":
+        return "Pay on Delivery"
+      case "upi":
+        return "UPI"
+      case "online":
+        return "Online Payment"
+      default:
+        return paymentMethod
+    }
+  }
+
+  const renderStatusHierarchy = (status: string) => {
+    if (status === "cancelled") {
+      return (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
+          <div className="flex items-center gap-2 font-medium text-destructive">
+            <XCircle className="h-5 w-5" />
+            Order Cancelled
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            This order was cancelled from the admin panel.
+          </p>
+        </div>
+      )
+    }
+
+    const currentStep = getStepIndex(status)
+
+    return (
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {ORDER_STEPS.map((step, index) => {
+          const StepIcon = step.icon
+          const isComplete = index < currentStep
+          const isCurrent = index === currentStep
+
+          return (
+            <div
+              key={step.key}
+              className={`rounded-lg border p-3 ${
+                isCurrent
+                  ? "border-primary bg-primary/10"
+                  : isComplete
+                    ? "border-success/30 bg-success/10"
+                    : "border-border bg-secondary/30"
+              }`}
+            >
+              <div
+                className={`mb-2 flex h-8 w-8 items-center justify-center rounded-full ${
+                  isCurrent
+                    ? "bg-primary text-primary-foreground"
+                    : isComplete
+                      ? "bg-success text-white"
+                      : "bg-muted text-muted-foreground"
+                }`}
+              >
+                <StepIcon className="h-4 w-4" />
+              </div>
+              <p className="text-sm font-medium text-foreground">{step.label}</p>
+              <p className="text-xs text-muted-foreground">
+                {isCurrent ? "Current status" : isComplete ? "Completed" : "Waiting"}
+              </p>
+            </div>
+          )
+        })}
+      </div>
+    )
   }
 
   if (!isAuthenticated) {
@@ -86,7 +241,21 @@ export default function OrdersPage() {
       <main className="container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-foreground mb-6">My Orders</h1>
 
-        {orders.length === 0 ? (
+        {ordersError && (
+          <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-muted-foreground">
+            Showing saved orders from this device because latest backend orders could not be loaded: {ordersError}
+          </div>
+        )}
+
+        {loadingOrders ? (
+          <Card className="bg-card border-border">
+            <CardContent className="p-12 text-center">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-foreground mb-2">Loading your orders</h2>
+              <p className="text-muted-foreground">Fetching the latest status from backend...</p>
+            </CardContent>
+          </Card>
+        ) : orders.length === 0 ? (
           <Card className="bg-card border-border">
             <CardContent className="p-12 text-center">
               <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
@@ -106,27 +275,24 @@ export default function OrdersPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Order Date</p>
-                      <p className="text-foreground">
-                        {new Date(order.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
+                      <p className="text-foreground">{formatDate(order.createdAt)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Total Amount</p>
                       <p className="text-lg font-bold text-foreground">₹{order.total}</p>
                     </div>
-                    {order.status !== "pending" && (
-                      <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
-                        {getStatusIcon(order.status)}
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </Badge>
-                    )}
+                    <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
+                      {getStatusIcon(order.status)}
+                      {getStatusLabel(order.status)}
+                    </Badge>
                   </div>
 
                   <div className="border-t border-border pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">Order Status</p>
+                    {renderStatusHierarchy(order.status)}
+                  </div>
+
+                  <div className="border-t border-border pt-4 mt-4">
                     <p className="text-sm text-muted-foreground mb-2">Items</p>
                     <div className="space-y-2">
                       {order.items.map((item, index) => (
@@ -151,7 +317,7 @@ export default function OrdersPage() {
                   <div className="border-t border-border pt-4 mt-4 flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Payment Method</p>
-                      <p className="text-foreground">{order.paymentMethod === "cod" ? "Cash on Delivery" : "UPI"}</p>
+                      <p className="text-foreground">{getPaymentLabel(order.paymentMethod)}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Link

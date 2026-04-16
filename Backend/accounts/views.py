@@ -525,6 +525,56 @@ def create_order(request):
         }, status=500)
 
 
+def _serialize_customer_order(order):
+    created_at = order.get("created_at")
+    if hasattr(created_at, "isoformat"):
+        created_at = created_at.isoformat()
+
+    return {
+        "id": order.get("order_id") or str(order.get("_id", "")),
+        "_id": str(order.get("_id", "")),
+        "items": [
+            {
+                "product": item.get("name", ""),
+                "flavor": item.get("flavor", ""),
+                "weight": item.get("weight", ""),
+                "quantity": item.get("quantity", 1),
+                "price": item.get("price", 0),
+            }
+            for item in order.get("order_items", [])
+        ],
+        "total": order.get("cash_paid", 0),
+        "address": order.get("address", {}),
+        "paymentMethod": order.get("payment_method", ""),
+        "status": order.get("status", "pending"),
+        "createdAt": created_at,
+        "shippingFee": order.get("shipping_fee", 0),
+        "coinsUsed": order.get("coins_used", 0),
+        "earnedPoints": order.get("earned_points", 0),
+    }
+
+
+@api_view(['GET'])
+def my_orders(request):
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return Response({'error': 'Token required'}, status=401)
+
+        user_id = get_user_id_from_auth(auth_header)
+        orders = list(
+            orders_col.find({"user_id": str(user_id)})
+            .sort("created_at", -1)
+        )
+
+        return Response({
+            "success": True,
+            "data": [_serialize_customer_order(order) for order in orders],
+        }, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+
 
 
 

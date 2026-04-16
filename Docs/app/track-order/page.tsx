@@ -90,7 +90,7 @@ export default function TrackOrderPage() {
   const getPaymentLabel = (paymentMethod: string) => {
     switch (paymentMethod) {
       case "cod":
-        return "Cash on Delivery"
+        return "Pay on Delivery"
       case "upi":
         return "UPI"
       case "online":

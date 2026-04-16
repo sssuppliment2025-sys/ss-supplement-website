@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useToast } from "@/hooks/use-toast"
@@ -568,16 +569,17 @@ export default function CheckoutPage() {
       return
     }
 
-    if (paymentMethod !== "online") {
-      setPaymentMethod("online")
-      toast({
-        title: "Online Payment Required",
-        description: "Please pay with Razorpay to place your order.",
-      })
+    if (paymentMethod === "online") {
+      await handleOnlinePayment()
       return
     }
 
-    await handleOnlinePayment()
+    if (paymentMethod === "upi") {
+      setShowQRCode(true)
+      return
+    }
+
+    await handleSubmit()
   }
 
   /* ================= ✅ BACKEND PAYLOAD WITH CONDITIONAL SHIPPING ================= */
@@ -754,6 +756,10 @@ export default function CheckoutPage() {
             <p className="text-muted-foreground mb-6">
               Your order has been saved in our system.
             </p>
+            <div className="mb-6 rounded-lg border border-border bg-secondary/40 p-4">
+              <p className="text-sm text-muted-foreground">Order ID</p>
+              <p className="mt-1 font-mono text-2xl font-bold text-primary">{orderId}</p>
+            </div>
             
             <div className="bg-gradient-to-r from-yellow-500/10 to-success/10 border border-yellow-200/50 rounded-2xl p-6 mb-8 space-y-4">
               <div className="flex items-center justify-center gap-2 mb-2">
@@ -979,12 +985,51 @@ export default function CheckoutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-                  <p className="font-medium text-foreground">Razorpay Secure Payment</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Payment mode is fixed to online payment via Razorpay.
-                  </p>
-                </div>
+                <RadioGroup
+                  value={paymentMethod}
+                  onValueChange={(value) => setPaymentMethod(value as "cod" | "upi" | "online")}
+                  className="gap-3"
+                >
+                  <div
+                    onClick={() => setPaymentMethod("online")}
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                      paymentMethod === "online"
+                        ? "border-primary bg-primary/5"
+                        : "border-border bg-secondary/40 hover:bg-secondary"
+                    }`}
+                  >
+                    <RadioGroupItem id="payment-online" value="online" className="mt-1" />
+                    <CreditCard className="mt-0.5 h-5 w-5 text-primary" />
+                    <span className="space-y-1">
+                      <Label htmlFor="payment-online" className="block cursor-pointer font-medium text-foreground">
+                        Razorpay Secure Payment
+                      </Label>
+                      <span className="block text-sm text-muted-foreground">
+                        Pay online using UPI, cards, netbanking, EMI, or Pay Later through Razorpay.
+                      </span>
+                    </span>
+                  </div>
+
+                  <div
+                    onClick={() => setPaymentMethod("cod")}
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
+                      paymentMethod === "cod"
+                        ? "border-primary bg-primary/5"
+                        : "border-border bg-secondary/40 hover:bg-secondary"
+                    }`}
+                  >
+                    <RadioGroupItem id="payment-cod" value="cod" className="mt-1" />
+                    <Truck className="mt-0.5 h-5 w-5 text-primary" />
+                    <span className="space-y-1">
+                      <Label htmlFor="payment-cod" className="block cursor-pointer font-medium text-foreground">
+                        Pay on Delivery
+                      </Label>
+                      <span className="block text-sm text-muted-foreground">
+                        Place your order now and pay Rs.{finalTotal.toLocaleString()} when it is delivered.
+                      </span>
+                    </span>
+                  </div>
+                </RadioGroup>
               </CardContent>
             </Card>
           </div>
@@ -1043,7 +1088,7 @@ export default function CheckoutPage() {
                     </div>
                     <Checkbox
                       checked={useCoins}
-                      onCheckedChange={setUseCoins}
+                      onCheckedChange={(checked) => setUseCoins(checked === true)}
                       disabled={loadingPoints || loadingQuote || points === 0}
                     />
                   </div>
@@ -1121,7 +1166,9 @@ export default function CheckoutPage() {
                   size="lg"
                   disabled={isSubmitting || loadingPoints || loadingQuote}
                 >
-                  {`Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`}
+                  {paymentMethod === "online"
+                    ? `Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`
+                    : `Place Order - Pay on Delivery (Rs.${finalTotal.toLocaleString()})`}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">

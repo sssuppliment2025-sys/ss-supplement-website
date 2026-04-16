@@ -29,6 +29,8 @@ interface User {
   isAdmin: boolean
 }
 
+type StoredUser = User | Record<string, unknown>
+
 interface OTPData {
   name: string
   phone: string
@@ -44,7 +46,7 @@ interface AuthContextType {
   // 🔥 OTP FLOW (Frontend handles email)
   otpData: OTPData | null
   setOtpData: (data: OTPData | null) => void
-  forgotPassword: (email: string, phone: string) => Promise<{ 
+  forgotPassword: (email: string, phone?: string) => Promise<{ 
     success: boolean; 
     message: string; 
     error?: string;
@@ -69,6 +71,7 @@ interface AuthContextType {
     referralCode?: string
   ) => Promise<{ success: boolean; message: string }>
   logout: () => void
+  getAllUsers: () => StoredUser[]
   adminLogin: (phone: string, password: string) => Promise<{ success: boolean; message: string }>
 }
 
@@ -240,8 +243,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setOtpData(null) // Clear OTP data
   }
 
+  const getAllUsers = () => {
+    try {
+      const storedUsers = JSON.parse(localStorage.getItem("ss_users") || "[]")
+      if (Array.isArray(storedUsers)) {
+        return storedUsers as StoredUser[]
+      }
+    } catch {
+      return user ? [user] : []
+    }
+
+    return user ? [user] : []
+  }
+
   // 🔥 ================= FORGOT PASSWORD - GET OTP DATA =================
-  const forgotPassword = async (email: string, phone: string) => {
+  const forgotPassword = async (email: string, phone = "") => {
     console.log("🔥 forgotPassword called:", { email, phone })
     try {
       const res = await fetch(`${API_BASE}/api/auth/forgot-password/`, {
@@ -375,6 +391,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         signup,
         logout,
+        getAllUsers,
         forgotPassword,    // 🔥 UPDATED: Returns OTP data
         verifyOTP,
         resetPassword,     // 🔥 UPDATED: Clears OTP data
