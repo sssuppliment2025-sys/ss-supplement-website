@@ -1239,8 +1239,8 @@ export default function CheckoutPage() {
                   {!showPaymentStep
                     ? "Continue to Payment"
                     : paymentMethod === "online"
-                      ? `Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`
-                      : `Place Order - Pay on Delivery (Rs.${finalTotal.toLocaleString()})`}
+                      ? `Pay Now with Razorpay`
+                      : `Place Order - Pay on Delivery`}
                 </Button>
                 {isMobile && showPaymentStep ? (
                   <Button
