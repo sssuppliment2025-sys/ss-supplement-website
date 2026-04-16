@@ -9,7 +9,7 @@ const offers = [
   {
     icon: Truck,
     title: "Free Shipping",
-    description: "On orders above ₹999",
+    description: "On any product in haldia",
   },
   {
     icon: Shield,
@@ -19,7 +19,7 @@ const offers = [
   {
     icon: RefreshCw,
     title: "Easy Updates",
-    description: "24x7 support",
+    description: "11 to 11 call support",
   },
 ]
 

@@ -23,14 +23,12 @@ export default function OurStoryPage() {
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold text-foreground mb-6">Who We Are</h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                SS Supplement was founded with a simple mission: to make premium quality health supplements accessible
-                to every fitness enthusiast in India. We believe that everyone deserves access to authentic, lab-tested
-                supplements that can help them achieve their fitness goals.
+                SS Supplement was founded with a simple mission to deliver premium quality health supplements accessible to every fitness enthusiast in India. We believe that everyone deserves access to authentic, lab-tested supplements that can help them achieve their fitness goals.
+
+                
               </p>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Starting from a small shop in Gurgaon, we have grown to become one of the most trusted names in the
-                supplement industry. Our commitment to authenticity, quality, and customer satisfaction has helped us
-                build a loyal community of fitness enthusiasts across the country.
+                Driven by authenticity, quality, and customer trust, we’ve built a growing family of fitness enthusiasts across the country.
               </p>
 
               {/* Values */}

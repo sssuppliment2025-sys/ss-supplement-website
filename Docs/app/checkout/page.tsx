@@ -31,6 +31,8 @@ interface OrderQuote {
   max_coins_allowed: number
   coins_used: number
   coin_discount: number
+  payment_surcharge: number
+  payment_surcharge_rate: number
   final_total: number
   coin_value: number
   coin_percent: number
@@ -240,6 +242,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: quoteItemsPayload,
           use_coins: useCoins,
+          payment_method: paymentMethod,
         }),
       },
       "Order quote calculation"
@@ -271,7 +274,7 @@ export default function CheckoutPage() {
         setLoadingPoints(false)
         setLoadingQuote(false)
       })
-  }, [isAuthenticated, toast, useCoins, items])
+  }, [isAuthenticated, toast, useCoins, items, paymentMethod])
 
   /* ================= ✅ CONDITIONAL SHIPPING CALCULATION ================= */
   // Items subtotal only (no shipping included)
@@ -299,7 +302,12 @@ export default function CheckoutPage() {
 
   // ✅ Final payment = itemsSubtotal + shipping - coin discount
   const coinDiscount = quote?.coin_discount ?? (coinsToUse * COIN_VALUE)
-  const finalTotal = Number((quote?.final_total ?? (itemsSubtotal + shippingFee - coinDiscount)).toFixed(2))
+  const paymentSurchargeRate = quote?.payment_surcharge_rate ?? 0.015
+  const subtotalAfterDiscount = Number((itemsSubtotal + shippingFee - coinDiscount).toFixed(2))
+  const paymentSurcharge =
+    quote?.payment_surcharge ??
+    (paymentMethod === "online" ? Number((subtotalAfterDiscount * paymentSurchargeRate).toFixed(2)) : 0)
+  const finalTotal = Number((quote?.final_total ?? (subtotalAfterDiscount + paymentSurcharge)).toFixed(2))
 
   const hasEnoughForMax = points >= maxCoinsAllowed
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -397,6 +405,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             items: quoteItemsPayload,
             use_coins: useCoins,
+            payment_method: "online",
           }),
         },
         "Razorpay order creation"
@@ -1007,6 +1016,9 @@ export default function CheckoutPage() {
                       <span className="block text-sm text-muted-foreground">
                         Pay online using UPI, cards, netbanking, EMI, or Pay Later through Razorpay.
                       </span>
+                      <span className="block text-xs font-medium text-amber-700">
+                        A 1.5% Razorpay convenience charge applies to online payments.
+                      </span>
                     </span>
                   </div>
 
@@ -1143,12 +1155,23 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
+                  {paymentMethod === "online" && paymentSurcharge > 0 && (
+                    <div className="flex justify-between text-sm text-amber-700">
+                      <span>Razorpay charges (1.5%)</span>
+                      <span>₹{paymentSurcharge.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
                   <div className="h-px bg-border my-2" />
 
                   <div className="flex justify-between text-xl font-bold">
                     <span>Total to Pay</span>
                     <span className="text-2xl text-primary">₹{finalTotal.toLocaleString()}</span>
                   </div>
+                  <p className="text-xs text-center text-muted-foreground">
+                    {paymentMethod === "online"
+                      ? "Total includes a 1.5% Razorpay charge for online payments."
+                      : "No Razorpay charge is applied for Pay on Delivery."}
+                  </p>
                   {/*<p className="text-xs text-muted-foreground text-center">
                     {useCoins && coinsToUse > 0 
                       ? `${coinsToUse.toLocaleString()} coins used - ${isFreeShipping ? "FREE" : "₹50"} shipping`
@@ -1167,7 +1190,7 @@ export default function CheckoutPage() {
                   disabled={isSubmitting || loadingPoints || loadingQuote}
                 >
                   {paymentMethod === "online"
-                    ? `Pay Now with Razorpay (Rs.${finalTotal.toLocaleString()})`
+                    ? `Place Order - EMI (Rs.${finalTotal.toLocaleString()})`
                     : `Place Order - Pay on Delivery (Rs.${finalTotal.toLocaleString()})`}
                 </Button>
 

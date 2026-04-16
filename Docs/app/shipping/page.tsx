@@ -93,7 +93,7 @@ export default function ShippingPolicyPage() {
                   <h2 className="text-2xl font-bold text-foreground">3. Shipping Charges</h2>
                 </div>
                 <ul className="ml-2 list-disc space-y-2 pl-4 text-muted-foreground">
-                  <li>Free shipping is available on orders above Rs. 999 unless otherwise stated during a special promotion.</li>
+                  <li>Free shipping is available on orders above Rs. 999 unless otherwise Free during a special promotion.</li>
                   <li>Orders below the free-shipping threshold may attract a delivery charge, which will be shown at checkout before payment.</li>
                   <li>Any additional charges for remote-area delivery, reattempted delivery, or address correction may be communicated where applicable.</li>
                 </ul>

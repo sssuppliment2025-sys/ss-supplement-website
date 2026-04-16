@@ -447,7 +447,13 @@ def order_quote(request):
 
         items = data.get("items", [])
         use_coins = bool(data.get("use_coins", False))
-        quote = calculate_order_quote(items, user.get("points", 0), use_coins=use_coins)
+        payment_method = data.get("payment_method", "cod")
+        quote = calculate_order_quote(
+            items,
+            user.get("points", 0),
+            use_coins=use_coins,
+            payment_method=payment_method,
+        )
 
         return Response(
             {
@@ -461,6 +467,8 @@ def order_quote(request):
                     "max_coins_allowed": quote["max_coins_allowed"],
                     "coins_used": quote["coins_used"],
                     "coin_discount": quote["coin_discount_value"],
+                    "payment_surcharge": quote["payment_surcharge"],
+                    "payment_surcharge_rate": quote["payment_surcharge_rate"],
                     "final_total": quote["final_total"],
                     "coin_value": quote["coin_value"],
                     "coin_percent": quote["coin_percent"],
@@ -503,6 +511,8 @@ def create_order(request):
                     'cart_total_with_shipping': quote["cart_total"],
                     'coins_used': quote["coins_used"],
                     'coin_discount': quote["coin_discount_value"],
+                    'payment_surcharge': quote["payment_surcharge"],
+                    'payment_surcharge_rate': quote["payment_surcharge_rate"],
                     'final_total': quote["final_total"],
                 }
             },
@@ -610,7 +620,12 @@ def razorpay_create_order(request):
         if not user:
             return Response({'error': 'User not found'}, status=404)
 
-        quote = calculate_order_quote(items, user.get('points', 0), use_coins=use_coins)
+        quote = calculate_order_quote(
+            items,
+            user.get('points', 0),
+            use_coins=use_coins,
+            payment_method='online',
+        )
         amount_in_paise = int(round(quote['final_total'] * 100))
 
         key_id = getattr(settings, 'RAZORPAY_KEY_ID', None)
@@ -648,6 +663,8 @@ def razorpay_create_order(request):
                 'cart_total_with_shipping': quote['cart_total'],
                 'coins_used': quote['coins_used'],
                 'coin_discount': quote['coin_discount_value'],
+                'payment_surcharge': quote['payment_surcharge'],
+                'payment_surcharge_rate': quote['payment_surcharge_rate'],
             },
         }, status=201)
 
@@ -716,6 +733,8 @@ def razorpay_verify_payment(request):
                     'cart_total_with_shipping': quote['cart_total'],
                     'coins_used': quote['coins_used'],
                     'coin_discount': quote['coin_discount_value'],
+                    'payment_surcharge': quote['payment_surcharge'],
+                    'payment_surcharge_rate': quote['payment_surcharge_rate'],
                     'final_total': quote['final_total'],
                 },
             },

@@ -744,7 +744,7 @@ export default function ProductPage() {
             <div className="grid grid-cols-3 gap-4 py-4 border-t border-border">
               <div className="text-center">
                 <Truck className="h-6 w-6 text-primary mx-auto mb-1" />
-                <p className="text-xs text-muted-foreground">Free Delivery</p>
+                <p className="text-xs text-muted-foreground">1 Day Delivery</p>
               </div>
               <div className="text-center">
                 <Shield className="h-6 w-6 text-primary mx-auto mb-1" />
@@ -752,7 +752,7 @@ export default function ProductPage() {
               </div>
               <div className="text-center">
                 <RefreshCw className="h-6 w-6 text-primary mx-auto mb-1" />
-                <p className="text-xs text-muted-foreground">Easy Returns</p>
+                <p className="text-xs text-muted-foreground">100% Payback if Not Genuine</p>
               </div>
             </div>
           </div>

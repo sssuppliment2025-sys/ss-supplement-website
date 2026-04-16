@@ -7,7 +7,8 @@ from utils.jwt_helper import decode_token
 
 
 SHIPPING_THRESHOLD = 1000.0
-SHIPPING_FEE = 50.0
+SHIPPING_FEE = 0
+RAZORPAY_FEE_RATE = 0.020
 COIN_PERCENT = 0.04
 COIN_VALUE = 0.2
 EARN_PERCENT = 0.04
@@ -27,7 +28,7 @@ def _to_int(value, fallback=0):
         return fallback
 
 
-def calculate_order_quote(items, user_points, use_coins=False):
+def calculate_order_quote(items, user_points, use_coins=False, payment_method="cod"):
     if not items:
         raise ValueError("No items in order")
 
@@ -61,7 +62,13 @@ def calculate_order_quote(items, user_points, use_coins=False):
 
     coins_used = min(max(user_points, 0), max_coins_allowed) if use_coins else 0
     coin_discount_value = round(coins_used * COIN_VALUE, 2)
-    final_total = round(max(cart_total - coin_discount_value, 0.0), 2)
+    subtotal_after_discount = round(max(cart_total - coin_discount_value, 0.0), 2)
+    payment_surcharge = (
+        round(subtotal_after_discount * RAZORPAY_FEE_RATE, 2)
+        if payment_method == "online"
+        else 0.0
+    )
+    final_total = round(subtotal_after_discount + payment_surcharge, 2)
 
     earned_points = math.floor((actual_subtotal * EARN_PERCENT) / COIN_VALUE)
 
@@ -75,6 +82,8 @@ def calculate_order_quote(items, user_points, use_coins=False):
         "coin_value": COIN_VALUE,
         "coin_percent": COIN_PERCENT,
         "coin_discount_value": coin_discount_value,
+        "payment_surcharge": payment_surcharge,
+        "payment_surcharge_rate": RAZORPAY_FEE_RATE,
         "final_total": final_total,
         "earned_points": earned_points,
         "normalized_items": normalized_items,
@@ -98,7 +107,13 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
         items = data.get("items", [])
         use_coins = bool(data.get("use_coins", False))
 
-        quote = calculate_order_quote(items, user.get("points", 0), use_coins=use_coins)
+        payment_method = data.get("payment_method", "cod")
+        quote = calculate_order_quote(
+            items,
+            user.get("points", 0),
+            use_coins=use_coins,
+            payment_method=payment_method,
+        )
         coins_used = quote["coins_used"]
         earned_points = quote["earned_points"]
 
@@ -112,7 +127,6 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
 
         order_id = str(uuid.uuid4())[:8].upper()
 
-        payment_method = data.get("payment_method", "cod")
         order_status = "confirmed" if payment_method == "online" else "pending"
         created_at = datetime.utcnow()
 
@@ -126,6 +140,7 @@ def CreateOrderUser(auth_header, data, users_collection, orders_collection):
                 "cart_total": quote["cart_total"],
                 "coins_used": coins_used,
                 "coin_discount_value": quote["coin_discount_value"],
+                "payment_surcharge": quote["payment_surcharge"],
                 "cash_paid": quote["final_total"],
                 "earned_points": earned_points,
                 "order_items": quote["normalized_items"],
