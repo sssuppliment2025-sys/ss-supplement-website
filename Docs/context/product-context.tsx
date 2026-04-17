@@ -16,6 +16,7 @@ interface ProductVariant {
 
 interface ProductContextType {
   products: Product[]
+  isLoading: boolean
   addProduct: (product: Product) => void
   updateProduct: (id: string, product: Partial<Product>) => void
   deleteProduct: (id: string) => void
@@ -195,6 +196,7 @@ const normalizeProduct = (raw: unknown): Product | null => {
 
 export function ProductProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
@@ -228,6 +230,10 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         if (mounted) {
           const csvProducts = await loadProductsFromCSV()
           setProducts(csvProducts)
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
         }
       }
     }
@@ -302,6 +308,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     <ProductContext.Provider
       value={{
         products,
+        isLoading,
         addProduct,
         updateProduct,
         deleteProduct,

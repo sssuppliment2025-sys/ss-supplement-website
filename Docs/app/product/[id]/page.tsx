@@ -62,12 +62,13 @@ const razorpayAffordabilityKey = getRazorpayAffordabilityKey()
 export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
-  const { getProductById, products, getProductVariants, findProductByVariant } = useProducts()
+  const { getProductById, products, isLoading, getProductVariants, findProductByVariant } = useProducts()
   const { addToCart } = useCart()
   const { isInWishlist, toggleWishlist } = useWishlist()
   const { toast } = useToast()
 
-  const product = getProductById(params.id as string)
+  const productId = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : ""
+  const product = getProductById(productId)
 
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedFlavor, setSelectedFlavor] = useState("")
@@ -245,6 +246,21 @@ export default function ProductPage() {
     if (matchingProduct && matchingProduct.id !== product.id) {
       router.push(`/product/${matchingProduct.id}`)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">Loading Product...</h1>
+            <p className="text-muted-foreground">Please wait while we load the product details.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
   }
 
   if (!product) {
