@@ -4,7 +4,13 @@ import uuid
 from bson import ObjectId
 
 from utils.jwt_helper import decode_token
-from accounts.coupon_codes import COUPON_DISCOUNT_RATE, is_valid_coupon_code, normalize_coupon_code
+from accounts.coupon_codes import (
+    COUPON_DISCOUNT_RATE,
+    COUPON_FLAT_DISCOUNT,
+    COUPON_FLAT_DISCOUNT_THRESHOLD,
+    is_valid_coupon_code,
+    normalize_coupon_code,
+)
 
 
 SHIPPING_THRESHOLD = 0 #//shipping fee
@@ -60,7 +66,13 @@ def calculate_order_quote(items, user_points, use_coins=False, payment_method="c
 
     normalized_coupon_code = normalize_coupon_code(coupon_code)
     is_coupon_applied = is_valid_coupon_code(normalized_coupon_code)
-    coupon_discount_value = round(cart_total * COUPON_DISCOUNT_RATE, 2) if is_coupon_applied else 0.0
+    if is_coupon_applied:
+        if cart_total > COUPON_FLAT_DISCOUNT_THRESHOLD:
+            coupon_discount_value = float(COUPON_FLAT_DISCOUNT)
+        else:
+            coupon_discount_value = round(cart_total * COUPON_DISCOUNT_RATE, 2)
+    else:
+        coupon_discount_value = 0.0
 
     max_coin_discount_value = round(cart_total * COIN_PERCENT, 2)
     max_coins_allowed = math.floor(max_coin_discount_value / COIN_VALUE)
@@ -86,6 +98,8 @@ def calculate_order_quote(items, user_points, use_coins=False, payment_method="c
         "coupon_requested_code": normalized_coupon_code,
         "coupon_applied": is_coupon_applied,
         "coupon_discount_rate": COUPON_DISCOUNT_RATE,
+        "coupon_flat_discount": COUPON_FLAT_DISCOUNT,
+        "coupon_flat_discount_threshold": COUPON_FLAT_DISCOUNT_THRESHOLD,
         "coupon_discount_value": coupon_discount_value,
         "max_coins_allowed": max_coins_allowed,
         "coins_used": coins_used,

@@ -34,6 +34,8 @@ interface OrderQuote {
   coupon_applied: boolean
   coupon_discount: number
   coupon_discount_rate: number
+  coupon_flat_discount?: number
+  coupon_flat_discount_threshold?: number
   max_coins_allowed: number
   coins_used: number
   coin_discount: number
@@ -315,6 +317,13 @@ export default function CheckoutPage() {
   const couponCodeApplied = quote?.coupon_code ?? ""
   const couponRequestedCode = quote?.coupon_requested_code ?? ""
   const isCouponApplied = quote?.coupon_applied ?? false
+  const couponDiscountRate = quote?.coupon_discount_rate ?? 0.02
+  const couponFlatDiscount = quote?.coupon_flat_discount ?? 20
+  const couponFlatDiscountThreshold = quote?.coupon_flat_discount_threshold ?? 150
+  const couponBenefitText =
+    cartTotalWithShipping > couponFlatDiscountThreshold
+      ? `You get Rs.${couponFlatDiscount} off.`
+      : `You get ${(couponDiscountRate * 100).toFixed(0)}% off.`
 
   // ✅ Final payment = itemsSubtotal + shipping - coin discount
   const coinDiscount = quote?.coin_discount ?? (coinsToUse * COIN_VALUE)
@@ -1238,7 +1247,7 @@ export default function CheckoutPage() {
                     {showCouponFeedback ? (
                       <p className={`text-xs ${isCouponApplied ? "text-green-600" : "text-amber-700"}`}>
                         {isCouponApplied
-                          ? `Coupon ${couponCodeApplied} applied. You get 2% off.`
+                          ? `Coupon ${couponCodeApplied} applied. ${couponBenefitText}`
                           : `Coupon ${couponRequestedCode || appliedCouponCode || normalizedCouponInput} is not valid.`}
                       </p>
                     ) : null}
@@ -1271,7 +1280,11 @@ export default function CheckoutPage() {
 
                   {couponDiscount > 0 && (
                     <div className="flex justify-between text-green-700 font-semibold text-sm">
-                      <span>Coupon Discount (2%)</span>
+                      <span>
+                        {cartTotalWithShipping > couponFlatDiscountThreshold
+                          ? `Coupon Discount (Rs.${couponFlatDiscount})`
+                          : `Coupon Discount (${(couponDiscountRate * 100).toFixed(0)}%)`}
+                      </span>
                       <span>-₹{couponDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}

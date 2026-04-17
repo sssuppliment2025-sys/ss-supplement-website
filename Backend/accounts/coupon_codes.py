@@ -1,18 +1,21 @@
 """Central place to manage checkout coupon codes."""
 
 COUPON_DISCOUNT_RATE = 0.02
+COUPON_FLAT_DISCOUNT = 20
+COUPON_FLAT_DISCOUNT_THRESHOLD = 200
 
 # Add or remove your custom coupon codes here.
 VALID_COUPON_CODES = [
-    "TMG2",
-    "RHC2",
-    "GTW2",
-    "GKM2",
-    "GUG2",
-    "OLG2",
-    "LFG2",
+    "SUMAN20",
+    "SUMIT20",
+    "SOMNATH20",
+    "SAYAN20",
+    "DIS20",
+    "PANDA20",
+    "AVAIL202",
     "UPOLABDHI2",
     "WELCOME2",
+    "OFFER20",
 ]
 
 
