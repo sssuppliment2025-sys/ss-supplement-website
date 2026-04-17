@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
+import { ScrollToTop } from "@/components/scroll-to-top"
 import { ProductProvider } from "@/context/product-context"
 import { CartProvider } from "@/context/cart-context"
 import { WishlistProvider } from "@/context/wishlist-context"
@@ -59,6 +60,7 @@ export default function RootLayout({
           <ProductProvider>
             <CartProvider>
               <WishlistProvider>
+                <ScrollToTop />
                 {children}
                 <Toaster />
               </WishlistProvider>
