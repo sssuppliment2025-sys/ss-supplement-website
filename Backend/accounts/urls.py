@@ -19,6 +19,10 @@ urlpatterns = [
     path('orders/my/', views.my_orders, name='my_orders'),
     path('orders/razorpay/create/', views.razorpay_create_order, name='razorpay_create_order'),
     path('orders/razorpay/verify/', views.razorpay_verify_payment, name='razorpay_verify_payment'),
+    path('cart/', views.cart_collection, name='cart_collection'),
+    path('cart/items/', views.cart_item, name='cart_item'),
+    path('wishlist/', views.wishlist_collection, name='wishlist_collection'),
+    path('wishlist/items/', views.wishlist_item, name='wishlist_item'),
 
     path('auth/forgot-password/', views.forgot_password, name='forgot_password'),
     path('auth/verify-otp/', views.verify_otp, name='verify_otp'),

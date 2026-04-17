@@ -22,7 +22,7 @@ export default function WishlistPage() {
     .map((id) => getProductById(id))
     .filter((p): p is NonNullable<typeof p> => p != null)
 
-  const handleAddToCart = (productId: string) => {
+  const handleAddToCart = async (productId: string) => {
     const product = getProductById(productId)
     if (!product) return
     const flavors = product.flavors
@@ -35,7 +35,15 @@ export default function WishlistPage() {
       toast({ title: "Select variant on product page", description: "This product has options." })
       return
     }
-    addToCart(product, flavor, weight, 1)
+    const result = await addToCart(product, flavor, weight, 1)
+    if (!result.success) {
+      toast({
+        title: "Could not add to cart",
+        description: result.message || "Please try again.",
+        variant: "destructive",
+      })
+      return
+    }
     toast({ title: "Added to cart", description: product.name })
   }
 
@@ -95,7 +103,7 @@ export default function WishlistPage() {
                       size="sm"
                       variant="outline"
                       className="flex-1"
-                      onClick={() => handleAddToCart(product.id)}
+                      onClick={() => void handleAddToCart(product.id)}
                     >
                       <ShoppingCart className="h-4 w-4 mr-1" />
                       Add to Cart
@@ -104,7 +112,7 @@ export default function WishlistPage() {
                       size="sm"
                       variant="ghost"
                       className="text-muted-foreground"
-                      onClick={() => removeFromWishlist(product.id)}
+                      onClick={() => void removeFromWishlist(product.id)}
                       aria-label="Remove from wishlist"
                     >
                       <Trash2 className="h-4 w-4" />

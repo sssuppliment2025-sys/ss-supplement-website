@@ -23,7 +23,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const selectedWeight = product.weight || product.weights?.[0] || ""
   const canAddToCart = product.inStock && Boolean(selectedWeight)
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -43,7 +43,16 @@ export function ProductCard({ product }: ProductCardProps) {
       return
     }
 
-    addToCart(product, selectedFlavor, selectedWeight)
+    const result = await addToCart(product, selectedFlavor, selectedWeight)
+    if (!result.success) {
+      toast({
+        title: "Could not add to cart",
+        description: result.message || "Please try again.",
+        variant: "destructive",
+      })
+      return
+    }
+
     toast({
       title: "Added to cart",
       description: `${product.name} has been added to your cart.`,

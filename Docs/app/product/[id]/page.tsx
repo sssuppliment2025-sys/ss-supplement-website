@@ -278,7 +278,7 @@ export default function ProductPage() {
   const isOutOfStock = !product || !product.inStock
 
   // ✅ FIXED: Uses selectedWeight (user's choice)
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return
     if (isOutOfStock) {
       toast({
@@ -288,14 +288,22 @@ export default function ProductPage() {
       return
     }
 
-    addToCart(product, selectedFlavor, selectedWeight, quantity)
+    const result = await addToCart(product, selectedFlavor, selectedWeight, quantity)
+    if (!result.success) {
+      toast({
+        title: "Could not add to cart",
+        description: result.message || "Please try again.",
+        variant: "destructive",
+      })
+      return
+    }
     toast({
       title: "Added to cart",
       description: `${product.name} (${selectedFlavor}, ${selectedWeight}) added!`,
     })
   }
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!product) return
     if (isOutOfStock) {
       toast({
@@ -305,7 +313,15 @@ export default function ProductPage() {
       return
     }
 
-    addToCart(product, selectedFlavor, selectedWeight, quantity)
+    const result = await addToCart(product, selectedFlavor, selectedWeight, quantity)
+    if (!result.success) {
+      toast({
+        title: "Could not add to cart",
+        description: result.message || "Please try again.",
+        variant: "destructive",
+      })
+      return
+    }
     router.push("/cart")
   }
 
@@ -345,12 +361,21 @@ export default function ProductPage() {
     }
   }
 
-  const handleWishlistToggle = () => {
+  const handleWishlistToggle = async () => {
     if (!product?.id) return
     setWishlistPulse(true)
-    toggleWishlist(product.id)
+    const wasWishlisted = isWishlisted
+    const result = await toggleWishlist(product.id)
+    if (!result.success) {
+      toast({
+        title: "Could not update wishlist",
+        description: result.message || "Please try again.",
+        variant: "destructive",
+      })
+      return
+    }
     toast({
-      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
+      title: wasWishlisted ? "Removed from wishlist" : "Added to wishlist",
       description: product.name,
     })
   }
