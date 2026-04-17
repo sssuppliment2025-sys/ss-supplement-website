@@ -448,11 +448,13 @@ def order_quote(request):
         items = data.get("items", [])
         use_coins = bool(data.get("use_coins", False))
         payment_method = data.get("payment_method", "cod")
+        coupon_code = data.get("coupon_code", "")
         quote = calculate_order_quote(
             items,
             user.get("points", 0),
             use_coins=use_coins,
             payment_method=payment_method,
+            coupon_code=coupon_code,
         )
 
         return Response(
@@ -464,6 +466,11 @@ def order_quote(request):
                     "shipping_fee": quote["shipping_fee"],
                     "is_free_shipping": quote["is_free_shipping"],
                     "cart_total_with_shipping": quote["cart_total"],
+                    "coupon_code": quote["coupon_code"],
+                    "coupon_discount": quote["coupon_discount_value"],
+                    "coupon_discount_rate": quote["coupon_discount_rate"],
+                    "coupon_applied": quote["coupon_applied"],
+                    "coupon_requested_code": quote["coupon_requested_code"],
                     "max_coins_allowed": quote["max_coins_allowed"],
                     "coins_used": quote["coins_used"],
                     "coin_discount": quote["coin_discount_value"],
@@ -509,6 +516,8 @@ def create_order(request):
                     'items_subtotal': quote["items_subtotal"],
                     'shipping_fee': quote["shipping_fee"],
                     'cart_total_with_shipping': quote["cart_total"],
+                    'coupon_code': quote["coupon_code"],
+                    'coupon_discount': quote["coupon_discount_value"],
                     'coins_used': quote["coins_used"],
                     'coin_discount': quote["coin_discount_value"],
                     'payment_surcharge': quote["payment_surcharge"],
@@ -570,6 +579,8 @@ def _serialize_customer_order(order):
         "createdAt": created_at,
         "statusTimeline": status_timeline,
         "shippingFee": order.get("shipping_fee", 0),
+        "couponCode": order.get("coupon_code", ""),
+        "couponDiscount": order.get("coupon_discount_value", 0),
         "coinsUsed": order.get("coins_used", 0),
         "earnedPoints": order.get("earned_points", 0),
     }
@@ -614,6 +625,7 @@ def razorpay_create_order(request):
 
         items = data.get('items', [])
         use_coins = bool(data.get('use_coins', False))
+        coupon_code = data.get('coupon_code', '')
 
         user_id = get_user_id_from_auth(auth_header)
         user = users_col.find_one({'_id': ObjectId(user_id)})
@@ -625,6 +637,7 @@ def razorpay_create_order(request):
             user.get('points', 0),
             use_coins=use_coins,
             payment_method='online',
+            coupon_code=coupon_code,
         )
         amount_in_paise = int(round(quote['final_total'] * 100))
 
@@ -661,6 +674,8 @@ def razorpay_create_order(request):
                 'items_subtotal': quote['items_subtotal'],
                 'shipping_fee': quote['shipping_fee'],
                 'cart_total_with_shipping': quote['cart_total'],
+                'coupon_code': quote['coupon_code'],
+                'coupon_discount': quote['coupon_discount_value'],
                 'coins_used': quote['coins_used'],
                 'coin_discount': quote['coin_discount_value'],
                 'payment_surcharge': quote['payment_surcharge'],
@@ -693,6 +708,7 @@ def razorpay_verify_payment(request):
         items = data.get('items', [])
         use_coins = bool(data.get('use_coins', False))
         address = data.get('address', {})
+        coupon_code = data.get('coupon_code', '')
 
         if not razorpay_order_id or not razorpay_payment_id or not razorpay_signature:
             return Response({'error': 'Razorpay payment details are required'}, status=400)
@@ -714,6 +730,7 @@ def razorpay_verify_payment(request):
                 'use_coins': use_coins,
                 'payment_method': 'online',
                 'address': address,
+                'coupon_code': coupon_code,
                 'razorpay_order_id': razorpay_order_id,
                 'razorpay_payment_id': razorpay_payment_id,
                 'razorpay_signature': razorpay_signature,
@@ -731,6 +748,8 @@ def razorpay_verify_payment(request):
                     'items_subtotal': quote['items_subtotal'],
                     'shipping_fee': quote['shipping_fee'],
                     'cart_total_with_shipping': quote['cart_total'],
+                    'coupon_code': quote['coupon_code'],
+                    'coupon_discount': quote['coupon_discount_value'],
                     'coins_used': quote['coins_used'],
                     'coin_discount': quote['coin_discount_value'],
                     'payment_surcharge': quote['payment_surcharge'],

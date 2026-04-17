@@ -125,6 +125,7 @@ function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) 
             { label: "Status", value: normalizedStatus.replaceAll("_", " ") },
             { label: "Payment", value: order.payment_method.toUpperCase() },
             { label: "UTR", value: order.utr_number || "N/A" },
+            { label: "Coupon", value: order.coupon_code || "N/A" },
           ].map(item => (
             <div key={item.label} className="flex flex-col gap-0.5">
               <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{item.label}</span>
@@ -143,6 +144,8 @@ function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) 
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="text-foreground">₹{order.actual_subtotal}</span></div>
           <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className="text-foreground">₹{order.shipping_fee}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Coupon Code</span><span className="text-foreground">{order.coupon_code || "N/A"}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Coupon Discount</span><span className="text-primary">-₹{order.coupon_discount_value || 0}</span></div>
           <div className="flex justify-between"><span className="text-muted-foreground">Coins Used</span><span className="text-foreground">{order.coins_used}</span></div>
           <div className="flex justify-between"><span className="text-muted-foreground">Coin Discount</span><span className="text-primary">-₹{order.coin_discount_value}</span></div>
           <div className="flex justify-between"><span className="text-muted-foreground">Earned Points</span><span className="text-primary">+{order.earned_points}</span></div>
@@ -316,6 +319,14 @@ export function OrdersPage() {
       className: "hidden md:table-cell",
       render: (order: Order) => (
         <span className="text-sm">{order.order_items.length} item(s)</span>
+      ),
+    },
+    {
+      key: "coupon_code",
+      label: "Coupon",
+      className: "hidden lg:table-cell",
+      render: (order: Order) => (
+        <span className="text-sm font-medium">{order.coupon_code || "N/A"}</span>
       ),
     },
     {

@@ -29,6 +29,11 @@ interface OrderQuote {
   shipping_fee: number
   is_free_shipping: boolean
   cart_total_with_shipping: number
+  coupon_code: string
+  coupon_requested_code: string
+  coupon_applied: boolean
+  coupon_discount: number
+  coupon_discount_rate: number
   max_coins_allowed: number
   coins_used: number
   coin_discount: number
@@ -177,6 +182,9 @@ export default function CheckoutPage() {
   const [copied, setCopied] = useState(false)
   const [orderId, setOrderId] = useState("")
   const [showPaymentStep, setShowPaymentStep] = useState(false)
+  const [couponInput, setCouponInput] = useState("")
+  const [appliedCouponCode, setAppliedCouponCode] = useState("")
+  const [hasAppliedCouponCheck, setHasAppliedCouponCheck] = useState(false)
   const paymentSectionRef = useRef<HTMLDivElement | null>(null)
 
   const [formData, setFormData] = useState({
@@ -188,7 +196,6 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
     landmark: "",
-    uniqueCode: "",
   })
 
   useEffect(() => {
@@ -247,6 +254,7 @@ export default function CheckoutPage() {
           items: quoteItemsPayload,
           use_coins: useCoins,
           payment_method: paymentMethod,
+          coupon_code: appliedCouponCode,
         }),
       },
       "Order quote calculation"
@@ -278,7 +286,7 @@ export default function CheckoutPage() {
         setLoadingPoints(false)
         setLoadingQuote(false)
       })
-  }, [isAuthenticated, toast, useCoins, items, paymentMethod])
+  }, [isAuthenticated, toast, useCoins, items, paymentMethod, appliedCouponCode])
 
   /* ================= ✅ CONDITIONAL SHIPPING CALCULATION ================= */
   // Items subtotal only (no shipping included)
@@ -303,11 +311,15 @@ export default function CheckoutPage() {
   const cartTotalWithShipping = quote?.cart_total_with_shipping ?? localCartTotalWithShipping
   const maxCoinsAllowed = quote?.max_coins_allowed ?? 0
   const coinsToUse = quote?.coins_used ?? 0
+  const couponDiscount = quote?.coupon_discount ?? 0
+  const couponCodeApplied = quote?.coupon_code ?? ""
+  const couponRequestedCode = quote?.coupon_requested_code ?? ""
+  const isCouponApplied = quote?.coupon_applied ?? false
 
   // ✅ Final payment = itemsSubtotal + shipping - coin discount
   const coinDiscount = quote?.coin_discount ?? (coinsToUse * COIN_VALUE)
   const paymentSurchargeRate = quote?.payment_surcharge_rate ?? 0.015
-  const subtotalAfterDiscount = Number((itemsSubtotal + shippingFee - coinDiscount).toFixed(2))
+  const subtotalAfterDiscount = Number((itemsSubtotal + shippingFee - couponDiscount - coinDiscount).toFixed(2))
   const paymentSurcharge =
     quote?.payment_surcharge ??
     (paymentMethod === "online" ? Number((subtotalAfterDiscount * paymentSurchargeRate).toFixed(2)) : 0)
@@ -328,11 +340,27 @@ export default function CheckoutPage() {
   }, [isAddressComplete])
 
   const hasEnoughForMax = points >= maxCoinsAllowed
+  const normalizedCouponInput = couponInput.trim().toUpperCase()
+  const showCouponFeedback = hasAppliedCouponCheck && Boolean(appliedCouponCode)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }))
+  }
+
+  const handleApplyCoupon = () => {
+    const nextCode = normalizedCouponInput
+    setCouponInput(nextCode)
+    setAppliedCouponCode(nextCode)
+    setHasAppliedCouponCheck(Boolean(nextCode))
+
+    toast({
+      title: nextCode ? "Coupon Applied" : "Coupon Removed",
+      description: nextCode
+        ? "Checking coupon code and updating your total."
+        : "Coupon discount removed from this order.",
+    })
   }
 
   const copyUpiId = () => {
@@ -379,6 +407,7 @@ export default function CheckoutPage() {
           items: quoteItemsPayload,
           use_coins: useCoins,
           address: formData,
+          coupon_code: appliedCouponCode,
         }),
       },
       "Payment verification"
@@ -424,6 +453,7 @@ export default function CheckoutPage() {
             items: quoteItemsPayload,
             use_coins: useCoins,
             payment_method: "online",
+            coupon_code: appliedCouponCode,
           }),
         },
         "Razorpay order creation"
@@ -501,6 +531,8 @@ export default function CheckoutPage() {
               }),
               total: Number(finalTotal.toFixed(2)),
               address: formData,
+              couponCode: couponCodeApplied,
+              couponDiscount,
               paymentMethod,
               status: "paid",
               createdAt: new Date().toISOString(),
@@ -657,6 +689,7 @@ export default function CheckoutPage() {
             payment_method: paymentMethod,
             utr_number: paymentMethod === "upi" ? utrNumber : null,
             address: formData,
+            coupon_code: appliedCouponCode,
           }),
         },
         "Order creation"
@@ -719,6 +752,8 @@ export default function CheckoutPage() {
         }),
         total: Number(finalTotal.toFixed(2)),
         address: formData,
+        couponCode: couponCodeApplied,
+        couponDiscount,
         paymentMethod,
         status: "pending",
         createdAt: new Date().toISOString(),
@@ -1014,19 +1049,6 @@ export default function CheckoutPage() {
                     </div>
                   ) : null}
 
-                  <div>
-                    <Label htmlFor="uniqueCode">Coupne Code (Optional)</Label>
-                    <Input
-                      id="uniqueCode"
-                      name="uniqueCode"
-                      value={formData.uniqueCode}
-                      onChange={handleInputChange}
-                      className="mt-2 bg-secondary border-border"
-                      placeholder="Enter your unique code"
-                      disabled={!isAddressComplete}
-                    />
-                  </div>
-
                   <RadioGroup
                     value={paymentMethod}
                     onValueChange={(value) => setPaymentMethod(value as "cod" | "upi" | "online")}
@@ -1143,7 +1165,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Coins className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium">Available Coins</span>
+                      <span className="text-sm font-medium">Use Coin</span>
                     </div>
                     <Checkbox
                       checked={useCoins}
@@ -1178,6 +1200,51 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
+                <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <Label htmlFor="couponCode" className="text-sm font-medium text-foreground">
+                        Coupon Code
+                      </Label>
+                      {/* <p className="text-xs text-muted-foreground">Apply a coupon separately from coins.</p> */}
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background p-3 space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        id="couponCode"
+                        value={couponInput}
+                        onChange={(e) => {
+                          const nextValue = e.target.value
+                          setCouponInput(nextValue)
+                          if (nextValue.trim().toUpperCase() !== appliedCouponCode) {
+                            setHasAppliedCouponCheck(false)
+                          }
+                        }}
+                        className="h-9 bg-secondary border-border text-sm"
+                        placeholder="Enter coupon code"
+                        disabled={!isAddressComplete || loadingQuote}
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="h-9 px-4"
+                        onClick={handleApplyCoupon}
+                        disabled={!isAddressComplete || loadingQuote}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                    {showCouponFeedback ? (
+                      <p className={`text-xs ${isCouponApplied ? "text-green-600" : "text-amber-700"}`}>
+                        {isCouponApplied
+                          ? `Coupon ${couponCodeApplied} applied. You get 2% off.`
+                          : `Coupon ${couponRequestedCode || appliedCouponCode || normalizedCouponInput} is not valid.`}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
                 {/* Price Summary WITH CONDITIONAL SHIPPING */}
                 <div className="space-y-2 pt-2">
                   <div className="flex justify-between text-sm">
@@ -1199,6 +1266,13 @@ export default function CheckoutPage() {
                     <div className="flex justify-between text-success font-semibold text-sm">
                       <span>🪙 Coins Discount (4% max)</span>
                       <span>-₹{(coinsToUse * COIN_VALUE).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                    </div>
+                  )}
+
+                  {couponDiscount > 0 && (
+                    <div className="flex justify-between text-green-700 font-semibold text-sm">
+                      <span>Coupon Discount (2%)</span>
+                      <span>-₹{couponDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}
 

@@ -52,6 +52,8 @@ export interface Order {
   actual_subtotal: number
   shipping_fee: number
   cart_total: number
+  coupon_code?: string
+  coupon_discount_value?: number
   coins_used: number
   coin_discount_value: number
   cash_paid: number
