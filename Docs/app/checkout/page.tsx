@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
@@ -22,6 +23,7 @@ import emailjs from "@emailjs/browser"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
 const ADMIN_UPI_ID = "8001101055-5@ybl"
+const WEST_BENGAL_STATE = "West Bengal"
 
 interface OrderQuote {
   points: number
@@ -193,6 +195,7 @@ export default function CheckoutPage() {
   const [appliedCouponCode, setAppliedCouponCode] = useState("")
   const [hasAppliedCouponCheck, setHasAppliedCouponCheck] = useState(false)
   const paymentSectionRef = useRef<HTMLDivElement | null>(null)
+  const lastFetchedPincodeRef = useRef("")
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -200,18 +203,24 @@ export default function CheckoutPage() {
     email: "",
     address: "",
     city: "",
-    state: "",
+    state: WEST_BENGAL_STATE,
     pincode: "",
     landmark: "",
   })
+  const [isFetchingPincode, setIsFetchingPincode] = useState(false)
+  const [pincodeMessage, setPincodeMessage] = useState("")
 
   useEffect(() => {
     if (!user) return
+    const normalizedUserPhone = (prevPhone: string, userPhone?: string) => {
+      const source = prevPhone || userPhone || ""
+      return source.replace(/\D/g, "").slice(-10)
+    }
     setFormData((prev) => ({
       ...prev,
       fullName: prev.fullName || user.username || "",
       email: prev.email || user.email || "",
-      phone: prev.phone || user.phone || "",
+      phone: normalizedUserPhone(prev.phone, user.phone),
     }))
   }, [user])
 
@@ -338,13 +347,19 @@ export default function CheckoutPage() {
     quote?.payment_surcharge ??
     (paymentMethod === "online" ? Number((subtotalAfterDiscount * paymentSurchargeRate).toFixed(2)) : 0)
   const finalTotal = Number((quote?.final_total ?? (subtotalAfterDiscount + paymentSurcharge)).toFixed(2))
+  const phoneDigits = formData.phone.replace(/\D/g, "")
+  const isPhoneValid = phoneDigits.length === 10
+  const isEmailValid = !formData.email.trim() || formData.email.includes("@")
+  const isPincodeValid = /^\d{6}$/.test(formData.pincode.trim())
+  const isWestBengalSelected = formData.state.trim().toLowerCase() === WEST_BENGAL_STATE.toLowerCase()
   const isAddressComplete = Boolean(
     formData.fullName.trim() &&
-      formData.phone.trim() &&
+      isPhoneValid &&
       formData.address.trim() &&
       formData.city.trim() &&
-      formData.state.trim() &&
-      formData.pincode.trim()
+      isWestBengalSelected &&
+      isPincodeValid &&
+      isEmailValid
   )
 
   useEffect(() => {
@@ -357,11 +372,86 @@ export default function CheckoutPage() {
   const normalizedCouponInput = couponInput.trim().toUpperCase()
   const showCouponFeedback = hasAppliedCouponCheck && Boolean(appliedCouponCode)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    if (name === "phone") {
+      setFormData((prev) => ({
+        ...prev,
+        phone: value.replace(/\D/g, "").slice(0, 10),
+      }))
+      return
+    }
+
+    if (name === "pincode") {
+      setPincodeMessage("")
+      setFormData((prev) => ({
+        ...prev,
+        pincode: value.replace(/\D/g, "").slice(0, 6),
+      }))
+      return
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }))
   }
+
+  useEffect(() => {
+    const pincode = formData.pincode.trim()
+    if (!/^\d{6}$/.test(pincode)) {
+      setIsFetchingPincode(false)
+      setPincodeMessage("")
+      lastFetchedPincodeRef.current = ""
+      return
+    }
+
+    if (lastFetchedPincodeRef.current === pincode) return
+    lastFetchedPincodeRef.current = pincode
+
+    const fetchPincodeData = async () => {
+      setIsFetchingPincode(true)
+      setPincodeMessage("")
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+        const result = await response.json()
+        const postOffices = Array.isArray(result?.[0]?.PostOffice) ? result[0].PostOffice : []
+
+        const wbOffice = postOffices.find(
+          (office: any) => (office?.State || "").toLowerCase() === WEST_BENGAL_STATE.toLowerCase(),
+        )
+
+        if (!wbOffice) {
+          setPincodeMessage("This PIN is outside West Bengal. Please enter a West Bengal PIN.")
+          setFormData((prev) => ({
+            ...prev,
+            city: "",
+            state: WEST_BENGAL_STATE,
+          }))
+          toast({
+            title: "Invalid Delivery PIN",
+            description: "Currently, checkout address is allowed only for West Bengal PIN codes.",
+            variant: "destructive",
+          })
+          return
+        }
+
+        const autoCity = wbOffice?.District || wbOffice?.Block || wbOffice?.Name || ""
+        setFormData((prev) => ({
+          ...prev,
+          city: autoCity,
+          state: WEST_BENGAL_STATE,
+        }))
+        setPincodeMessage(`Auto-filled: ${wbOffice?.Name || autoCity}, ${WEST_BENGAL_STATE}`)
+      } catch (error) {
+        console.error("Pincode lookup failed:", error)
+        setPincodeMessage("Could not fetch location from PIN right now. Please fill city manually.")
+      } finally {
+        setIsFetchingPincode(false)
+      }
+    }
+
+    void fetchPincodeData()
+  }, [formData.pincode, toast])
 
   const handleApplyCoupon = () => {
     const nextCode = normalizedCouponInput
@@ -629,6 +719,42 @@ export default function CheckoutPage() {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!isPhoneValid) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Phone number must be exactly 10 digits.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!isEmailValid) {
+      toast({
+        title: "Invalid Email",
+        description: "Email must include '@' or leave it empty.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!isPincodeValid) {
+      toast({
+        title: "Invalid PIN Code",
+        description: "PIN code must be exactly 6 digits.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!isWestBengalSelected) {
+      toast({
+        title: "State Restriction",
+        description: "Please select West Bengal only.",
         variant: "destructive",
       })
       return
@@ -995,12 +1121,18 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
-                    <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} className="bg-secondary border-border" />
+                    <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} maxLength={10} className="bg-secondary border-border" placeholder="10-digit mobile number" />
+                    {formData.phone && !isPhoneValid ? (
+                      <p className="mt-1 text-xs text-destructive">Phone number must be exactly 10 digits.</p>
+                    ) : null}
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="email">Email (Optional)</Label>
                   <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} className="bg-secondary border-border" />
+                  {formData.email.trim() && !isEmailValid ? (
+                    <p className="mt-1 text-xs text-destructive">Email must contain '@'.</p>
+                  ) : null}
                 </div>
                 <div>
                   <Label htmlFor="address">Complete Address <span className="text-destructive">*</span></Label>
@@ -1013,11 +1145,34 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <Label htmlFor="state">State <span className="text-destructive">*</span></Label>
-                    <Input id="state" name="state" value={formData.state} onChange={handleInputChange} className="bg-secondary border-border" />
+                    <Select
+                      value={formData.state || WEST_BENGAL_STATE}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          state: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="state" className="bg-secondary border-border w-full">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value={WEST_BENGAL_STATE}>{WEST_BENGAL_STATE}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label htmlFor="pincode">Pincode <span className="text-destructive">*</span></Label>
-                    <Input id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} className="bg-secondary border-border" />
+                    <Input id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} maxLength={6} className="bg-secondary border-border" placeholder="6-digit PIN code" />
+                    {isFetchingPincode ? (
+                      <p className="mt-1 text-xs text-muted-foreground">Checking PIN and auto-filling location...</p>
+                    ) : null}
+                    {pincodeMessage ? (
+                      <p className={`mt-1 text-xs ${pincodeMessage.startsWith("Auto-filled") ? "text-green-600" : "text-destructive"}`}>
+                        {pincodeMessage}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 <div>
