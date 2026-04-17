@@ -819,7 +819,7 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
-                  <div className="border-t border-border bg-muted/10 px-5 py-4">
+                  <div className="hidden border-t border-border bg-muted/10 px-5 py-4 sm:block">
                     <div className="flex flex-wrap items-center gap-y-3 overflow-x-auto">
                       {previewSteps.map((step, index) => {
                         const StepIcon = step.icon
