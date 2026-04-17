@@ -10,6 +10,10 @@ import {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 
+const normalizePhone = (value: string) => (value || "").replace(/\D/g, "").slice(0, 10)
+const isValidPhone = (value: string) => /^\d{10}$/.test(value)
+const isValidEmail = (value: string) => (value || "").includes("@")
+
 async function parseJsonSafe(res: Response) {
   const raw = await res.text()
   try {
@@ -125,11 +129,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ================= LOGIN =================
   const login = async (phone: string, password: string) => {
+    const normalizedPhone = normalizePhone(phone)
+    if (!isValidPhone(normalizedPhone)) {
+      return { success: false, message: "Phone number must be exactly 10 digits." }
+    }
+
     try {
       const res = await fetch(`${API_BASE}/api/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify({ phone: normalizedPhone, password }),
       })
 
       const data = await parseJsonSafe(res)
@@ -157,11 +166,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ================= ADMIN LOGIN =================
   const adminLogin = async (phone: string, password: string) => {
+    const normalizedPhone = normalizePhone(phone)
+    if (!isValidPhone(normalizedPhone)) {
+      return { success: false, message: "Phone number must be exactly 10 digits." }
+    }
+
     try {
       const res = await fetch(`${API_BASE}/api/admin/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify({ phone: normalizedPhone, password }),
       })
 
       const data = await parseJsonSafe(res)
@@ -195,11 +209,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
     referralCode?: string
   ) => {
+    const normalizedPhone = normalizePhone(phone)
+    const normalizedEmail = (email || "").trim().toLowerCase()
+
+    if (!isValidPhone(normalizedPhone)) {
+      return { success: false, message: "Phone number must be exactly 10 digits." }
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+      return { success: false, message: "Please enter a valid email containing '@'." }
+    }
+
     try {
       const body: any = {
         name,
-        email,
-        phone,
+        email: normalizedEmail,
+        phone: normalizedPhone,
         password,
         confirmPassword: password,
       }

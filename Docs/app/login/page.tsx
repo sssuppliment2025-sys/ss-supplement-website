@@ -53,6 +53,10 @@ export default function LoginPage() {
     referralCode: "",
   })
 
+  const normalizePhone = (value: string) => value.replace(/\D/g, "").slice(0, 10)
+  const isValidPhone = (value: string) => /^\d{10}$/.test(value)
+  const isValidEmail = (value: string) => value.includes("@")
+
   /* ================= SAVE REFERRAL FROM URL ================= */
   useEffect(() => {
     if (refFromUrl) {
@@ -113,9 +117,18 @@ export default function LoginPage() {
   /* ================= LOGIN ================= */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoginLoading(true)
+    const normalizedPhone = normalizePhone(loginData.phone)
+    if (!isValidPhone(normalizedPhone)) {
+      toast({
+        title: "Invalid Phone",
+        description: "Phone number must be exactly 10 digits.",
+        variant: "destructive",
+      })
+      return
+    }
 
-    const result = await login(loginData.phone, loginData.password)
+    setLoginLoading(true)
+    const result = await login(normalizedPhone, loginData.password)
 
     if (result.success) {
       toast({ title: "Success", description: result.message })
@@ -134,6 +147,27 @@ export default function LoginPage() {
   /* ================= SIGNUP ================= */
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+    const normalizedPhone = normalizePhone(signupData.phone)
+    const normalizedEmail = signupData.email.trim().toLowerCase()
+
+    if (!isValidPhone(normalizedPhone)) {
+      toast({
+        title: "Invalid Phone",
+        description: "Phone number must be exactly 10 digits.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email with '@'.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setSignupLoading(true)
 
     if (signupData.password !== signupData.confirmPassword) {
@@ -148,8 +182,8 @@ export default function LoginPage() {
 
     const result = await signup(
       signupData.name.trim(),
-      signupData.email.trim(),
-      signupData.phone.trim(),
+      normalizedEmail,
+      normalizedPhone,
       signupData.password,
       signupData.referralCode || undefined
     )
@@ -161,7 +195,7 @@ export default function LoginPage() {
       localStorage.removeItem("referral_code")
 
       setActiveTab("login")
-      setLoginData({ phone: signupData.phone, password: "" })
+      setLoginData({ phone: normalizedPhone, password: "" })
     } else {
       toast({
         title: "Error",
@@ -228,11 +262,15 @@ export default function LoginPage() {
                     <div>
                       <Label>Phone</Label>
                       <Input
+                        type="tel"
+                        inputMode="numeric"
+                        maxLength={10}
+                        placeholder="10-digit phone number"
                         value={loginData.phone}
                         onChange={(e) =>
                           setLoginData({
                             ...loginData,
-                            phone: e.target.value,
+                            phone: normalizePhone(e.target.value),
                           })
                         }
                         required
@@ -319,12 +357,15 @@ export default function LoginPage() {
                       required
                     />
                     <Input
-                      placeholder="Phone"
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      placeholder="10-digit phone number"
                       value={signupData.phone}
                       onChange={(e) =>
                         setSignupData({
                           ...signupData,
-                          phone: e.target.value,
+                          phone: normalizePhone(e.target.value),
                         })
                       }
                       required
