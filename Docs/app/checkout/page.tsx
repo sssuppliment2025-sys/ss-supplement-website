@@ -151,7 +151,7 @@ const resolveEmailJsConfig = () => {
 
 // Shipping configuration
 const SHIPPING_THRESHOLD = 1000
-const SHIPPING_FEE = 50
+const SHIPPING_FEE = 0
 
 export default function CheckoutPage() {
   const router = useRouter()
