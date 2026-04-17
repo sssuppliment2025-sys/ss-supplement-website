@@ -248,38 +248,9 @@ export default function ProductPage() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-12">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Loading Product...</h1>
-            <p className="text-muted-foreground">Please wait while we load the product details.</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
-  }
-
-  if (!product) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-12">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Product Not Found</h1>
-            <Button onClick={() => router.push("/")}>Go to Homepage</Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
-  }
-
   // ✅ FIXED: Price considers BOTH flavor AND weight
   const getCurrentPrice = () => {
+    if (!product) return 0
     let price = product.price // base fallback
     
     // 1. Flavor price
@@ -298,16 +269,17 @@ export default function ProductPage() {
   const affordabilityAmount = Math.round(affordabilityTotal * 100)
 
   // Get all product images
-  const baseImages = [product.image, product.image1, product.image2, product.image3].filter(
+  const baseImages = [product?.image, product?.image1, product?.image2, product?.image3].filter(
     (img): img is string => Boolean(img),
   )
-  const dataImages = product.images?.filter((img): img is string => Boolean(img)) ?? []
+  const dataImages = product?.images?.filter((img): img is string => Boolean(img)) ?? []
   const productImages = [...new Set(dataImages.length > 0 ? dataImages : baseImages)]
   const galleryImages = productImages.length > 0 ? productImages : ["/placeholder.svg"]
-  const isOutOfStock = !product.inStock
+  const isOutOfStock = !product || !product.inStock
 
   // ✅ FIXED: Uses selectedWeight (user's choice)
   const handleAddToCart = () => {
+    if (!product) return
     if (isOutOfStock) {
       toast({
         title: "Out of stock",
@@ -324,6 +296,7 @@ export default function ProductPage() {
   }
 
   const handleBuyNow = () => {
+    if (!product) return
     if (isOutOfStock) {
       toast({
         title: "Out of stock",
@@ -337,6 +310,7 @@ export default function ProductPage() {
   }
 
   const handleShare = async () => {
+    if (!product) return
     const shareUrl = typeof window !== "undefined" ? window.location.href : `/product/${product.id}`
     const shareData = {
       title: `${product.name} | ${product.brand}`,
@@ -381,13 +355,15 @@ export default function ProductPage() {
     })
   }
 
-  const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
+  const relatedProducts = product
+    ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
+    : []
   const otherCategoryProducts = products
-    .filter((p) => p.category !== product.category)
+    .filter((p) => p.category !== product?.category)
     .sort(() => Math.random() - 0.5)
     .slice(0, 8)
   const bestSellingProducts = products
-    .filter((p) => p.id !== product.id)
+    .filter((p) => p.id !== product?.id)
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 8)
   const isWishlisted = isInWishlist(product?.id ?? "")
@@ -433,6 +409,36 @@ export default function ProductPage() {
       widgetHost.innerHTML = ""
     }
   }, [affordabilityAmount, isAffordabilityScriptReady, product?.id, quantity, selectedFlavor, selectedWeight])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">Loading Product...</h1>
+            <p className="text-muted-foreground">Please wait while we load the product details.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">Product Not Found</h1>
+            <Button onClick={() => router.push("/")}>Go to Homepage</Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background">

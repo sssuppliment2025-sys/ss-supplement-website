@@ -139,6 +139,17 @@ const toNumber = (value: unknown, fallback = 0): number => {
   return fallback
 }
 
+const toBoolean = (value: unknown, fallback = true): boolean => {
+  if (typeof value === "boolean") return value
+  if (typeof value === "number") return value !== 0
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase()
+    if (["true", "1", "yes", "y", "in stock", "instock"].includes(normalized)) return true
+    if (["false", "0", "no", "n", "out of stock", "outofstock"].includes(normalized)) return false
+  }
+  return fallback
+}
+
 const normalizeProduct = (raw: unknown): Product | null => {
   if (!raw || typeof raw !== "object") return null
   const row = raw as Record<string, unknown>
@@ -187,7 +198,7 @@ const normalizeProduct = (raw: unknown): Product | null => {
     description: typeof row.description === "string" ? row.description : "",
     keyBenefits,
     nutritionalInfo: typeof row.nutritionalInfo === "string" ? row.nutritionalInfo : "",
-    inStock: typeof row.inStock === "boolean" ? row.inStock : true,
+    inStock: toBoolean(row.inStock, true),
   }
 
   product.images = buildImagesArray(product)

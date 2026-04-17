@@ -18,6 +18,14 @@ export function RelatedProducts({
   subtitle = "Based on what you're viewing",
 }: RelatedProductsProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const visibleProducts = products.map((product, index) => {
+    const primaryFlavor = product.flavors?.[0]?.name || "default"
+    const variantKey = `${product.id}-${product.weight || "no-weight"}-${primaryFlavor}-${product.price}-${index}`
+    return {
+      product,
+      variantKey,
+    }
+  })
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -29,7 +37,7 @@ export function RelatedProducts({
     }
   }
 
-  if (products.length === 0) return null
+  if (visibleProducts.length === 0) return null
 
   return (
     <section className="mt-12 bg-card rounded-xl border border-border p-6">
@@ -63,8 +71,8 @@ export function RelatedProducts({
         className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-2 px-2"
         style={{ scrollSnapType: "x mandatory" }}
       >
-        {products.map((product) => (
-          <div key={product.id} className="flex-shrink-0 w-[220px] md:w-[250px]" style={{ scrollSnapAlign: "start" }}>
+        {visibleProducts.map(({ product, variantKey }) => (
+          <div key={variantKey} className="flex-shrink-0 w-[220px] md:w-[250px]" style={{ scrollSnapAlign: "start" }}>
             <ProductCard product={product} />
           </div>
         ))}
