@@ -103,11 +103,14 @@ async function parseJsonSafe(res: Response) {
 
 // ✅ HELPER: Enhanced fetch with better error handling
 async function fetchWithErrorContext(url: string, options: RequestInit, contextLabel: string) {
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => controller.abort(), 15000)
+
   try {
     console.log(`🔄 Fetching ${contextLabel}: ${url}`)
     const response = await fetch(url, {
       ...options,
-      signal: AbortSignal.timeout(15000), // 15s timeout
+      signal: controller.signal,
     })
     return response
   } catch (error: any) {
@@ -120,6 +123,8 @@ async function fetchWithErrorContext(url: string, options: RequestInit, contextL
       )
     }
     throw error
+  } finally {
+    window.clearTimeout(timeoutId)
   }
 }
 

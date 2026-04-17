@@ -167,23 +167,39 @@ export default function ProductPage() {
       return
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!media.matches) return
-        setShowMobileStickyActions(!entry.isIntersecting)
-      },
-      {
-        threshold: 0.2,
-      },
-    )
+    let observer: IntersectionObserver | null = null
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!media.matches) return
+          setShowMobileStickyActions(!entry.isIntersecting)
+        },
+        {
+          threshold: 0.2,
+        },
+      )
 
-    observer.observe(target)
-    media.addEventListener("change", syncForViewport)
+      observer.observe(target)
+    }
+
+    const onMediaChange = () => {
+      syncForViewport()
+    }
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", onMediaChange)
+    } else if (typeof media.addListener === "function") {
+      media.addListener(onMediaChange)
+    }
     window.addEventListener("resize", syncForViewport)
 
     return () => {
-      observer.disconnect()
-      media.removeEventListener("change", syncForViewport)
+      observer?.disconnect()
+      if (typeof media.removeEventListener === "function") {
+        media.removeEventListener("change", onMediaChange)
+      } else if (typeof media.removeListener === "function") {
+        media.removeListener(onMediaChange)
+      }
       window.removeEventListener("resize", syncForViewport)
     }
   }, [product?.id])
