@@ -150,7 +150,7 @@ const resolveEmailJsConfig = () => {
 }
 
 // Shipping configuration
-const SHIPPING_THRESHOLD = 1000
+const SHIPPING_THRESHOLD = 0      //shipping charge
 const SHIPPING_FEE = 0
 
 export default function CheckoutPage() {

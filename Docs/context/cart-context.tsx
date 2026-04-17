@@ -29,6 +29,9 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+const CART_FREE_SHIPPING_THRESHOLD = 0
+const CART_SHIPPING_FEE = 0
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
 
@@ -143,7 +146,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   
   const getShippingFee = () => {
     const subtotal = getCartSubtotal()
-    return subtotal <= 999 ? 50 : 0
+    return subtotal <= CART_FREE_SHIPPING_THRESHOLD ? CART_SHIPPING_FEE : 0
   }
 
   

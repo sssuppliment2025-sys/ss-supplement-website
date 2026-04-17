@@ -6,8 +6,8 @@ from bson import ObjectId
 from utils.jwt_helper import decode_token
 
 
-SHIPPING_THRESHOLD = 1000.0
-SHIPPING_FEE = 0
+SHIPPING_THRESHOLD = 0 #//shipping fee
+SHIPPING_FEE = 50
 RAZORPAY_FEE_RATE = 0.020
 COIN_PERCENT = 0.04
 COIN_VALUE = 0.2
