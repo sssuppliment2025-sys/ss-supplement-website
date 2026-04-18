@@ -51,7 +51,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import BaseAuthentication
-from mongo.collections import users_col, user_addresses_col, orders_col
+from mongo.collections import users_col, user_addresses_col, orders_col, carts_col, wishlists_col
 import jwt
 from django.conf import settings
 from datetime import datetime
@@ -605,6 +605,253 @@ def my_orders(request):
         }, status=200)
     except Exception as e:
         return Response({'error': str(e)}, status=500)
+
+
+MAX_SAVED_PRODUCTS_PER_USER = 10
+
+
+def _get_authenticated_user_id(request):
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        raise ValueError('Token required')
+    return str(get_user_id_from_auth(auth_header))
+
+
+def _safe_int(value, default=0):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _cart_item_key(item):
+    return (
+        str(item.get("product_id", "")),
+        str(item.get("selected_flavor", "")),
+        str(item.get("selected_weight", "")),
+    )
+
+
+def _serialize_cart_items(items):
+    serialized = []
+    for item in items:
+        serialized.append({
+            "productId": str(item.get("product_id", "")),
+            "selectedFlavor": str(item.get("selected_flavor", "")),
+            "selectedWeight": str(item.get("selected_weight", "")),
+            "quantity": max(1, _safe_int(item.get("quantity"), 1)),
+            "product": item.get("product", {}),
+        })
+    return serialized
+
+
+def _cart_unique_product_count(items):
+    return len({str(item.get("product_id", "")).strip() for item in items if str(item.get("product_id", "")).strip()})
+
+
+def _cart_response_payload(items):
+    return {
+        "items": _serialize_cart_items(items),
+        "product_count": _cart_unique_product_count(items),
+        "max_products": MAX_SAVED_PRODUCTS_PER_USER,
+    }
+
+
+@api_view(['GET', 'DELETE'])
+def cart_collection(request):
+    try:
+        user_id = _get_authenticated_user_id(request)
+
+        if request.method == 'GET':
+            cart_doc = carts_col.find_one({"user_id": user_id}) or {}
+            items = cart_doc.get("items", [])
+            if not isinstance(items, list):
+                items = []
+            return Response({"success": True, "data": _cart_response_payload(items)}, status=200)
+
+        carts_col.update_one(
+            {"user_id": user_id},
+            {"$set": {"items": [], "updated_at": datetime.utcnow()}},
+            upsert=True,
+        )
+        return Response({"success": True, "message": "Cart cleared", "data": _cart_response_payload([])}, status=200)
+
+    except ValueError as ve:
+        return Response({"success": False, "error": str(ve)}, status=401 if "Token" in str(ve) else 400)
+    except Exception as e:
+        return Response({"success": False, "error": str(e)}, status=500)
+
+
+@api_view(['POST', 'PATCH', 'DELETE'])
+def cart_item(request):
+    try:
+        user_id = _get_authenticated_user_id(request)
+
+        cart_doc = carts_col.find_one({"user_id": user_id}) or {}
+        items = cart_doc.get("items", [])
+        if not isinstance(items, list):
+            items = []
+
+        payload = request.data.get("item") if isinstance(request.data, dict) and "item" in request.data else request.data
+        if not isinstance(payload, dict):
+            payload = {}
+
+        product_id = str(payload.get("productId") or payload.get("product_id") or "").strip()
+        selected_flavor = str(payload.get("selectedFlavor") or payload.get("selected_flavor") or "")
+        selected_weight = str(payload.get("selectedWeight") or payload.get("selected_weight") or "")
+
+        if not product_id:
+            return Response({"success": False, "error": "productId is required"}, status=400)
+
+        target_index = next(
+            (idx for idx, item in enumerate(items) if _cart_item_key(item) == (product_id, selected_flavor, selected_weight)),
+            -1,
+        )
+
+        if request.method == 'POST':
+            quantity = max(1, _safe_int(payload.get("quantity"), 1))
+            product_snapshot = payload.get("product") if isinstance(payload.get("product"), dict) else {}
+
+            if target_index >= 0:
+                items[target_index]["quantity"] = max(1, _safe_int(items[target_index].get("quantity"), 1) + quantity)
+                if product_snapshot:
+                    items[target_index]["product"] = product_snapshot
+            else:
+                unique_products = {str(item.get("product_id", "")).strip() for item in items if str(item.get("product_id", "")).strip()}
+                if product_id not in unique_products and len(unique_products) >= MAX_SAVED_PRODUCTS_PER_USER:
+                    return Response(
+                        {
+                            "success": False,
+                            "error": f"You can store only {MAX_SAVED_PRODUCTS_PER_USER} products in cart.",
+                        },
+                        status=400,
+                    )
+                items.append({
+                    "product_id": product_id,
+                    "selected_flavor": selected_flavor,
+                    "selected_weight": selected_weight,
+                    "quantity": quantity,
+                    "product": product_snapshot,
+                    "updated_at": datetime.utcnow(),
+                })
+
+        elif request.method == 'PATCH':
+            quantity = _safe_int(payload.get("quantity"), 1)
+            if target_index < 0:
+                return Response({"success": False, "error": "Cart item not found"}, status=404)
+
+            if quantity <= 0:
+                items.pop(target_index)
+            else:
+                items[target_index]["quantity"] = quantity
+                items[target_index]["updated_at"] = datetime.utcnow()
+
+        else:  # DELETE
+            if target_index >= 0:
+                items.pop(target_index)
+
+        carts_col.update_one(
+            {"user_id": user_id},
+            {"$set": {"items": items, "updated_at": datetime.utcnow()}},
+            upsert=True,
+        )
+
+        return Response({"success": True, "data": _cart_response_payload(items)}, status=200)
+
+    except ValueError as ve:
+        return Response({"success": False, "error": str(ve)}, status=401 if "Token" in str(ve) else 400)
+    except Exception as e:
+        return Response({"success": False, "error": str(e)}, status=500)
+
+
+def _sanitize_wishlist_ids(product_ids):
+    if not isinstance(product_ids, list):
+        return []
+    unique_ids = []
+    seen = set()
+    for product_id in product_ids:
+        normalized = str(product_id).strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        unique_ids.append(normalized)
+    return unique_ids
+
+
+def _wishlist_response_payload(product_ids):
+    normalized_ids = _sanitize_wishlist_ids(product_ids)
+    return {
+        "product_ids": normalized_ids,
+        "product_count": len(normalized_ids),
+        "max_products": MAX_SAVED_PRODUCTS_PER_USER,
+    }
+
+
+@api_view(['GET', 'DELETE'])
+def wishlist_collection(request):
+    try:
+        user_id = _get_authenticated_user_id(request)
+
+        if request.method == 'GET':
+            wishlist_doc = wishlists_col.find_one({"user_id": user_id}) or {}
+            product_ids = _sanitize_wishlist_ids(wishlist_doc.get("product_ids", []))
+            return Response({"success": True, "data": _wishlist_response_payload(product_ids)}, status=200)
+
+        wishlists_col.update_one(
+            {"user_id": user_id},
+            {"$set": {"product_ids": [], "updated_at": datetime.utcnow()}},
+            upsert=True,
+        )
+        return Response({"success": True, "message": "Wishlist cleared", "data": _wishlist_response_payload([])}, status=200)
+
+    except ValueError as ve:
+        return Response({"success": False, "error": str(ve)}, status=401 if "Token" in str(ve) else 400)
+    except Exception as e:
+        return Response({"success": False, "error": str(e)}, status=500)
+
+
+@api_view(['POST', 'DELETE'])
+def wishlist_item(request):
+    try:
+        user_id = _get_authenticated_user_id(request)
+        payload = request.data if isinstance(request.data, dict) else {}
+        product_id = str(payload.get("productId") or payload.get("product_id") or "").strip()
+
+        if not product_id:
+            return Response({"success": False, "error": "productId is required"}, status=400)
+
+        wishlist_doc = wishlists_col.find_one({"user_id": user_id}) or {}
+        product_ids = _sanitize_wishlist_ids(wishlist_doc.get("product_ids", []))
+
+        if request.method == 'POST':
+            if product_id in product_ids:
+                return Response({"success": True, "data": _wishlist_response_payload(product_ids)}, status=200)
+
+            if len(product_ids) >= MAX_SAVED_PRODUCTS_PER_USER:
+                return Response(
+                    {
+                        "success": False,
+                        "error": f"You can store only {MAX_SAVED_PRODUCTS_PER_USER} products in wishlist.",
+                    },
+                    status=400,
+                )
+            product_ids.append(product_id)
+
+        else:  # DELETE
+            product_ids = [pid for pid in product_ids if pid != product_id]
+
+        wishlists_col.update_one(
+            {"user_id": user_id},
+            {"$set": {"product_ids": product_ids, "updated_at": datetime.utcnow()}},
+            upsert=True,
+        )
+
+        return Response({"success": True, "data": _wishlist_response_payload(product_ids)}, status=200)
+
+    except ValueError as ve:
+        return Response({"success": False, "error": str(ve)}, status=401 if "Token" in str(ve) else 400)
+    except Exception as e:
+        return Response({"success": False, "error": str(e)}, status=500)
 
 
 
