@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { Gift, Coins, Users, Share2, Copy } from "lucide-react"
+import { Gift, Coins, Share2, Copy } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import {
@@ -16,6 +16,10 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000"
+const REFERRER_REWARD = 30
+const NEW_USER_REWARD = 20
+const COIN_TO_RUPEE = 1
+const MAX_ORDER_USAGE_PERCENT = 4
 
 
 /* ================= TYPES ================= */
@@ -180,6 +184,30 @@ export default function ReferralPage() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Refer & Earn Rules</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border bg-secondary/40 p-4">
+              <p className="text-sm text-muted-foreground">Per successful referral</p>
+              <p className="mt-1 text-xl font-bold text-foreground">You get {REFERRER_REWARD} coins</p>
+            </div>
+            <div className="rounded-xl border bg-secondary/40 p-4">
+              <p className="text-sm text-muted-foreground">For every new signup with your code</p>
+              <p className="mt-1 text-xl font-bold text-foreground">New user gets {NEW_USER_REWARD} coins</p>
+            </div>
+            <div className="rounded-xl border bg-secondary/40 p-4">
+              <p className="text-sm text-muted-foreground">Coin to money ratio</p>
+              <p className="mt-1 text-xl font-bold text-foreground">1 coin = Rs. {COIN_TO_RUPEE}</p>
+            </div>
+            <div className="rounded-xl border bg-secondary/40 p-4">
+              <p className="text-sm text-muted-foreground">Maximum usable in one order</p>
+              <p className="mt-1 text-xl font-bold text-foreground">Up to {MAX_ORDER_USAGE_PERCENT}% of order value</p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* SHARE */}
         <Card>
           <CardHeader>
@@ -187,13 +215,22 @@ export default function ReferralPage() {
               <Share2 className="h-5 w-5" /> Share Referral
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <CardContent className="space-y-4">
+            <div className="rounded-xl border bg-secondary/30 p-4">
+              <p className="text-sm font-medium text-foreground">Your referral code</p>
+              <p className="mt-1 break-all font-mono text-lg text-primary">{referralCode}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Share this code or link. When a friend signs up with it, you get {REFERRER_REWARD} coins and they get {NEW_USER_REWARD} coins.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Button onClick={shareWhatsApp}>WhatsApp</Button>
             <Button onClick={shareTelegram}>Telegram</Button>
             <Button onClick={shareMessenger}>Messenger</Button>
             <Button variant="outline" onClick={copyLink}>
               <Copy className="mr-2 h-4 w-4" /> Copy Link
             </Button>
+            </div>
           </CardContent>
         </Card>
 

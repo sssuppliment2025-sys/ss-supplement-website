@@ -6,6 +6,9 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from utils.jwt import generate_tokens_for_user
 
+REFERRER_REWARD_POINTS = 30
+REFEREE_REWARD_POINTS = 20
+
 
 def _generate_referral_code():
     return f"SS{ObjectId().__str__()[-8:].upper()}"
@@ -63,13 +66,13 @@ def signup_logic(data, phone, password, name, email, referral_code):
 
                     users_col.update_one(
                         {"_id": referrer["_id"]}, 
-                        {"$inc": {"points": 100}, "$currentDate": {"updated_at": True}}
+                        {"$inc": {"points": REFERRER_REWARD_POINTS}, "$currentDate": {"updated_at": True}}
                     )
                     
 
                     users_col.update_one(
                         {"_id": ObjectId(user_id)}, 
-                        {"$inc": {"points": 50}, "$currentDate": {"updated_at": True}}
+                        {"$inc": {"points": REFEREE_REWARD_POINTS}, "$currentDate": {"updated_at": True}}
                     )
 
 
@@ -81,8 +84,8 @@ def signup_logic(data, phone, password, name, email, referral_code):
                             "phone": phone,
                             "email": email,
                         },
-                        "referrer_points": 100,
-                        "referee_points": 50,
+                        "referrer_points": REFERRER_REWARD_POINTS,
+                        "referee_points": REFEREE_REWARD_POINTS,
                         "status": "completed",
                         "created_at": datetime.utcnow(),
                     })

@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { useCart } from "@/context/cart-context"
@@ -1175,38 +1174,49 @@ export default function CheckoutPage() {
                 )}
 
                 {/* Coins Section */}
-                <div className="border border-border rounded-lg p-4 space-y-3 bg-secondary/30">
-                  <div className="flex items-center justify-between">
+                <div className="border border-border rounded-lg p-4 space-y-1 bg-secondary/30">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <Coins className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium">Use Coin</span>
+                      <div>
+                        <span className="text-sm font-medium"><p className="font-semibold text-foreground">{points.toLocaleString()} coins</p></span>
+                        {/* <p className="text-xs text-muted-foreground">1 coin = Rs. 1 • You can use up to 4% of this order</p> */}
+                      </div>
                     </div>
-                    <Checkbox
-                      checked={useCoins}
-                      onCheckedChange={(checked) => setUseCoins(checked === true)}
+                    <Button
+                      type="button"
+                      variant={useCoins ? "secondary" : "outline"}
+                      size="sm"
+                      onClick={() => setUseCoins((prev) => !prev)}
                       disabled={loadingPoints || loadingQuote || points === 0}
-                    />
+                    >
+                      {useCoins ? "Remove Coin" : "Use Coin"}
+                    </Button>
                   </div>
+
+                  <div className="rounded-lg bg-background px-3 py-2">
+                      <p className="text-xs text-muted-foreground">*1 coin = ₹1 • You can get up to 4% off using coin</p>
+                    </div>
 
                   {useCoins && points > 0 && (
                     <div className="space-y-2 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-medium text-success">
-                          Max 4% of total (₹{cartTotalWithShipping.toLocaleString()})
+                          Coin Used{/* (₹{cartTotalWithShipping.toLocaleString()}) */}
                         </span>
                         <span className="text-sm font-bold text-success">
                           {coinsToUse.toLocaleString()} coins (-₹{(coinsToUse * COIN_VALUE).toLocaleString(undefined, {maximumFractionDigits: 0})})
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Max allowed:</span>
-                        <span>{maxCoinsAllowed.toLocaleString()}</span>
+                        <span>Coin remain</span>
+                        <span>{Math.max(points - coinsToUse, 0).toLocaleString()}</span>
                       </div>
-                      {!hasEnoughForMax && (
+                      {/* {!hasEnoughForMax && (
                         <div className="text-xs text-destructive">
-                          Only {points.toLocaleString()} available (need {maxCoinsAllowed.toLocaleString()})
+                          Only {points.toLocaleString()} available
                         </div>
-                      )}
+                      )} */}
                     </div>
                   )}
                   {useCoins && points === 0 && (
@@ -1278,7 +1288,7 @@ export default function CheckoutPage() {
 
                   {useCoins && coinsToUse > 0 && (
                     <div className="flex justify-between text-success font-semibold text-sm">
-                      <span>🪙 Coins Discount (4% max)</span>
+                      <span>🪙 Coins Discount</span>
                       <span>-₹{(coinsToUse * COIN_VALUE).toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
                     </div>
                   )}
@@ -1296,7 +1306,7 @@ export default function CheckoutPage() {
 
                   {paymentMethod === "online" && paymentSurcharge > 0 && (
                     <div className="flex justify-between text-sm text-amber-700">
-                      <span>Razorpay charges (1.5%)</span>
+                      <span>Razorpay charges</span>
                       <span>₹{paymentSurcharge.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}

@@ -29,7 +29,37 @@ const DataContext = createContext<DataContextType | null>(null)
 type ApiResponse<T> = {
   success?: boolean
   data?: T
-  error?: string | { detail?: string }
+  error?: string | { detail?: string } | Record<string, unknown>
+}
+
+function getErrorMessage(error: ApiResponse<unknown>["error"]): string {
+  if (typeof error === "string") {
+    return error
+  }
+
+  if (error && typeof error === "object") {
+    if ("detail" in error && typeof error.detail === "string") {
+      return error.detail
+    }
+
+    const flattened = Object.entries(error)
+      .map(([key, value]) => {
+        if (Array.isArray(value)) {
+          return `${key}: ${value.join(", ")}`
+        }
+        if (typeof value === "string") {
+          return `${key}: ${value}`
+        }
+        return null
+      })
+      .filter((value): value is string => Boolean(value))
+
+    if (flattened.length > 0) {
+      return flattened.join(" | ")
+    }
+  }
+
+  return "Request failed"
 }
 
 async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
@@ -44,11 +74,7 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
 
   const body = (await res.json()) as ApiResponse<T>
   if (!res.ok) {
-    const detail =
-      typeof body.error === "string"
-        ? body.error
-        : body.error?.detail || "Request failed"
-    throw new Error(detail)
+    throw new Error(getErrorMessage(body.error))
   }
 
   return (body.data as T) ?? (body as T)

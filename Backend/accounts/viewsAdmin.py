@@ -59,6 +59,39 @@ def serialize_docs(docs):
     return [serialize_doc(doc) for doc in docs]
 
 
+def _normalize_optional_referral_code(value):
+    if value is None:
+        return None
+    normalized = str(value).strip().upper()
+    return normalized or None
+
+
+def _coerce_points(value, fallback=0):
+    try:
+        return max(int(value), 0)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _build_user_payload(data, *, existing_user=None):
+    payload = {}
+
+    for field in ("phone", "email", "name"):
+        if field in data and data.get(field) not in (None, ""):
+            payload[field] = data[field]
+
+    if "points" in data:
+        payload["points"] = _coerce_points(
+            data.get("points"),
+            existing_user.get("points", 0) if existing_user else 0,
+        )
+
+    if "referral_code" in data:
+        payload["referral_code"] = _normalize_optional_referral_code(data.get("referral_code"))
+
+    return payload
+
+
 ORDER_STATUS_SEQUENCE = ['pending', 'confirmed', 'packed_and_ready', 'shipped', 'out_for_delivery', 'delivered', 'cancelled']
 ORDER_TIMELINE_KEYS = ['pending', 'confirmed', 'packed_and_ready', 'shipped', 'out_for_delivery', 'delivered', 'cancelled']
 
@@ -321,18 +354,21 @@ class UserListCreateView(APIView):
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         now = datetime.now(timezone.utc)
-        user_doc = {
-            'phone': data['phone'],
-            'email': data['email'],
-            'name': data['name'],
+        user_doc = _build_user_payload(data)
+        user_doc.update({
             'password': hashed.decode('utf-8'),
-            'points': data.get('points', 0),
-            'referral_code': data.get('referral_code'),
             'created_at': now,
             'updated_at': now,
-        }
+        })
 
-        result = collection.insert_one(user_doc)
+        try:
+            result = collection.insert_one(user_doc)
+        except PyMongoError as exc:
+            return Response(
+                {'success': False, 'error': str(exc)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         user_doc['_id'] = str(result.inserted_id)
 
         return Response(
@@ -377,14 +413,25 @@ class UserDetailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        update_data = {k: v for k, v in serializer.validated_data.items() if v is not None}
+        update_data = _build_user_payload(serializer.validated_data, existing_user=user)
         update_data['updated_at'] = datetime.now(timezone.utc)
 
         collection = get_users_collection()
-        collection.update_one(
-            {'_id': ObjectId(pk)},
-            {'$set': update_data}
-        )
+        update_ops = {'$set': update_data}
+        if update_data.get('referral_code') is None:
+            update_ops['$unset'] = {'referral_code': ""}
+            del update_data['referral_code']
+
+        try:
+            collection.update_one(
+                {'_id': ObjectId(pk)},
+                update_ops
+            )
+        except PyMongoError as exc:
+            return Response(
+                {'success': False, 'error': str(exc)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         updated_user = self.get_object(pk)
         return Response({'success': True, 'data': serialize_doc(updated_user)})

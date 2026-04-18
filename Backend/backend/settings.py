@@ -175,8 +175,8 @@ SIMPLE_JWT = {
 # Referral Points
 # ---------------------------------------------------------------------------
 
-REFERRAL_POINTS_FOR_REFERRER = 100
-REFERRAL_POINTS_FOR_REFEREE = 50
+REFERRAL_POINTS_FOR_REFERRER = 30
+REFERRAL_POINTS_FOR_REFEREE = 20
 
 # ---------------------------------------------------------------------------
 # Internationalization / Static
