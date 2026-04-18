@@ -170,7 +170,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const isMobile = useIsMobile()
   const { items, clearCart } = useCart()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, loading: authLoading } = useAuth()
   const { toast } = useToast()
 
   // ✅ FLEXIBLE COINS STATE
@@ -208,6 +208,19 @@ export default function CheckoutPage() {
   })
   const [isFetchingPincode, setIsFetchingPincode] = useState(false)
   const [pincodeMessage, setPincodeMessage] = useState("")
+
+  useEffect(() => {
+    if (authLoading || orderPlaced) return
+
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/checkout")
+      return
+    }
+
+    if (items.length === 0) {
+      router.push("/cart")
+    }
+  }, [authLoading, isAuthenticated, items.length, orderPlaced, router])
 
   useEffect(() => {
     if (!user) return
@@ -923,13 +936,11 @@ export default function CheckoutPage() {
   }
 
   // Early returns
-  if (!isAuthenticated) {
-    router.push("/login?redirect=/checkout")
+  if (authLoading || !isAuthenticated) {
     return null
   }
 
   if (items.length === 0 && !orderPlaced) {
-    router.push("/cart")
     return null
   }
 
