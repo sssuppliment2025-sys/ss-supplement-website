@@ -18,7 +18,7 @@ SHIPPING_FEE = 50
 RAZORPAY_FEE_RATE = 0.020
 COIN_PERCENT = 0.04
 COIN_VALUE = 1
-EARN_PERCENT = 0.01
+EARN_PERCENT = 0
 
 
 def _to_float(value, fallback=0.0):
