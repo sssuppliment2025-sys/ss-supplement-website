@@ -35,14 +35,25 @@ export interface OrderItem {
 }
 
 export interface OrderAddress {
-  fullName: string
-  phone: string
-  email: string
-  address: string
-  city: string
-  state: string
-  pincode: string
-  landmark: string
+  fullName?: string
+  full_name?: string
+  name?: string
+  phone?: string
+  delivery_phone?: string
+  email?: string
+  address?: string
+  full_address?: string
+  flat_house?: string
+  address2?: string
+  address3?: string
+  area_street?: string
+  city?: string
+  town_city?: string
+  district?: string
+  state?: string
+  pincode?: string
+  pin_code?: string
+  landmark?: string
 }
 
 export interface Order {

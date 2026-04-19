@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 export async function GET() {
   const cookieStore = await cookies()
   const token = cookieStore.get("admin_token")?.value
-  const backendUrl = process.env.BACKEND_URL
+  const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:8000"
   const backendBase = backendUrl?.replace(/\/+$/, "")
 
   if (!token || !backendBase) {

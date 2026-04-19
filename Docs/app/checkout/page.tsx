@@ -195,6 +195,7 @@ export default function CheckoutPage() {
   const [hasAppliedCouponCheck, setHasAppliedCouponCheck] = useState(false)
   const paymentSectionRef = useRef<HTMLDivElement | null>(null)
   const lastFetchedPincodeRef = useRef("")
+  const lastAutoAddressRef = useRef("")
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -448,12 +449,27 @@ export default function CheckoutPage() {
         }
 
         const autoCity = wbOffice?.District || wbOffice?.Block || wbOffice?.Name || ""
+        const autoAddress = [
+          wbOffice?.Name,
+          wbOffice?.Block,
+          wbOffice?.District,
+        ]
+          .filter(Boolean)
+          .filter((value, index, values) => values.indexOf(value) === index)
+          .join(", ")
+
+        const previousAutoAddress = lastAutoAddressRef.current
         setFormData((prev) => ({
           ...prev,
           city: autoCity,
           state: WEST_BENGAL_STATE,
+          address:
+            !prev.address.trim() || prev.address.trim() === previousAutoAddress
+              ? autoAddress
+              : prev.address,
         }))
-        setPincodeMessage(`Auto-filled: ${wbOffice?.Name || autoCity}, ${WEST_BENGAL_STATE}`)
+        lastAutoAddressRef.current = autoAddress
+        setPincodeMessage(`Auto-filled: ${autoAddress || autoCity}, ${WEST_BENGAL_STATE}`)
       } catch (error) {
         console.error("Pincode lookup failed:", error)
         setPincodeMessage("Could not fetch location from PIN right now. Please fill city manually.")

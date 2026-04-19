@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 async function forward(request: NextRequest, method: string, path: string[]) {
   const cookieStore = await cookies()
   const token = cookieStore.get("admin_token")?.value
-  const backendUrl = process.env.BACKEND_URL?.replace(/\/+$/, "")
+  const backendUrl = (process.env.BACKEND_URL || "http://127.0.0.1:8000").replace(/\/+$/, "")
 
   if (!token) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })

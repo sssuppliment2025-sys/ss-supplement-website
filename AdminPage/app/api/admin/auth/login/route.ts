@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
-    const backendUrl = process.env.BACKEND_URL
+    const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:8000"
     const backendBase = backendUrl?.replace(/\/+$/, "")
 
     if (!backendBase) {

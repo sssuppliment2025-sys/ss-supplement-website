@@ -108,8 +108,64 @@ function parseKolkataDateTimeLocalToISOString(value: string) {
   }
 }
 
+function firstFilled(...values: Array<unknown>) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim()
+    }
+  }
+  return ""
+}
+
+function uniqueAddressParts(parts: string[]) {
+  const seen = new Set<string>()
+  return parts.filter((part) => {
+    const normalized = part.toLowerCase()
+    if (seen.has(normalized)) return false
+    seen.add(normalized)
+    return true
+  })
+}
+
+function getOrderAddress(address: Partial<Order["address"]> = {}) {
+  const fullName = firstFilled(address.fullName, address.full_name, address.name)
+  const phone = firstFilled(address.phone, address.delivery_phone)
+  const city = firstFilled(address.city, address.town_city, address.district)
+  const state = firstFilled(address.state)
+  const pincode = firstFilled(address.pincode, address.pin_code)
+  const landmark = firstFilled(address.landmark)
+  const savedFullAddress = firstFilled(address.address, address.full_address)
+
+  const addressParts = uniqueAddressParts([
+    savedFullAddress,
+    firstFilled(address.flat_house),
+    firstFilled(address.address2),
+    firstFilled(address.address3),
+    firstFilled(address.area_street),
+  ].filter(Boolean))
+
+  const completeAddress = addressParts.join(", ")
+  const cityStateLine = [
+    city,
+    state,
+    pincode ? `PIN ${pincode}` : "",
+  ].filter(Boolean).join(", ")
+
+  return {
+    fullName: fullName || "Customer",
+    phone: phone || "Phone not provided",
+    completeAddress: completeAddress || "Address not provided",
+    city: city || "City not provided",
+    state,
+    pincode,
+    cityStateLine: cityStateLine || "Location not provided",
+    landmark,
+  }
+}
+
 function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) {
   const normalizedStatus = normalizeOrderStatus(order.status)
+  const deliveryAddress = getOrderAddress(order.address)
 
   return (
     <div className="flex flex-col gap-5 max-h-[70vh] overflow-y-auto">
@@ -179,12 +235,11 @@ function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) 
           Delivery Address
         </h3>
         <div className="text-sm text-foreground leading-relaxed">
-          <p className="font-medium">{order.address.fullName}</p>
-          <p className="text-muted-foreground">{order.address.phone}</p>
-          <p className="text-muted-foreground mt-1">
-            {order.address.address}, {order.address.city}, {order.address.state} - {order.address.pincode}
-          </p>
-          {order.address.landmark && <p className="text-muted-foreground">Landmark: {order.address.landmark}</p>}
+          <p className="font-medium">{deliveryAddress.fullName}</p>
+          <p className="text-muted-foreground">{deliveryAddress.phone}</p>
+          <p className="text-muted-foreground mt-1">{deliveryAddress.completeAddress}</p>
+          <p className="text-muted-foreground">{deliveryAddress.cityStateLine}</p>
+          {deliveryAddress.landmark && <p className="text-muted-foreground">Landmark: {deliveryAddress.landmark}</p>}
         </div>
       </div>
 
@@ -306,12 +361,16 @@ export function OrdersPage() {
     {
       key: "address",
       label: "Customer",
-      render: (order: Order) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-foreground">{order.address.fullName}</span>
-          <span className="text-xs text-muted-foreground">{order.address.city}, {order.address.state}</span>
-        </div>
-      ),
+      render: (order: Order) => {
+        const deliveryAddress = getOrderAddress(order.address)
+
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium text-foreground">{deliveryAddress.fullName}</span>
+            <span className="text-xs text-muted-foreground">{deliveryAddress.cityStateLine}</span>
+          </div>
+        )
+      },
     },
     {
       key: "order_items",
