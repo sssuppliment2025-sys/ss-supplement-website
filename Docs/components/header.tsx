@@ -33,6 +33,29 @@ const categories = [
 
 const stores = ["Haldia", "Kolkata", "Raipur"]
 
+const partnerBrands = [
+  "MB",
+  "GNC",
+  "MUSCLETECH",
+  "ON",
+  "ISOPURE",
+  "LABRADA",
+  "AVVATAR",
+  "WELLBEING NUTRITION",
+  "WELLCORE",
+  "PINTOLA",
+  "FAST & UP",
+  "MAX PROTIEN",
+  "KAPIVA",
+  "PROSUPPS",
+  "RC",
+  "ATTOM",
+  "FUELONE",
+  "MC",
+  "MYFITNESS",
+  "Doctor choice",
+]
+
 export function Header() {
   const router = useRouter()
   const pathname = usePathname()
@@ -325,11 +348,21 @@ export function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/business-enquiry">
-                <Button variant="ghost" size="sm" className="text-foreground hover:text-primary">
-                  BUSINESS ENQUIRY
-                </Button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1 text-foreground hover:text-primary">
+                    ELITE PARTNER
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-card border-border w-64 max-h-96 overflow-y-auto">
+                  {partnerBrands.map((brand) => (
+                    <DropdownMenuItem key={brand} asChild>
+                      <Link href={`/brand/${encodeURIComponent(brand)}`}>{brand}</Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </li>
           </ul>
         </div>
@@ -381,9 +414,19 @@ export function Header() {
                 </Link>
               </li>
               <li>
-                <Link href="/business-enquiry" className="block py-2 text-foreground">
-                  BUSINESS ENQUIRY
-                </Link>
+                <p className="pt-2 pb-1 text-sm font-semibold text-foreground">ELITE PARTNER</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {partnerBrands.map((brand) => (
+                    <Link
+                      key={brand}
+                      href={`/brand/${encodeURIComponent(brand)}`}
+                      className="text-sm py-1 text-foreground hover:text-primary"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {brand}
+                    </Link>
+                  ))}
+                </div>
               </li>
               <li className="pt-4 border-t border-border">
                 <p className="text-sm text-muted-foreground mb-2">Categories</p>

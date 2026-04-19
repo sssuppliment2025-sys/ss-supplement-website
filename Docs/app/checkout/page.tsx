@@ -1251,13 +1251,13 @@ export default function CheckoutPage() {
                       <CreditCard className="mt-0.5 h-5 w-5 text-primary" />
                       <span className="space-y-1">
                         <Label htmlFor="payment-online" className="block cursor-pointer font-medium text-foreground">
-                          Razorpay Secure Payment
+                          Prepaid
                         </Label>
                         <span className="block text-sm text-muted-foreground">
-                          Pay online using UPI, cards, netbanking, EMI, or Pay Later through Razorpay.
+                          Pay online using UPI, cards, netbanking or EMI.
                         </span>
                         <span className="block text-xs font-medium text-amber-700">
-                          A 1.5% Razorpay convenience charge applies to online payments.
+                          A 2% convenience fee applies to online payments.
                         </span>
                       </span>
                     </div>
@@ -1472,7 +1472,7 @@ export default function CheckoutPage() {
 
                   {paymentMethod === "online" && paymentSurcharge > 0 && (
                     <div className="flex justify-between text-sm text-amber-700">
-                      <span>Razorpay charges</span>
+                      <span>Convenience fee</span>
                       <span>₹{paymentSurcharge.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}
@@ -1484,8 +1484,8 @@ export default function CheckoutPage() {
                   </div>
                   <p className="text-xs text-center text-muted-foreground">
                     {paymentMethod === "online"
-                      ? "Total includes a 1.5% Razorpay charge for online payments."
-                      : "No Razorpay charge is applied for Pay on Delivery."}
+                      ? "Total includes a 2% convenience fee for online payments."
+                      : ""}
                   </p>
                   {/*<p className="text-xs text-muted-foreground text-center">
                     {useCoins && coinsToUse > 0 
@@ -1507,7 +1507,7 @@ export default function CheckoutPage() {
                   {!showPaymentStep
                     ? "Continue to Payment"
                     : paymentMethod === "online"
-                      ? `Pay Now with Razorpay`
+                      ? `Pay Now`
                       : `Place Order - Pay on Delivery`}
                 </Button>
                 {isMobile && showPaymentStep ? (
