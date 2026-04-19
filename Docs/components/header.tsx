@@ -351,7 +351,7 @@ export function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-1 text-foreground hover:text-primary">
-                    ELITE PARTNER
+                    ELITE PARTNERS
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
