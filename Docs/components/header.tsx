@@ -127,7 +127,7 @@ export function Header() {
               Refer & Earn
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary-foreground/15 px-2 py-0.5 text-xs sm:text-sm font-bold leading-none tabular-nums">
                 <Coins className="h-3 w-3" />
-                {referralCoins.toLocaleString()}
+                ₹{referralCoins.toLocaleString()}
               </span>
             </Link>
             <span className="hidden sm:block">100% Authentic Products</span>

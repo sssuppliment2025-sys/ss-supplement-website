@@ -171,7 +171,7 @@ export default function ReferralPage() {
           <Gift className="h-10 w-10 mx-auto mb-2 text-primary" />
           <h1 className="text-3xl font-bold">Referral Dashboard</h1>
           <p className="text-muted-foreground">
-            Share your link & earn points 🚀
+            Share your link & earn points
           </p>
         </div>
 
@@ -186,7 +186,7 @@ export default function ReferralPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Refer & Earn Rules</CardTitle>
+            <CardTitle>Terms & Conditions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-xl border bg-secondary/40 p-4">
@@ -199,7 +199,7 @@ export default function ReferralPage() {
             </div>
             <div className="rounded-xl border bg-secondary/40 p-4">
               <p className="text-sm text-muted-foreground">Coin to money ratio</p>
-              <p className="mt-1 text-xl font-bold text-foreground">1 coin = Rs. {COIN_TO_RUPEE}</p>
+              <p className="mt-1 text-xl font-bold text-foreground">1 coin = ₹{COIN_TO_RUPEE}</p>
             </div>
             <div className="rounded-xl border bg-secondary/40 p-4">
               <p className="text-sm text-muted-foreground">Maximum usable in one order</p>
