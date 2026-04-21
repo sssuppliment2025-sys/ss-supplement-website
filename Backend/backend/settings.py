@@ -14,9 +14,10 @@ load_dotenv(BASE_DIR / ".env")
 # Core
 # ---------------------------------------------------------------------------
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-change-this-in-production",
+SECRET_KEY = (
+    os.environ.get("SECRET_KEY")
+    or os.environ.get("DJANGO_SECRET_KEY")
+    or "django-insecure-change-this-in-production"
 )
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
@@ -197,13 +198,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+MONGO_URI = os.getenv(
+    "MONGO_URI",
+    "mongodb+srv://sssuppliment2025_db_user:hvwSArrVRQFhEsAD@supplimentcluster.q0id4n0.mongodb.net/sssuppliment_db?retryWrites=true&w=majority",
+)
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "sssuppliment_db")
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
 
-
-SECRET_KEY = os.getenv("SECRET_KEY")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],

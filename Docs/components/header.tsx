@@ -34,26 +34,26 @@ const categories = [
 const stores = ["Haldia", "Kolkata", "Raipur"]
 
 const partnerBrands = [
-  "MB",
+  "MB( Muscleblaze)",
   "GNC",
   "MUSCLETECH",
-  "ON",
+  "ON (Optimum Nutrition)",
   "ISOPURE",
   "LABRADA",
   "AVVATAR",
-  "WELLBEING NUTRITION",
+  "WELLBEINGS NUTRITION",
   "WELLCORE",
   "PINTOLA",
   "FAST & UP",
   "MAX PROTIEN",
   "KAPIVA",
   "PROSUPPS",
-  "RC",
+  "RC(Ronnie Coleman)",
   "ATTOM",
   "FUELONE",
-  "MC",
+  "MC(Muscleclub)",
   "MYFITNESS",
-  "Doctor choice",
+  "DOCTOR'S CHOICE",
 ]
 
 export function Header() {

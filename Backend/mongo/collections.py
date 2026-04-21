@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from django.conf import settings
 
-client = MongoClient(settings.MONGO_URI)
+client = MongoClient(settings.MONGO_URI, serverSelectionTimeoutMS=5000)
 db = client[settings.MONGO_DB_NAME]
 
 users_col = db["users"]
