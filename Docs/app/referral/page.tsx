@@ -180,7 +180,7 @@ export default function ReferralPage() {
           <CardContent className="p-6 text-center">
             <Coins className="mx-auto mb-2" />
             <p className="text-3xl font-bold">{profile.points}</p>
-            <p className="text-muted-foreground">Your Points</p>
+            <p className="text-muted-foreground">Your Coins</p>
           </CardContent>
         </Card>
 
