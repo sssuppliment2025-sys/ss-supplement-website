@@ -1,6 +1,6 @@
 ﻿import Image from "next/image"
 import Link from "next/link"
-import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Send } from "lucide-react"
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Send, Heart } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
@@ -57,6 +57,9 @@ export function Footer() {
               <li><Link href="/consumer-policy" className="text-muted-foreground hover:text-primary">Consumer Policy</Link></li>
               <li><Link href="/returns" className="text-muted-foreground hover:text-primary">Cancellation & Refunds</Link></li>
               <li><Link href="/faq" className="text-muted-foreground hover:text-primary">FAQs</Link></li>
+              <li><Link href="/privacy" className="text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-muted-foreground hover:text-primary">Terms & Conditions</Link></li>
+              <li><Link href="/shipping" className="text-muted-foreground hover:text-primary">Shipping & Exchange Policy</Link></li>
             </ul>
           </div>
 
@@ -97,16 +100,33 @@ export function Footer() {
         </div>
 
         <div className="mt-8 border-t border-border pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-sm text-muted-foreground">© 2026 SS Supplements. All rights reserved.</p>
-            <div className="flex items-center gap-4 text-sm">
-              <Link href="/privacy" className="text-muted-foreground hover:text-primary">Privacy Policy</Link>
-              <Link href="/terms" className="text-muted-foreground hover:text-primary">Terms & Conditions</Link>
-              <Link href="/shipping" className="text-muted-foreground hover:text-primary">Shipping & Exchange Policy</Link>
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center justify-center gap-5 lg:flex-row lg:justify-between">
+            <p className="flex min-h-12 items-center text-center text-sm leading-none text-muted-foreground lg:text-left">
+              © 2026 SS Supplements. All rights reserved.
+            </p>
+            <div className="flex min-h-12 items-center gap-2 whitespace-nowrap leading-none">
               <span className="text-xs text-muted-foreground">FSSAI License:</span>
               <span className="text-xs text-foreground">22825162000174</span>
+            </div>
+            <div className="flex min-h-12 items-center gap-2 text-xs font-semibold text-slate-700">
+              <span className="whitespace-nowrap text-muted-foreground">Made with</span>
+              {/* <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500" /> */}
+              {/* <span>love by</span> */}
+              <a
+                href="https://www.upolabdhi.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Upolabdhi official website"
+                className="block transition-transform hover:scale-105"
+              >
+                <Image
+                  src="/upolabdhi-logo.png"
+                  alt="Upolabdhi"
+                  width={200}
+                  height={100}
+                  className="aspect-[2/1] h-10 w-20 object-contain sm:h-12 sm:w-24"
+                />
+              </a>
             </div>
           </div>
         </div>
