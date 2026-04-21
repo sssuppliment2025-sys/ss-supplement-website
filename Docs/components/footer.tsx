@@ -1,10 +1,55 @@
-﻿import Image from "next/image"
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
-import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Send, Heart } from "lucide-react"
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Send } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 export function Footer() {
+  const footerBottomRef = useRef<HTMLDivElement>(null)
+  const logoPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hasShownLogoPromptRef = useRef(false)
+  const [autoShowLogoPrompt, setAutoShowLogoPrompt] = useState(false)
+  const [isLogoHovered, setIsLogoHovered] = useState(false)
+  const isLogoPromptVisible = autoShowLogoPrompt || isLogoHovered
+
+  useEffect(() => {
+    const footerBottom = footerBottomRef.current
+
+    if (!footerBottom) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || hasShownLogoPromptRef.current) {
+          return
+        }
+
+        hasShownLogoPromptRef.current = true
+        setAutoShowLogoPrompt(true)
+        logoPromptTimerRef.current = setTimeout(() => {
+          setAutoShowLogoPrompt(false)
+        }, 10000)
+      },
+      {
+        threshold: 0.45,
+      },
+    )
+
+    observer.observe(footerBottom)
+
+    return () => {
+      observer.disconnect()
+
+      if (logoPromptTimerRef.current) {
+        clearTimeout(logoPromptTimerRef.current)
+      }
+    }
+  }, [])
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
@@ -53,7 +98,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/about" className="text-muted-foreground hover:text-primary">About Us</Link></li>
               <li><Link href="/contact" className="text-muted-foreground hover:text-primary">Contact Us</Link></li>
-              <li><Link href="/track-order" className="text-muted-foreground hover:text-primary">Track Order</Link></li>
+              {/* <li><Link href="/track-order" className="text-muted-foreground hover:text-primary">Track Order</Link></li> */}
               <li><Link href="/consumer-policy" className="text-muted-foreground hover:text-primary">Consumer Policy</Link></li>
               <li><Link href="/returns" className="text-muted-foreground hover:text-primary">Cancellation & Refunds</Link></li>
               <li><Link href="/faq" className="text-muted-foreground hover:text-primary">FAQs</Link></li>
@@ -99,7 +144,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-border pt-8">
+        <div ref={footerBottomRef} className="mt-8 border-t border-border pt-8">
           <div className="flex flex-col items-center justify-center gap-5 lg:flex-row lg:justify-between">
             <p className="flex min-h-12 items-center text-center text-sm leading-none text-muted-foreground lg:text-left">
               © 2026 SS Supplements. All rights reserved.
@@ -110,23 +155,39 @@ export function Footer() {
             </div>
             <div className="flex min-h-12 items-center gap-2 text-xs font-semibold text-slate-700">
               <span className="whitespace-nowrap text-muted-foreground">Made with</span>
-              {/* <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500" /> */}
-              {/* <span>love by</span> */}
-              <a
-                href="https://www.upolabdhi.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Visit Upolabdhi official website"
-                className="block transition-transform hover:scale-105"
+              <div
+                className="relative"
+                onMouseEnter={() => setIsLogoHovered(true)}
+                onMouseLeave={() => setIsLogoHovered(false)}
+                onFocus={() => setIsLogoHovered(true)}
+                onBlur={() => setIsLogoHovered(false)}
               >
-                <Image
-                  src="/upolabdhi-logo.png"
-                  alt="Upolabdhi"
-                  width={200}
-                  height={100}
-                  className="aspect-[2/1] h-10 w-20 object-contain sm:h-12 sm:w-24"
-                />
-              </a>
+                <div
+                  className={`pointer-events-none absolute bottom-full right-0 mb-3 w-56 rounded-md border border-primary/20 bg-background px-3 py-2 text-center text-xs font-semibold leading-snug text-foreground shadow-lg transition-all duration-300 sm:right-1/2 sm:translate-x-1/2 ${
+                    isLogoPromptVisible
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-2 opacity-0"
+                  }`}
+                >
+                  Click now and make your own web app
+                  <span className="absolute -bottom-1.5 right-8 h-3 w-3 rotate-45 border-b border-r border-primary/20 bg-background sm:right-1/2 sm:translate-x-1/2" />
+                </div>
+                <a
+                  href="https://www.upolabdhi.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Visit Upolabdhi official website"
+                  className="block transition-transform hover:scale-105"
+                >
+                  <Image
+                    src="/upolabdhi-logo.png"
+                    alt="Upolabdhi"
+                    width={200}
+                    height={100}
+                    className="aspect-[2/1] h-10 w-20 object-contain sm:h-12 sm:w-24"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>
